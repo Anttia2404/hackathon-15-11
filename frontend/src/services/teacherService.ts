@@ -7,6 +7,13 @@ export interface TeacherDashboard {
     avg_attendance: number;
     at_risk_count: number;
   };
+  // Flattened properties for easier access
+  total_students?: number;
+  average_attendance?: number;
+  avg_attendance?: number;
+  assignment_completion_rate?: number;
+  active_courses?: number;
+  at_risk_count?: number;
 }
 
 export interface AtRiskStudent {

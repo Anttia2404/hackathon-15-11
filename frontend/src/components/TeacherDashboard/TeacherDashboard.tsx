@@ -10,15 +10,7 @@ import {
 } from "lucide-react";
 import { Card } from "../ui/card";
 import { Progress } from "../ui/progress";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+
 import { useTeacherDashboard, useAtRiskStudents } from "../../hooks/useTeacher";
 import { useAuth } from "../../contexts/AuthContext";
 
@@ -60,11 +52,12 @@ export function TeacherDashboard({ onNavigate: _onNavigate }: TeacherDashboardPr
     );
   }
 
+  const stats = dashboard.statistics || {};
   const classStats = {
-    totalStudents: dashboard.total_students || 0,
-    avgAttendance: Math.round(dashboard.average_attendance || 0),
-    assignmentCompletion: dashboard.assignment_completion_rate || 0,
-    atRiskCount: atRiskStudents?.length || 0,
+    totalStudents: stats.total_students || 0,
+    avgAttendance: Math.round(stats.avg_attendance || 0),
+    assignmentCompletion: 0, // Not available yet
+    atRiskCount: stats.at_risk_count || atRiskStudents?.length || 0,
   };
 
   const engagementData = [
@@ -86,7 +79,7 @@ export function TeacherDashboard({ onNavigate: _onNavigate }: TeacherDashboardPr
           <h1 className="mb-2 text-gray-900">Teacher Dashboard</h1>
           <p className="text-gray-600">
             Chào mừng {user?.full_name || "Giảng viên"} - Quản lý{" "}
-            {dashboard.active_courses || 0} lớp học
+            {dashboard.classes?.length || 0} lớp học
           </p>
         </motion.div>
 
