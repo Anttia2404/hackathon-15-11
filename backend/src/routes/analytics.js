@@ -9,7 +9,9 @@ router.get('/optimal-time/:studentId', studyHealthController.getOptimalStudyTime
 router.get('/dashboard/:studentId', studyHealthController.getStudentDashboard);
 
 // Teacher Analytics Routes
+router.get('/teacher/:teacherId/classes', teacherAnalyticsController.getTeacherClasses);
 router.get('/class/:classId', teacherAnalyticsController.getClassAnalytics);
+router.get('/class/:classId/students', teacherAnalyticsController.getClassStudents);
 router.post('/reminder', teacherAnalyticsController.generateReminder);
 
 module.exports = router;

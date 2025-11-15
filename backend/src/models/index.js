@@ -10,11 +10,10 @@ const Class = require('./Class');
 const Deadline = require('./Deadline');
 const StudyPlan = require('./StudyPlan');
 const Quiz = require('./Quiz');
-const Discussion = require('./Discussion');
-const DiscussionResponse = require('./DiscussionResponse');
 
-// Setup associations
-const models = {
+// Export all models and sequelize instance
+module.exports = {
+  sequelize,
   User,
   Student,
   Teacher,
@@ -23,19 +22,4 @@ const models = {
   Deadline,
   StudyPlan,
   Quiz,
-  Discussion,
-  DiscussionResponse,
-};
-
-// Call associate methods if they exist
-Object.keys(models).forEach((modelName) => {
-  if (models[modelName].associate) {
-    models[modelName].associate(models);
-  }
-});
-
-// Export all models and sequelize instance
-module.exports = {
-  sequelize,
-  ...models,
 };

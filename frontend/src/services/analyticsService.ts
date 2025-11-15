@@ -152,5 +152,37 @@ export const analyticsService = {
         timestamp: new Date()
       };
     }
+  },
+
+  /**
+   * Get all students in a class
+   */
+  async getClassStudents(classId: string): Promise<any> {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/analytics/class/${classId}/students`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching class students:', error);
+      return {
+        students: [],
+        total: 0
+      };
+    }
+  },
+
+  /**
+   * Get all classes taught by a teacher
+   */
+  async getTeacherClasses(teacherId: string): Promise<any> {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/analytics/teacher/${teacherId}/classes`);
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching teacher classes:', error);
+      return {
+        classes: [],
+        total: 0
+      };
+    }
   }
 };

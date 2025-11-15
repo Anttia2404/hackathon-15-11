@@ -25,16 +25,55 @@ export function TeacherDashboard() {
   const [customMessage, setCustomMessage] = useState('');
   const [sendingCustom, setSendingCustom] = useState(false);
   const [showStudentList, setShowStudentList] = useState(false);
+  const [allStudents, setAllStudents] = useState<any[]>([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [teacherClasses, setTeacherClasses] = useState<any[]>([]);
+  const [selectedClassId, setSelectedClassId] = useState<string>('');
+  const [loadingClasses, setLoadingClasses] = useState(true);
   
-  // Hardcoded classId - in production, get from auth context or props
-  const classId = '1';
+  // Get teacher info from localStorage
+  const userStr = localStorage.getItem('user');
+  const user = userStr ? JSON.parse(userStr) : null;
+  const teacherId = user?.teacher_id;
 
-  // Fetch real data from PostgreSQL
+  // Fetch teacher's classes
+  useEffect(() => {
+    const fetchTeacherClasses = async () => {
+      if (!teacherId) {
+        setLoadingClasses(false);
+        return;
+      }
+
+      try {
+        setLoadingClasses(true);
+        const data = await analyticsService.getTeacherClasses(teacherId);
+        setTeacherClasses(data.classes || []);
+        
+        // Auto-select first class if available
+        if (data.classes && data.classes.length > 0) {
+          setSelectedClassId(data.classes[0].class_id);
+        }
+      } catch (error) {
+        console.error('Error fetching teacher classes:', error);
+      } finally {
+        setLoadingClasses(false);
+      }
+    };
+
+    fetchTeacherClasses();
+  }, [teacherId]);
+
+  // Fetch class analytics when class is selected
   useEffect(() => {
     const fetchClassAnalytics = async () => {
+      if (!selectedClassId) {
+        setLoading(false);
+        return;
+      }
+
       try {
         setLoading(true);
-        const data = await analyticsService.getClassAnalytics(classId);
+        const data = await analyticsService.getClassAnalytics(selectedClassId);
         setClassData(data);
       } catch (error) {
         console.error('Error fetching class analytics:', error);
@@ -44,13 +83,40 @@ export function TeacherDashboard() {
     };
 
     fetchClassAnalytics();
-  }, [classId]);
+  }, [selectedClassId]);
+
+  // Fetch all students when showing student list
+  useEffect(() => {
+    const fetchAllStudents = async () => {
+      if (showStudentList && allStudents.length === 0 && selectedClassId) {
+        try {
+          setLoadingStudents(true);
+          const data = await analyticsService.getClassStudents(selectedClassId);
+          setAllStudents(data.students || []);
+        } catch (error) {
+          console.error('Error fetching all students:', error);
+        } finally {
+          setLoadingStudents(false);
+        }
+      }
+    };
+
+    fetchAllStudents();
+  }, [showStudentList, selectedClassId, allStudents.length]);
+
+  // Reset students list when changing class
+  useEffect(() => {
+    setAllStudents([]);
+    setShowStudentList(false);
+  }, [selectedClassId]);
 
   // Poll for help requests every 5 seconds
   useEffect(() => {
+    if (!selectedClassId) return;
+
     const fetchHelpRequests = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/notifications/help-requests/${classId}`);
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/notifications/help-requests/${selectedClassId}`);
         if (response.ok) {
           const data = await response.json();
           setHelpRequests(data.requests || []);
@@ -64,11 +130,16 @@ export function TeacherDashboard() {
     const interval = setInterval(fetchHelpRequests, 5000); // Poll every 5 seconds
 
     return () => clearInterval(interval);
-  }, [classId]);
+  }, [selectedClassId]);
 
   const handleSendCustomMessage = async () => {
     if (!customMessage.trim()) {
       alert('Vui lòng nhập nội dung tin nhắn!');
+      return;
+    }
+
+    if (!selectedClassId) {
+      alert('Vui lòng chọn lớp học!');
       return;
     }
 
@@ -80,9 +151,9 @@ export function TeacherDashboard() {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          classId,
+          classId: selectedClassId,
           message: customMessage,
-          teacherName: 'Giảng viên Nguyễn',
+          teacherName: user?.full_name || 'Giảng viên',
           type: 'announcement'
         }),
       });
@@ -99,12 +170,47 @@ export function TeacherDashboard() {
     }
   };
 
+  if (!teacherId) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
+          <p className="text-red-600 mb-4">Vui lòng đăng nhập với tài khoản giáo viên</p>
+          <Button onClick={() => window.location.href = '/'}>Về trang chủ</Button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loadingClasses) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Đang tải danh sách lớp học...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (teacherClasses.length === 0) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
+          <p className="text-gray-600 mb-4">Bạn chưa được phân công dạy lớp nào</p>
+          <Button onClick={() => window.location.reload()}>Làm mới</Button>
+        </div>
+      </div>
+    );
+  }
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-          <p className="text-gray-600">Đang tải dữ liệu từ database...</p>
+          <p className="text-gray-600">Đang tải dữ liệu lớp học...</p>
         </div>
       </div>
     );
@@ -166,10 +272,10 @@ export function TeacherDashboard() {
           animate={{ opacity: 1, y: 0 }}
           className="mb-8"
         >
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="mb-2 text-gray-900">Dashboard Giảng viên 👨‍🏫</h1>
-              <p className="text-gray-600">Quản lý và theo dõi tiến độ học tập của sinh viên</p>
+              <p className="text-gray-600">Xin chào, {user?.full_name}! Quản lý và theo dõi tiến độ học tập của sinh viên</p>
             </div>
             <div className="flex items-center gap-3">
               {helpRequests.length > 0 && (
@@ -183,11 +289,28 @@ export function TeacherDashboard() {
                   <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full animate-ping" />
                 </div>
               )}
-              <div className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg">
-                <span className="font-medium">
-                  Lớp: {classData.overview.class_code} - {classData.overview.course_name}
-                </span>
-              </div>
+            </div>
+          </div>
+
+          {/* Class Selector */}
+          <div className="flex items-center gap-3 p-4 bg-white rounded-xl border-2 border-blue-200">
+            <Users className="w-5 h-5 text-blue-600" />
+            <span className="text-gray-700 font-medium">Chọn lớp học:</span>
+            <select
+              value={selectedClassId}
+              onChange={(e) => setSelectedClassId(e.target.value)}
+              className="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+              {teacherClasses.map((cls: any) => (
+                <option key={cls.class_id} value={cls.class_id}>
+                  {cls.class_code} - {cls.course_name} ({cls.student_count} sinh viên) - {cls.semester} {cls.year}
+                </option>
+              ))}
+            </select>
+            <div className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg">
+              <span className="font-medium">
+                {teacherClasses.length} lớp
+              </span>
             </div>
           </div>
         </motion.div>
@@ -471,49 +594,49 @@ export function TeacherDashboard() {
               {showStudentList && (
                 <div className="mt-4 p-4 bg-white rounded-xl border-2 border-blue-200">
                   <h4 className="font-medium text-gray-900 mb-3">
-                    Danh sách sinh viên ({classStats.totalStudents} sinh viên)
+                    Danh sách sinh viên ({allStudents.length > 0 ? allStudents.length : classStats.totalStudents} sinh viên)
                   </h4>
-                  <div className="space-y-2 max-h-96 overflow-y-auto">
-                    {studentsNeedHelp.map((student: any, idx: number) => (
-                      <div key={idx} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium">
-                              {idx + 1}
-                            </div>
-                            <div>
-                              <p className="font-medium text-gray-900">{student.name}</p>
-                              <p className="text-xs text-gray-500">SV00{idx + 1}</p>
+                  {loadingStudents ? (
+                    <div className="flex items-center justify-center py-8">
+                      <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+                      <span className="ml-2 text-gray-600">Đang tải danh sách...</span>
+                    </div>
+                  ) : allStudents.length > 0 ? (
+                    <div className="space-y-2 max-h-96 overflow-y-auto">
+                      {allStudents.map((student: any, idx: number) => {
+                        const studyHealth = student.study_health || 0;
+                        const isAtRisk = studyHealth < 60;
+                        const bgColor = isAtRisk ? 'bg-red-50' : studyHealth >= 80 ? 'bg-green-50' : 'bg-gray-50';
+                        const iconBg = isAtRisk ? 'bg-red-100 text-red-600' : studyHealth >= 80 ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600';
+                        const healthColor = isAtRisk ? 'text-red-600' : studyHealth >= 80 ? 'text-green-600' : 'text-gray-900';
+                        
+                        return (
+                          <div key={student.student_id} className={`p-3 ${bgColor} rounded-lg hover:bg-opacity-80 transition-colors`}>
+                            <div className="flex items-center justify-between">
+                              <div className="flex items-center gap-3">
+                                <div className={`w-8 h-8 ${iconBg} rounded-full flex items-center justify-center font-medium text-sm`}>
+                                  {idx + 1}
+                                </div>
+                                <div>
+                                  <p className="font-medium text-gray-900">{student.full_name}</p>
+                                  <p className="text-xs text-gray-500">{student.student_code}</p>
+                                </div>
+                              </div>
+                              <div className="text-right">
+                                <p className={`text-sm font-medium ${healthColor}`}>{studyHealth}/100</p>
+                                <p className="text-xs text-gray-500">Study Health</p>
+                              </div>
                             </div>
                           </div>
-                          <div className="text-right">
-                            <p className="text-sm font-medium text-gray-900">{student.studyHealth}/100</p>
-                            <p className="text-xs text-gray-500">Study Health</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                    {/* Add more mock students */}
-                    {Array.from({ length: Math.max(0, classStats.totalStudents - studentsNeedHelp.length) }).map((_, idx) => (
-                      <div key={`extra-${idx}`} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
-                        <div className="flex items-center justify-between">
-                          <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-medium">
-                              {studentsNeedHelp.length + idx + 1}
-                            </div>
-                            <div>
-                              <p className="font-medium text-gray-900">Sinh viên {studentsNeedHelp.length + idx + 1}</p>
-                              <p className="text-xs text-gray-500">SV0{studentsNeedHelp.length + idx + 1}</p>
-                            </div>
-                          </div>
-                          <div className="text-right">
-                            <p className="text-sm font-medium text-green-600">{Math.floor(Math.random() * 20) + 75}/100</p>
-                            <p className="text-xs text-gray-500">Study Health</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <div className="text-center py-8 text-gray-500">
+                      <Users className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                      <p>Chưa có sinh viên trong lớp</p>
+                    </div>
+                  )}
                 </div>
               )}
             </Card>

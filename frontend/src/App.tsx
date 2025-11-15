@@ -40,9 +40,14 @@ function AppContent() {
     }
   };
 
-  // Show login page if not authenticated
-  if (!isAuthenticated) {
+  // Show login page only when explicitly navigated to
+  if (currentPage === "login") {
     return <LoginPage onLoginSuccess={handleLoginSuccess} />;
+  }
+
+  // Redirect to home if not authenticated and trying to access protected pages
+  if (!isAuthenticated && currentPage !== "home") {
+    setCurrentPage("home");
   }
 
   const renderPage = () => {
@@ -58,7 +63,7 @@ function AppContent() {
       case "join-discussion":
         return <JoinDiscussion />;
       case "teacher-dashboard":
-        return <TeacherDashboard onNavigate={handleNavigate} />;
+        return <TeacherDashboard />;
       case "teacher-classes":
         return <TeacherClassManagement />;
       case "interactive-classroom":
@@ -72,11 +77,14 @@ function AppContent() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navigation
-        currentPage={currentPage}
-        onNavigate={handleNavigate}
-        userType={userType}
-      />
+      {/* Show Navigation on all pages except login */}
+      {currentPage !== "login" && (
+        <Navigation
+          currentPage={currentPage}
+          onNavigate={handleNavigate}
+          userType={userType}
+        />
+      )}
       {renderPage()}
     </div>
   );

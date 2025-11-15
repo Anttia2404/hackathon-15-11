@@ -24,7 +24,7 @@ export function Navigation({
   onNavigate,
   userType,
 }: NavigationProps) {
-  const { user, logout } = useAuth();
+  const { user, logout, isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
 
@@ -127,9 +127,10 @@ export function Navigation({
             </div>
           )}
 
-          {/* User Info & Logout */}
-          {userType && user && (
-            <div className="flex items-center gap-3">
+          {/* Right Side - User Info or Login Button */}
+          <div className="flex items-center gap-3">
+            {isAuthenticated && user ? (
+              <>
               {/* Notification Bell for Students */}
               {userType === 'student' && (
                 <div className="relative">
@@ -177,13 +178,24 @@ export function Navigation({
                 variant="outline"
                 size="sm"
                 onClick={handleLogout}
-                className="gap-2"
+                className="gap-2 hover:bg-red-50 hover:text-red-600 hover:border-red-300 transition-all"
               >
                 <LogOut className="w-4 h-4" />
                 Đăng xuất
               </Button>
-            </div>
-          )}
+              </>
+            ) : (
+              /* Login Button - Show when not authenticated */
+              <Button
+                size="sm"
+                onClick={() => onNavigate("login")}
+                className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md hover:shadow-lg transition-all duration-300 px-6"
+              >
+                <LogOut className="w-4 h-4 rotate-180" />
+                Đăng nhập
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </nav>

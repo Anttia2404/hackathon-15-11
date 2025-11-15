@@ -152,7 +152,116 @@ const generateReminder = async (req, res) => {
   }
 };
 
+/**
+ * Get all students in a class
+ */
+const getClassStudents = async (req, res) => {
+  try {
+    const { classId } = req.params;
+
+    // First, check if class exists
+    const classCheck = await sequelize.query(
+      'SELECT class_id, class_code FROM classes WHERE class_id = $1',
+      {
+        bind: [classId],
+        type: sequelize.QueryTypes.SELECT
+      }
+    );
+
+    if (classCheck.length === 0) {
+      return res.status(404).json({ error: 'Class not found' });
+    }
+
+    // Simplified query to get basic student info
+    const studentsQuery = `
+      SELECT 
+        s.student_id,
+        s.student_code,
+        u.full_name,
+        u.email,
+        COALESCE(
+          (SELECT shs2.overall_score 
+           FROM study_health_scores shs2 
+           WHERE shs2.student_id = s.student_id 
+           ORDER BY shs2.score_date DESC 
+           LIMIT 1), 
+          0
+        ) as study_health,
+        ce.enrolled_at
+      FROM students s
+      JOIN users u ON s.user_id = u.user_id
+      JOIN class_enrollments ce ON s.student_id = ce.student_id
+      WHERE ce.class_id = $1
+        AND ce.status = 'active'
+      ORDER BY u.full_name ASC
+    `;
+
+    const students = await sequelize.query(studentsQuery, {
+      bind: [classId],
+      type: sequelize.QueryTypes.SELECT
+    });
+
+    res.json({
+      students: students,
+      total: students.length
+    });
+
+  } catch (error) {
+    console.error('Error getting class students:', error);
+    console.error('Error details:', error.message);
+    res.status(500).json({ 
+      error: 'Failed to get class students',
+      details: error.message 
+    });
+  }
+};
+
+/**
+ * Get all classes taught by a teacher
+ */
+const getTeacherClasses = async (req, res) => {
+  try {
+    const { teacherId } = req.params;
+
+    const classesQuery = `
+      SELECT 
+        c.class_id,
+        c.class_code,
+        co.course_name,
+        c.semester,
+        c.year,
+        c.room,
+        COUNT(DISTINCT ce.student_id) as student_count
+      FROM classes c
+      JOIN courses co ON c.course_id = co.course_id
+      LEFT JOIN class_enrollments ce ON c.class_id = ce.class_id AND ce.status = 'active'
+      WHERE c.teacher_id = $1
+      GROUP BY c.class_id, c.class_code, co.course_name, c.semester, c.year, c.room
+      ORDER BY c.year DESC, c.semester DESC, c.class_code ASC
+    `;
+
+    const classes = await sequelize.query(classesQuery, {
+      bind: [teacherId],
+      type: sequelize.QueryTypes.SELECT
+    });
+
+    res.json({
+      classes: classes,
+      total: classes.length
+    });
+
+  } catch (error) {
+    console.error('Error getting teacher classes:', error);
+    res.status(500).json({ 
+      error: 'Failed to get teacher classes',
+      details: error.message 
+    });
+  }
+};
+
 module.exports = {
   getClassAnalytics,
-  generateReminder
+  generateReminder,
+  getClassStudents,
+  getTeacherClasses
 };
