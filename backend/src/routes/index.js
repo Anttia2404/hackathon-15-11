@@ -12,6 +12,7 @@ const timetableRoutes = require('./timetableRoutes');
 const deadlineRoutes = require('./deadlineRoutes');
 const studyPlanRoutes = require('./studyPlanRoutes');
 const preferencesRoutes = require('./preferencesRoutes');
+const studyRoomRoutes = require('./studyRoomRoutes');
 
 const router = express.Router();
 
@@ -29,6 +30,7 @@ router.use('/timetable', timetableRoutes);
 router.use('/deadlines', deadlineRoutes);
 router.use('/study-plans', studyPlanRoutes);
 router.use('/preferences', preferencesRoutes);
+router.use('/study-rooms', studyRoomRoutes);
 
 // Health check
 router.get('/health', (req, res) => {

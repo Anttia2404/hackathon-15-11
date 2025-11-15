@@ -101,6 +101,7 @@ export function ScheduleGeneratorTab({
           
           const plansRes = await api.studyPlans.load(undefined, today, endDate.toISOString().split('T')[0]);
           console.log('📦 API response:', plansRes);
+          console.log('📦 Plans data:', JSON.stringify(plansRes.plans, null, 2));
           
           if (plansRes.success && plansRes.plans && plansRes.plans.length > 0) {
             console.log('📥 Loading plans from DB:', plansRes.plans.length, 'days');
@@ -108,7 +109,7 @@ export function ScheduleGeneratorTab({
             // Group plans by week
             const weekMap = new Map();
             
-            plansRes.plans.forEach(plan => {
+            plansRes.plans.forEach((plan: any) => {
               const planDate = new Date(plan.plan_date);
               const dayName = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'][planDate.getDay()];
               
@@ -136,14 +137,32 @@ export function ScheduleGeneratorTab({
                 });
               }
               
-              // Add tasks to the correct day
+              // Add tasks to the correct day - filter out null/invalid tasks
               const week = weekMap.get(weekKey);
-              week.days[dayName] = (plan.tasks || []).map(t => ({
-                time: `${t.startTime} - ${t.endTime}`,
-                activity: t.taskName,
-                category: t.category || 'study',
-                priority: 'medium'
-              }));
+              const validTasks = (plan.tasks || [])
+                .filter((t: any) => {
+                  if (!t || !t.taskName || !t.startTime || !t.endTime) {
+                    console.warn('Skipping invalid task:', t);
+                    return false;
+                  }
+                  // Check for valid time format
+                  if (!/^\d{2}:\d{2}$/.test(t.startTime) || !/^\d{2}:\d{2}$/.test(t.endTime)) {
+                    console.warn('Skipping task with invalid time format:', t);
+                    return false;
+                  }
+                  return true;
+                })
+                .map((t: any) => ({
+                  time: `${t.startTime} - ${t.endTime}`,
+                  activity: t.taskName,
+                  category: t.category || 'study',
+                  priority: 'medium'
+                }));
+              
+              console.log(`📅 ${dayName} (${plan.plan_date}): ${validTasks.length} task(s)`);
+              
+              // Replace (not append) - each plan_date should have its own tasks
+              week.days[dayName] = validTasks;
             });
 
             const weeks = Array.from(weekMap.values());
@@ -192,34 +211,14 @@ export function ScheduleGeneratorTab({
         scheduleWeeks,
       });
       
-      // Merge with existing plan if any
-      if (generatedPlan && generatedPlan.weeks) {
-        // Merge weeks
-        const mergedWeeks = [...generatedPlan.weeks];
-        plan.weeks?.forEach((newWeek: any) => {
-          const existingWeekIdx = mergedWeeks.findIndex(w => w.weekNumber === newWeek.weekNumber);
-          if (existingWeekIdx >= 0) {
-            // Merge days
-            Object.keys(newWeek.days).forEach(dayName => {
-              const existingTasks = mergedWeeks[existingWeekIdx].days[dayName] || [];
-              const newTasks = newWeek.days[dayName] || [];
-              mergedWeeks[existingWeekIdx].days[dayName] = [...existingTasks, ...newTasks];
-            });
-          } else {
-            mergedWeeks.push(newWeek);
-          }
-        });
-
-        plan.weeks = mergedWeeks;
-        plan.summary = `${generatedPlan.summary}\n\n---\n\n${plan.summary}`;
-      }
-
       // Track processed deadlines
       plan.metadata = {
         ...plan.metadata,
         processedDeadlineIds: [...processedDeadlineIds, ...newDeadlines.map(d => d.id)]
       };
 
+      // Don't merge - just set the new plan
+      // The database will handle merging when we save
       setGeneratedPlan(plan);
 
       // Auto-save plan to database
@@ -243,9 +242,9 @@ export function ScheduleGeneratorTab({
             dayDate.setDate(weekStart.getDate() + dayIndex);
             const planDate = dayDate.toISOString().split('T')[0];
             
-            const tasks = [];
+            const tasks: any[] = [];
             
-            dayTasks.forEach(task => {
+            dayTasks.forEach((task: any) => {
               // Skip if task doesn't have required fields
               if (!task.task && !task.activity) {
                 console.warn('Skipping task without name:', task);
@@ -291,7 +290,7 @@ export function ScheduleGeneratorTab({
               });
             });
 
-            // Save this day's plan to DB
+            // Save this day's plan to DB (will replace if exists)
             if (tasks.length > 0) {
               await api.studyPlans.save({
                 planDate,
@@ -361,7 +360,6 @@ export function ScheduleGeneratorTab({
           deadlines={deadlines}
           onAddDeadline={addDeadline}
           onRemoveDeadline={removeDeadline}
-          timetableData={timetableData}
         />
 
         <LifestyleSettings

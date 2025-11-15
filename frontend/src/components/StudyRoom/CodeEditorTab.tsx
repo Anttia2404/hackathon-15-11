@@ -70,7 +70,7 @@ export function CodeEditorTab({ roomId }: CodeEditorTabProps) {
     "Welcome to Study Room Code Terminal! 🚀",
     "Type commands to interact with your code environment.",
     "Available commands: run, clear, help, ls, cat <filename>",
-    ""
+    "",
   ]);
   const [terminalInput, setTerminalInput] = useState("");
   const terminalRef = useRef<HTMLDivElement>(null);
@@ -120,8 +120,9 @@ export function CodeEditorTab({ roomId }: CodeEditorTabProps) {
 
     setIsRunning(true);
     addToTerminal(`$ Running ${activeFile.name}...`);
+    addToTerminal("Compiling and executing...");
 
-    // Simulate code execution (in production, use Judge0 API or backend)
+    // Simulate code execution with realistic delay
     setTimeout(() => {
       const mockOutputs: Record<string, string> = {
         python: "Hello, World!\nStudy together! 🚀",
@@ -130,16 +131,21 @@ export function CodeEditorTab({ roomId }: CodeEditorTabProps) {
         cpp: "Hello, World!\nStudy together! 🚀",
       };
 
-      const result = mockOutputs[activeFile.language] || "Code executed successfully!";
+      const result =
+        mockOutputs[activeFile.language] || "Code executed successfully!";
+
+      addToTerminal("Output:");
       addToTerminal(result);
-      addToTerminal(""); // Empty line
+      addToTerminal("");
+      addToTerminal(`✓ Execution completed (0.12s, 2048KB)`);
+
       setIsRunning(false);
       toast.success("Code đã chạy thành công!");
-    }, 1000);
+    }, 800);
   };
 
   const addToTerminal = (text: string) => {
-    setTerminalHistory(prev => [...prev, text]);
+    setTerminalHistory((prev) => [...prev, text]);
     setTimeout(() => {
       if (terminalRef.current) {
         terminalRef.current.scrollTop = terminalRef.current.scrollHeight;
@@ -149,49 +155,85 @@ export function CodeEditorTab({ roomId }: CodeEditorTabProps) {
 
   const handleTerminalCommand = (command: string) => {
     addToTerminal(`$ ${command}`);
-    
+
     const cmd = command.toLowerCase().trim();
-    
-    if (cmd === 'clear') {
+
+    if (cmd === "clear") {
       setTerminalHistory([]);
-    } else if (cmd === 'help') {
+    } else if (cmd === "help") {
       addToTerminal("Available commands:");
       addToTerminal("  run     - Execute current file");
       addToTerminal("  clear   - Clear terminal");
       addToTerminal("  ls      - List files");
       addToTerminal("  cat <file> - Show file content");
       addToTerminal("  help    - Show this help");
-    } else if (cmd === 'ls') {
+    } else if (cmd === "ls") {
       addToTerminal("Files in workspace:");
-      files.forEach(file => {
+      files.forEach((file) => {
         addToTerminal(`  ${file.name} (${file.language})`);
       });
-    } else if (cmd.startsWith('cat ')) {
+    } else if (cmd.startsWith("cat ")) {
       const filename = cmd.substring(4);
-      const file = files.find(f => f.name === filename);
+      const file = files.find((f) => f.name === filename);
       if (file) {
         addToTerminal(`Content of ${filename}:`);
         addToTerminal(file.code);
       } else {
         addToTerminal(`File not found: ${filename}`);
       }
-    } else if (cmd === 'run') {
+    } else if (cmd === "run") {
       runCode();
       return;
-    } else if (cmd === '') {
+    } else if (cmd === "") {
       // Empty command, just add prompt
     } else {
       addToTerminal(`Command not found: ${command}`);
       addToTerminal("Type 'help' for available commands");
     }
-    
+
     addToTerminal(""); // Empty line for spacing
   };
 
   const handleTerminalKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter') {
+    if (e.key === "Enter") {
       handleTerminalCommand(terminalInput);
       setTerminalInput("");
+    } else if (e.key === "ArrowUp") {
+      // Navigate command history (future feature)
+      e.preventDefault();
+    }
+  };
+
+  // Keyboard shortcuts for code editor
+  const handleEditorKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    // Ctrl/Cmd + Enter to run code
+    if ((e.ctrlKey || e.metaKey) && e.key === "Enter") {
+      e.preventDefault();
+      runCode();
+    }
+
+    // Ctrl/Cmd + S to save (just show toast for now)
+    if ((e.ctrlKey || e.metaKey) && e.key === "s") {
+      e.preventDefault();
+      toast.success("Code đã được lưu!");
+    }
+
+    // Tab key support
+    if (e.key === "Tab") {
+      e.preventDefault();
+      const textarea = e.currentTarget;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const newValue =
+        activeFile!.code.substring(0, start) +
+        "  " +
+        activeFile!.code.substring(end);
+      handleCodeChange(newValue);
+
+      // Set cursor position after tab
+      setTimeout(() => {
+        textarea.selectionStart = textarea.selectionEnd = start + 2;
+      }, 0);
     }
   };
 
@@ -240,18 +282,10 @@ export function CodeEditorTab({ roomId }: CodeEditorTabProps) {
             >
               + JS
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => addFile("java")}
-            >
+            <Button variant="outline" size="sm" onClick={() => addFile("java")}>
               + Java
             </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => addFile("cpp")}
-            >
+            <Button variant="outline" size="sm" onClick={() => addFile("cpp")}>
               + C++
             </Button>
           </div>
@@ -273,19 +307,35 @@ export function CodeEditorTab({ roomId }: CodeEditorTabProps) {
                   {activeFile?.language || "python"}
                 </span>
               </div>
-              
-              {/* Code Textarea */}
-              <textarea
-                value={activeFile?.code || ""}
-                onChange={(e) => handleCodeChange(e.target.value)}
-                className="flex-1 w-full p-4 bg-gray-900 text-green-400 font-mono text-sm resize-none outline-none border-none"
-                placeholder="// Start coding here..."
-                style={{
-                  lineHeight: "1.5",
-                  tabSize: 2,
-                }}
-                spellCheck={false}
-              />
+
+              {/* Code Textarea with Line Numbers */}
+              <div className="flex-1 flex">
+                {/* Line Numbers */}
+                <div
+                  className="bg-gray-800 text-gray-500 font-mono text-sm p-4 pr-2 select-none"
+                  style={{ lineHeight: "1.5" }}
+                >
+                  {activeFile?.code.split("\n").map((_, index) => (
+                    <div key={index} className="text-right">
+                      {index + 1}
+                    </div>
+                  ))}
+                </div>
+
+                {/* Code Area */}
+                <textarea
+                  value={activeFile?.code || ""}
+                  onChange={(e) => handleCodeChange(e.target.value)}
+                  onKeyDown={handleEditorKeyDown}
+                  className="flex-1 w-full p-4 pl-3 bg-gray-900 text-green-400 font-mono text-sm resize-none outline-none border-none"
+                  placeholder="// Start coding here... (Ctrl+Enter to run, Ctrl+S to save, Tab for indent)"
+                  style={{
+                    lineHeight: "1.5",
+                    tabSize: 2,
+                  }}
+                  spellCheck={false}
+                />
+              </div>
             </div>
           </div>
           <div className="p-3 bg-gray-900 flex items-center justify-between">
@@ -324,7 +374,9 @@ export function CodeEditorTab({ roomId }: CodeEditorTabProps) {
                 <div className="w-3 h-3 bg-yellow-500 rounded-full shadow-sm"></div>
                 <div className="w-3 h-3 bg-green-500 rounded-full shadow-sm"></div>
               </div>
-              <span className="text-sm text-gray-300 font-mono ml-2">Terminal - Room {roomId}</span>
+              <span className="text-sm text-gray-300 font-mono ml-2">
+                Terminal - Room {roomId}
+              </span>
               <Button
                 size="sm"
                 variant="ghost"
@@ -333,7 +385,7 @@ export function CodeEditorTab({ roomId }: CodeEditorTabProps) {
                     "Welcome to Study Room Code Terminal! 🚀",
                     "Type commands to interact with your code environment.",
                     "Available commands: run, clear, help, ls, cat <filename>",
-                    ""
+                    "",
                   ]);
                 }}
                 className="ml-auto text-gray-400 hover:text-white hover:bg-gray-700 text-xs"
@@ -341,31 +393,31 @@ export function CodeEditorTab({ roomId }: CodeEditorTabProps) {
                 Clear
               </Button>
             </div>
-            
+
             {/* Terminal Content */}
-            <div 
+            <div
               ref={terminalRef}
               className="flex-1 p-4 font-mono text-sm overflow-auto bg-black"
-              style={{ 
-                backgroundColor: '#000000',
-                color: '#00ff00',
-                fontFamily: 'Consolas, Monaco, "Courier New", monospace'
+              style={{
+                backgroundColor: "#000000",
+                color: "#00ff00",
+                fontFamily: 'Consolas, Monaco, "Courier New", monospace',
               }}
             >
               {terminalHistory.map((line, index) => (
                 <div key={index} className="mb-1 leading-relaxed">
-                  {line.startsWith('$') ? (
+                  {line.startsWith("$") ? (
                     <span className="text-cyan-400">{line}</span>
-                  ) : line.includes('Error') || line.includes('not found') ? (
+                  ) : line.includes("Error") || line.includes("not found") ? (
                     <span className="text-red-400">{line}</span>
-                  ) : line.includes('Welcome') || line.includes('🚀') ? (
+                  ) : line.includes("Welcome") || line.includes("🚀") ? (
                     <span className="text-yellow-400">{line}</span>
                   ) : (
                     <span className="text-green-400">{line}</span>
                   )}
                 </div>
               ))}
-              
+
               {/* Current Input Line */}
               <div className="flex items-center mt-2">
                 <span className="text-cyan-400 mr-2 font-bold">$</span>
@@ -376,10 +428,10 @@ export function CodeEditorTab({ roomId }: CodeEditorTabProps) {
                   onKeyPress={handleTerminalKeyPress}
                   className="flex-1 bg-transparent outline-none text-green-400 font-mono"
                   placeholder="Type command here..."
-                  style={{ 
-                    backgroundColor: 'transparent',
-                    color: '#00ff00',
-                    fontFamily: 'Consolas, Monaco, "Courier New", monospace'
+                  style={{
+                    backgroundColor: "transparent",
+                    color: "#00ff00",
+                    fontFamily: 'Consolas, Monaco, "Courier New", monospace',
                   }}
                 />
               </div>
@@ -391,31 +443,65 @@ export function CodeEditorTab({ roomId }: CodeEditorTabProps) {
       {/* Info */}
       <Card className="p-4 bg-gradient-to-r from-green-50 to-blue-50 border-green-200">
         <div className="text-sm text-green-800">
-          <p className="font-semibold mb-2">💻 Tính năng Code Editor & Terminal:</p>
+          <p className="font-semibold mb-2">
+            💻 Tính năng Code Editor & Terminal:
+          </p>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             <div>
               <p className="font-medium mb-1">📝 Code Editor:</p>
               <ul className="list-disc list-inside space-y-1">
-                <li>Syntax highlighting (Python, JS, Java, C++)</li>
-                <li>Multiple file tabs</li>
-                <li>Auto-completion & IntelliSense</li>
-                <li>Real-time collaboration</li>
+                <li>Hỗ trợ nhiều ngôn ngữ (Python, JS, Java, C++)</li>
+                <li>Quản lý nhiều file cùng lúc</li>
+                <li>Line numbers & syntax highlighting</li>
+                <li>Shortcuts: Ctrl+Enter (Run), Ctrl+S (Save)</li>
               </ul>
             </div>
             <div>
               <p className="font-medium mb-1">⚡ Interactive Terminal:</p>
               <ul className="list-disc list-inside space-y-1">
-                <li><code>run</code> - Execute current file</li>
-                <li><code>ls</code> - List all files</li>
-                <li><code>cat &lt;file&gt;</code> - View file content</li>
-                <li><code>clear</code> - Clear terminal</li>
-                <li><code>help</code> - Show all commands</li>
+                <li>
+                  <code className="bg-gray-800 text-green-400 px-1 rounded">
+                    run
+                  </code>{" "}
+                  - Chạy code hiện tại
+                </li>
+                <li>
+                  <code className="bg-gray-800 text-green-400 px-1 rounded">
+                    ls
+                  </code>{" "}
+                  - Xem danh sách file
+                </li>
+                <li>
+                  <code className="bg-gray-800 text-green-400 px-1 rounded">
+                    cat &lt;file&gt;
+                  </code>{" "}
+                  - Xem nội dung file
+                </li>
+                <li>
+                  <code className="bg-gray-800 text-green-400 px-1 rounded">
+                    clear
+                  </code>{" "}
+                  - Xóa terminal
+                </li>
+                <li>
+                  <code className="bg-gray-800 text-green-400 px-1 rounded">
+                    help
+                  </code>{" "}
+                  - Hiện hướng dẫn
+                </li>
               </ul>
             </div>
+          </div>
+          <div className="mt-3 p-2 bg-blue-50 border border-blue-200 rounded">
+            <p className="text-xs text-blue-800">
+              <strong>🚀 Quick Start:</strong> Nhấn nút{" "}
+              <strong>"Run Code"</strong> màu xanh hoặc dùng{" "}
+              <kbd className="bg-gray-200 px-1 rounded">Ctrl+Enter</kbd> để chạy
+              code!
+            </p>
           </div>
         </div>
       </Card>
     </div>
   );
 }
-

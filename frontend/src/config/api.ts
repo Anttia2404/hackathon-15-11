@@ -2,7 +2,7 @@ import axios from "axios";
 
 // API Base URL
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5002/api/v1";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
 
 // Create axios instance
 const api = axios.create({
@@ -31,12 +31,16 @@ api.interceptors.request.use(
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    // Temporarily disabled for demo - don't redirect on 401
-    // if (error.response?.status === 401) {
-    //   localStorage.removeItem("auth_token");
-    //   localStorage.removeItem("user");
-    //   window.location.href = "/";
-    // }
+    // Handle unauthorized access
+    if (error.response?.status === 401) {
+      // Only clear auth if we're not on login page
+      const currentPath = window.location.pathname;
+      if (currentPath !== "/login" && currentPath !== "/register") {
+        localStorage.removeItem("auth_token");
+        localStorage.removeItem("user");
+        window.location.href = "/login";
+      }
+    }
     return Promise.reject(error);
   }
 );

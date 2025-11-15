@@ -55,7 +55,7 @@ export function LoginPage() {
     try {
       await login(loginData);
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-      
+
       // Navigate based on user type
       if (user.user_type === "admin") {
         navigate("/admin-dashboard");
@@ -97,7 +97,7 @@ export function LoginPage() {
 
       await register(data);
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-      
+
       // Navigate based on user type
       if (user.user_type === "admin") {
         navigate("/admin-dashboard");

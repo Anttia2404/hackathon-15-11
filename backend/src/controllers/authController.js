@@ -17,9 +17,12 @@ class AuthController {
         department,
       } = req.body;
 
+      console.log('📝 Register request:', { email, user_type, teacher_code, department });
+
       // Check if user already exists
       const existingUser = await User.findOne({ where: { email } });
       if (existingUser) {
+        console.log('❌ Email already exists:', email);
         return res.status(400).json({ message: 'Email already registered' });
       }
 
@@ -36,17 +39,19 @@ class AuthController {
 
       // Create role-specific record
       if (user_type === 'student') {
-        await Student.create({
+        const studentRecord = await Student.create({
           user_id: user.user_id,
           student_code: student_code || `SV${Date.now()}`,
           major,
         });
+        console.log('✅ Student record created:', studentRecord.student_id);
       } else if (user_type === 'teacher') {
-        await Teacher.create({
+        const teacherRecord = await Teacher.create({
           user_id: user.user_id,
           teacher_code: teacher_code || `TC${Date.now()}`,
           department,
         });
+        console.log('✅ Teacher record created:', teacherRecord.teacher_id);
       }
 
       // Generate token
@@ -67,7 +72,8 @@ class AuthController {
         },
       });
     } catch (error) {
-      console.error('Register error:', error);
+      console.error('❌ Register error:', error);
+      console.error('Error details:', error.message, error.stack);
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   }

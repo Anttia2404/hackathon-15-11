@@ -27,15 +27,17 @@ export function Navigation({ userType }: NavigationProps) {
 
   // Poll for notifications if student
   useEffect(() => {
-    if (userType === 'student' && user) {
+    if (userType === "student" && user) {
       const fetchNotifications = async () => {
         try {
           // Use user_id as identifier (notifications are not student-specific in current implementation)
           const userId = user.user_id;
-          
+
           if (userId) {
             const response = await fetch(
-              `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/notifications/student/${userId}`
+              `${
+                import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1"
+              }/notifications/student/${userId}`
             );
             if (response.ok) {
               const data = await response.json();
@@ -43,7 +45,7 @@ export function Navigation({ userType }: NavigationProps) {
             }
           }
         } catch (error) {
-          console.error('Error fetching notifications:', error);
+          console.error("Error fetching notifications:", error);
         }
       };
 
@@ -58,21 +60,66 @@ export function Navigation({ userType }: NavigationProps) {
     window.location.reload();
   };
   const studentPages = [
-    { id: "student-dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/student-dashboard" },
-    { id: "study-room", label: "Study Room", icon: MessageSquare, path: "/study-room" },
-    { id: "join-discussion", label: "Join Discussion", icon: MessageSquare, path: "/join-discussion" },
-    { id: "smart-scheduler", label: "Smart Schedule", icon: Calendar, path: "/smart-scheduler" },
-    { id: "smart-study", label: "Smart Study", icon: FileText, path: "/smart-study" },
+    {
+      id: "student-dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      path: "/student-dashboard",
+    },
+    {
+      id: "study-room",
+      label: "Study Room",
+      icon: MessageSquare,
+      path: "/study-room",
+    },
+    {
+      id: "join-discussion",
+      label: "Join Discussion",
+      icon: MessageSquare,
+      path: "/join-discussion",
+    },
+    {
+      id: "smart-scheduler",
+      label: "Smart Schedule",
+      icon: Calendar,
+      path: "/smart-scheduler",
+    },
+    {
+      id: "smart-study",
+      label: "Smart Study",
+      icon: FileText,
+      path: "/smart-study",
+    },
   ];
 
   const teacherPages = [
-    { id: "teacher-dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/teacher-dashboard" },
-    { id: "teacher-classes", label: "My Classes", icon: LayoutDashboard, path: "/teacher-classes" },
-    { id: "interactive-classroom", label: "Interactive Class", icon: MessageSquare, path: "/interactive-classroom" },
+    {
+      id: "teacher-dashboard",
+      label: "Dashboard",
+      icon: LayoutDashboard,
+      path: "/teacher-dashboard",
+    },
+    {
+      id: "teacher-classes",
+      label: "My Classes",
+      icon: LayoutDashboard,
+      path: "/teacher-classes",
+    },
+    {
+      id: "interactive-classroom",
+      label: "Interactive Class",
+      icon: MessageSquare,
+      path: "/interactive-classroom",
+    },
   ];
 
   const adminPages = [
-    { id: "admin-dashboard", label: "Admin Dashboard", icon: LayoutDashboard, path: "/admin-dashboard" },
+    {
+      id: "admin-dashboard",
+      label: "Admin Dashboard",
+      icon: LayoutDashboard,
+      path: "/admin-dashboard",
+    },
   ];
 
   const pages =
@@ -116,7 +163,9 @@ export function Navigation({ userType }: NavigationProps) {
                 {pages.map((page) => (
                   <Button
                     key={page.id}
-                    variant={location.pathname === page.path ? "default" : "ghost"}
+                    variant={
+                      location.pathname === page.path ? "default" : "ghost"
+                    }
                     onClick={() => navigate(page.path)}
                     className="gap-2 px-5 py-2 mx-1"
                   >
@@ -133,7 +182,7 @@ export function Navigation({ userType }: NavigationProps) {
             {isAuthenticated && user ? (
               <>
                 {/* Notification Bell for Students */}
-                {userType === 'student' && (
+                {userType === "student" && (
                   <div className="relative">
                     <button
                       onClick={() => setShowNotifications(!showNotifications)}
@@ -151,13 +200,13 @@ export function Navigation({ userType }: NavigationProps) {
                     {showNotifications && (
                       <>
                         {/* Backdrop */}
-                        <div 
-                          className="fixed inset-0 z-40" 
+                        <div
+                          className="fixed inset-0 z-40"
                           onClick={() => setShowNotifications(false)}
                         />
                         {/* Dropdown */}
                         <div className="absolute right-0 top-full mt-2 z-50">
-                          <PushNotification 
+                          <PushNotification
                             onClose={() => setShowNotifications(false)}
                             notifications={notifications}
                           />
@@ -172,7 +221,11 @@ export function Navigation({ userType }: NavigationProps) {
                     {user.full_name}
                   </p>
                   <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full capitalize">
-                    {userType === "student" ? "Sinh viên" : userType === "teacher" ? "Giảng viên" : "Admin"}
+                    {userType === "student"
+                      ? "Sinh viên"
+                      : userType === "teacher"
+                      ? "Giảng viên"
+                      : "Admin"}
                   </span>
                 </div>
                 <Button

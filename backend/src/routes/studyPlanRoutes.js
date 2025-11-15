@@ -89,7 +89,7 @@ router.post('/save', async (req, res) => {
         WHERE plan_id = $3
       `, [plan.studyMode, plan.summary, planId]);
 
-      // Delete old tasks
+      // Delete old tasks before inserting new ones
       await client.query('DELETE FROM study_plan_tasks WHERE plan_id = $1', [planId]);
     } else {
       // Create new plan

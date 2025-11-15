@@ -1,4 +1,10 @@
-import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+} from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { Navigation } from "./components/layouts";
 import { HomePage } from "./components/HomePage";
@@ -15,7 +21,20 @@ import { AdminDashboard } from "./components/AdminDashboard";
 
 // Protected Route Component
 function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+  // Show nothing while loading (checking auth state)
+  if (loading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
+          <p className="mt-4 text-gray-600">Đang tải...</p>
+        </div>
+      </div>
+    );
+  }
+
   return isAuthenticated ? <>{children}</> : <Navigate to="/login" replace />;
 }
 
@@ -39,7 +58,7 @@ function AppContent() {
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<LoginPage />} />
       <Route path="/" element={<Navigate to="/login" replace />} />
-      
+
       <Route
         path="/home"
         element={
@@ -48,7 +67,7 @@ function AppContent() {
           </Layout>
         }
       />
-      
+
       <Route
         path="/student-dashboard"
         element={
@@ -59,7 +78,7 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/smart-scheduler"
         element={
@@ -70,7 +89,7 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/smart-study"
         element={
@@ -81,7 +100,7 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/study-room"
         element={
@@ -92,7 +111,7 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/join-discussion"
         element={
@@ -103,7 +122,7 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/teacher-dashboard"
         element={
@@ -114,7 +133,7 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/teacher-classes"
         element={
@@ -125,7 +144,7 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/interactive-classroom"
         element={
@@ -136,7 +155,7 @@ function AppContent() {
           </ProtectedRoute>
         }
       />
-      
+
       <Route
         path="/admin-dashboard"
         element={

@@ -633,14 +633,98 @@ COMMENT ON TABLE migrations IS 'Theo dõi các migration đã chạy';
 INSERT INTO migrations (name) VALUES ('complete_schema_v1') ON CONFLICT DO NOTHING;
 
 -- =====================================================
+-- STUDY ROOMS & COLLABORATIVE LEARNING
+-- =====================================================
+
+CREATE TABLE study_rooms (
+    room_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    room_code VARCHAR(8) UNIQUE NOT NULL,
+    room_name VARCHAR(255) NOT NULL,
+    created_by UUID REFERENCES users(user_id) ON DELETE CASCADE,
+    max_participants INTEGER DEFAULT 10,
+    is_active BOOLEAN DEFAULT TRUE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    ended_at TIMESTAMP
+);
+
+CREATE INDEX idx_study_rooms_code ON study_rooms(room_code);
+CREATE INDEX idx_study_rooms_created_by ON study_rooms(created_by);
+
+COMMENT ON TABLE study_rooms IS 'Phòng học nhóm (Study Room) cho sinh viên';
+COMMENT ON COLUMN study_rooms.room_code IS 'Mã phòng 8 ký tự để mời bạn bè';
+
+CREATE TABLE study_room_participants (
+    participant_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    room_id UUID REFERENCES study_rooms(room_id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
+    display_name VARCHAR(255) NOT NULL,
+    joined_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    left_at TIMESTAMP,
+    status VARCHAR(20) DEFAULT 'active',
+    study_time INTEGER DEFAULT 0,
+    UNIQUE(room_id, user_id)
+);
+
+CREATE INDEX idx_study_room_participants_room ON study_room_participants(room_id);
+CREATE INDEX idx_study_room_participants_user ON study_room_participants(user_id);
+
+COMMENT ON TABLE study_room_participants IS 'Thành viên tham gia phòng học nhóm';
+COMMENT ON COLUMN study_room_participants.study_time IS 'Thời gian học tích lũy (phút)';
+
+CREATE TABLE study_room_goals (
+    goal_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    room_id UUID REFERENCES study_rooms(room_id) ON DELETE CASCADE,
+    user_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
+    goal_text TEXT NOT NULL,
+    completed BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    completed_at TIMESTAMP
+);
+
+CREATE INDEX idx_study_room_goals_room ON study_room_goals(room_id);
+
+COMMENT ON TABLE study_room_goals IS 'Mục tiêu học tập cá nhân trong phòng';
+
+CREATE TABLE study_room_invitations (
+    invitation_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    room_id UUID REFERENCES study_rooms(room_id) ON DELETE CASCADE,
+    invited_by UUID REFERENCES users(user_id) ON DELETE CASCADE,
+    invited_user UUID REFERENCES users(user_id) ON DELETE CASCADE,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    responded_at TIMESTAMP,
+    UNIQUE(room_id, invited_user)
+);
+
+CREATE INDEX idx_study_room_invitations_user ON study_room_invitations(invited_user);
+
+COMMENT ON TABLE study_room_invitations IS 'Lời mời tham gia phòng học nhóm';
+
+CREATE TABLE friendships (
+    friendship_id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
+    friend_id UUID REFERENCES users(user_id) ON DELETE CASCADE,
+    status VARCHAR(20) DEFAULT 'pending',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    accepted_at TIMESTAMP,
+    CHECK (user_id != friend_id),
+    UNIQUE(user_id, friend_id)
+);
+
+CREATE INDEX idx_friendships_user ON friendships(user_id);
+CREATE INDEX idx_friendships_friend ON friendships(friend_id);
+
+COMMENT ON TABLE friendships IS 'Quan hệ bạn bè giữa các người dùng';
+
+-- =====================================================
 -- COMPLETION MESSAGE
 -- =====================================================
 
 DO $$
 BEGIN
     RAISE NOTICE '✅ Smart University Database Schema Created Successfully!';
-    RAISE NOTICE '📊 Total Tables: 30+';
-    RAISE NOTICE '🔍 Total Indexes: 50+';
+    RAISE NOTICE '📊 Total Tables: 35+';
+    RAISE NOTICE '🔍 Total Indexes: 58+';
     RAISE NOTICE '👁️ Total Views: 3';
-    RAISE NOTICE '🎯 Features: Authentication, Courses, Smart Scheduler, Smart Study, Interactive Classroom, Analytics';
+    RAISE NOTICE '🎯 Features: Authentication, Courses, Smart Scheduler, Smart Study, Interactive Classroom, Study Rooms, Analytics';
 END $$;

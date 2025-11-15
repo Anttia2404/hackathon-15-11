@@ -10,6 +10,8 @@ const Class = require('./Class');
 const Deadline = require('./Deadline');
 const StudyPlan = require('./StudyPlan');
 const Quiz = require('./Quiz');
+const Discussion = require('./Discussion');
+const DiscussionResponse = require('./DiscussionResponse');
 
 // Export all models and sequelize instance
 module.exports = {
@@ -22,4 +24,6 @@ module.exports = {
   Deadline,
   StudyPlan,
   Quiz,
+  Discussion,
+  DiscussionResponse,
 };
