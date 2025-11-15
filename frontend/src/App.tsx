@@ -9,6 +9,7 @@ import { AISummary } from "./components/AISummary";
 import { TeacherDashboard } from "./components/TeacherDashboard";
 import { QuizGenerator } from "./components/QuizGenerator";
 import { VoiceAssistant } from "./components/VoiceAssistant/VoiceAssistant";
+import { StudyRoom } from "./components/StudyRoom/StudyRoom";
 
 function AppContent() {
   const { user, isAuthenticated } = useAuth();
@@ -52,13 +53,15 @@ function AppContent() {
         return <TeacherDashboard />;
       case "quiz-generator":
         return <QuizGenerator />;
+      case "study-room":
+        return <StudyRoom />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }
   };
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen" style={{ backgroundColor: 'transparent' }}>
       <Navigation
         currentPage={currentPage}
         onNavigate={handleNavigate}

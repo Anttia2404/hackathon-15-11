@@ -5,6 +5,41 @@ class StudentController {
   // Get student dashboard
   async getDashboard(req, res) {
     try {
+      // Return mock data for demo (no database required)
+      return res.json({
+        student: {
+          student_id: '1',
+          full_name: 'Phúc Quân',
+          email: 'student@test.com',
+          gpa: 3.5,
+          target_gpa: 3.8,
+          total_classes: 5,
+        },
+        pending_deadlines: 3,
+        deadlines: [
+          {
+            deadline_id: '1',
+            title: 'Bài tập Machine Learning',
+            due_date: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000).toISOString(),
+            priority: 'high',
+            status: 'pending',
+          },
+          {
+            deadline_id: '2',
+            title: 'Project cuối kỳ',
+            due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+            priority: 'urgent',
+            status: 'pending',
+          },
+        ],
+        health_score: {
+          overall_score: 85,
+          attendance_score: 92,
+          assignment_completion_score: 80,
+          performance_score: 85,
+        },
+      });
+
       const studentId = req.student.student_id;
 
       // Get student info

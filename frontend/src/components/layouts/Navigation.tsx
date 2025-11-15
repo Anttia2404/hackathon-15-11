@@ -12,7 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useAuth } from "../../contexts/AuthContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { PushNotification } from "../PushNotification/PushNotification";
 
 interface NavigationProps {
@@ -28,15 +28,43 @@ export function Navigation({
 }: NavigationProps) {
   const { user, logout } = useAuth();
   const [showNotifications, setShowNotifications] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(0);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   const handleLogout = async () => {
     await logout();
     window.location.reload();
   };
+
+  // Fetch notifications for students
+  useEffect(() => {
+    if (userType === 'student') {
+      const fetchNotifications = async () => {
+        try {
+          const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/notifications/student`);
+          if (response.ok) {
+            const data = await response.json();
+            const unreadNotifs = (data.notifications || []).filter((n: any) => !n.isRead);
+            setNotifications(unreadNotifs);
+            setNotificationCount(unreadNotifs.length);
+          }
+        } catch (error) {
+          console.error('Error fetching notifications:', error);
+        }
+      };
+
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 5000);
+      return () => clearInterval(interval);
+    }
+  }, [userType]);
+
+
   const studentPages = [
     { id: "student-dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "smart-scheduler", label: "Smart Schedule", icon: Calendar },
     { id: "ai-summary", label: "AI Summary", icon: FileText },
+    { id: "study-room", label: "Study Room", icon: Users },
   ];
 
   const teacherPages = [
@@ -127,11 +155,47 @@ export function Navigation({
                     className="relative"
                   >
                     <Bell className="w-5 h-5" />
-                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                    {notificationCount > 0 && (
+                      <span className="absolute -top-1 -right-1 w-5 h-5 bg-red-600 rounded-full flex items-center justify-center text-white text-xs font-bold">
+                        {notificationCount}
+                      </span>
+                    )}
                   </Button>
                   {showNotifications && (
-                    <div className="absolute right-0 mt-2 z-50">
-                      <PushNotification onClose={() => setShowNotifications(false)} />
+                    <div className="absolute right-0 mt-2 z-50 w-96">
+                      <div className="bg-white rounded-xl shadow-lg border-2 border-gray-200 p-4 max-h-96 overflow-y-auto">
+                        <div className="flex items-center justify-between mb-3">
+                          <h3 className="font-medium text-gray-900">Thông báo</h3>
+                          <button
+                            onClick={() => setShowNotifications(false)}
+                            className="text-gray-400 hover:text-gray-600"
+                          >
+                            ✕
+                          </button>
+                        </div>
+                        {notifications.length > 0 ? (
+                          <div className="space-y-2">
+                            {notifications.map((notif: any, idx: number) => (
+                              <div key={idx} className="p-3 bg-blue-50 rounded-lg border border-blue-200">
+                                <div className="flex items-start justify-between mb-1">
+                                  <span className="text-sm font-medium text-blue-900">
+                                    {notif.teacherName || 'Giảng viên'}
+                                  </span>
+                                  <span className="text-xs text-gray-500">
+                                    {new Date(notif.timestamp).toLocaleTimeString('vi-VN', { 
+                                      hour: '2-digit', 
+                                      minute: '2-digit' 
+                                    })}
+                                  </span>
+                                </div>
+                                <p className="text-sm text-gray-700">{notif.message}</p>
+                              </div>
+                            ))}
+                          </div>
+                        ) : (
+                          <p className="text-center text-gray-500 py-8">Không có thông báo mới</p>
+                        )}
+                      </div>
                     </div>
                   )}
                 </div>

@@ -4,6 +4,7 @@ const studentRoutes = require('./studentRoutes');
 const teacherRoutes = require('./teacherRoutes');
 const quizRoutes = require('./quizRoutes');
 const analyticsRoutes = require('./analytics');
+const notificationRoutes = require('./notificationRoutes');
 
 const router = express.Router();
 
@@ -13,6 +14,7 @@ router.use('/students', studentRoutes);
 router.use('/teachers', teacherRoutes);
 router.use('/quizzes', quizRoutes);
 router.use('/analytics', analyticsRoutes);
+router.use('/notifications', notificationRoutes);
 
 // Health check
 router.get('/health', (req, res) => {

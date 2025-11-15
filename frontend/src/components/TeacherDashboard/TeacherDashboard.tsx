@@ -19,9 +19,12 @@ import {
 } from "recharts";
 
 export function TeacherDashboard() {
-  const [reminderSent, setReminderSent] = useState(false);
   const [loading, setLoading] = useState(true);
   const [classData, setClassData] = useState<any>(null);
+  const [helpRequests, setHelpRequests] = useState<any[]>([]);
+  const [customMessage, setCustomMessage] = useState('');
+  const [sendingCustom, setSendingCustom] = useState(false);
+  const [showStudentList, setShowStudentList] = useState(false);
   
   // Hardcoded classId - in production, get from auth context or props
   const classId = '1';
@@ -43,13 +46,56 @@ export function TeacherDashboard() {
     fetchClassAnalytics();
   }, [classId]);
 
-  const handleSendReminder = async () => {
+  // Poll for help requests every 5 seconds
+  useEffect(() => {
+    const fetchHelpRequests = async () => {
+      try {
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/notifications/help-requests/${classId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setHelpRequests(data.requests || []);
+        }
+      } catch (error) {
+        console.error('Error fetching help requests:', error);
+      }
+    };
+
+    fetchHelpRequests();
+    const interval = setInterval(fetchHelpRequests, 5000); // Poll every 5 seconds
+
+    return () => clearInterval(interval);
+  }, [classId]);
+
+  const handleSendCustomMessage = async () => {
+    if (!customMessage.trim()) {
+      alert('Vui lòng nhập nội dung tin nhắn!');
+      return;
+    }
+
+    setSendingCustom(true);
     try {
-      await analyticsService.sendReminder(classId, 'assignment');
-      setReminderSent(true);
-      setTimeout(() => setReminderSent(false), 3000);
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/notifications/send-message`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          classId,
+          message: customMessage,
+          teacherName: 'Giảng viên Nguyễn',
+          type: 'announcement'
+        }),
+      });
+
+      if (response.ok) {
+        alert('Đã gửi tin nhắn đến tất cả sinh viên!');
+        setCustomMessage('');
+      }
     } catch (error) {
-      console.error('Error sending reminder:', error);
+      console.error('Error sending custom message:', error);
+      alert('Không thể gửi tin nhắn. Vui lòng thử lại!');
+    } finally {
+      setSendingCustom(false);
     }
   };
 
@@ -125,10 +171,23 @@ export function TeacherDashboard() {
               <h1 className="mb-2 text-gray-900">Dashboard Giảng viên 👨‍🏫</h1>
               <p className="text-gray-600">Quản lý và theo dõi tiến độ học tập của sinh viên</p>
             </div>
-            <div className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg">
-              <span className="font-medium">
-                Lớp: {classData.overview.class_code} - {classData.overview.course_name}
-              </span>
+            <div className="flex items-center gap-3">
+              {helpRequests.length > 0 && (
+                <div className="relative px-4 py-2 bg-red-100 text-red-700 rounded-lg animate-pulse">
+                  <div className="flex items-center gap-2">
+                    <AlertCircle className="w-5 h-5" />
+                    <span className="font-medium">
+                      {helpRequests.length} sinh viên cần hỗ trợ
+                    </span>
+                  </div>
+                  <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full animate-ping" />
+                </div>
+              )}
+              <div className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg">
+                <span className="font-medium">
+                  Lớp: {classData.overview.class_code} - {classData.overview.course_name}
+                </span>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -287,6 +346,37 @@ export function TeacherDashboard() {
             className="lg:col-span-1"
           >
             <Card className="p-6 sticky top-24">
+              {/* Help Requests Alert */}
+              {helpRequests.length > 0 && (
+                <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl">
+                  <div className="flex items-center gap-2 mb-3">
+                    <div className="relative">
+                      <AlertCircle className="w-6 h-6 text-red-600" />
+                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full animate-ping" />
+                    </div>
+                    <h4 className="font-medium text-red-900">Yêu cầu hỗ trợ mới!</h4>
+                  </div>
+                  <div className="space-y-2">
+                    {helpRequests.slice(0, 3).map((request: any, idx: number) => (
+                      <div key={idx} className="p-3 bg-white rounded-lg border border-red-200">
+                        <div className="flex items-center justify-between mb-1">
+                          <span className="font-medium text-gray-900">{request.studentName}</span>
+                          <span className="text-xs text-red-600">
+                            {new Date(request.timestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </div>
+                        <p className="text-sm text-gray-600">{request.message}</p>
+                        <div className="mt-2 flex items-center gap-2">
+                          <span className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded">
+                            Study Health: {request.studyHealth}/100
+                          </span>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center gap-2 mb-6">
                 <AlertCircle className="w-5 h-5 text-red-600" />
                 <h3 className="text-gray-900">Sinh viên cần hỗ trợ</h3>
@@ -330,33 +420,32 @@ export function TeacherDashboard() {
                 ))}
               </div>
 
-              {/* AI Auto Reminder */}
+              {/* Custom Message Composer */}
               <div className="p-4 bg-gradient-to-r from-blue-50 to-purple-50 rounded-xl mb-4">
                 <h4 className="text-sm font-medium text-gray-900 mb-2">
-                  💬 AI soạn tin nhắc nhở
+                  💬 Soạn tin nhắn gửi sinh viên
                 </h4>
-                <p className="text-sm text-gray-700 mb-3 p-3 bg-white rounded-lg border">
-                  "Chào các em! Bài tập tuần này sắp hết hạn. Hãy hoàn thành trước 23:59 ngày mai nhé. 
-                  Nếu gặp khó khăn, hãy liên hệ thầy qua email hoặc office hours. Good luck! 📚"
-                </p>
+                <textarea
+                  value={customMessage}
+                  onChange={(e) => setCustomMessage(e.target.value)}
+                  placeholder="Nhập nội dung tin nhắn..."
+                  className="w-full p-3 border border-gray-300 rounded-lg mb-3 text-sm resize-none focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  rows={4}
+                />
                 <Button
-                  onClick={handleSendReminder}
-                  disabled={reminderSent}
-                  className={`w-full ${
-                    reminderSent
-                      ? "bg-green-600 hover:bg-green-700"
-                      : "bg-blue-600 hover:bg-blue-700"
-                  }`}
+                  onClick={handleSendCustomMessage}
+                  disabled={sendingCustom || !customMessage.trim()}
+                  className="w-full bg-blue-600 hover:bg-blue-700"
                 >
-                  {reminderSent ? (
+                  {sendingCustom ? (
                     <>
-                      <CheckCircle className="mr-2 w-4 h-4" />
-                      Đã gửi thành công!
+                      <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                      Đang gửi...
                     </>
                   ) : (
                     <>
                       <Send className="mr-2 w-4 h-4" />
-                      Gửi nhắc nhở tự động
+                      Gửi đến tất cả sinh viên
                     </>
                   )}
                 </Button>
@@ -364,15 +453,69 @@ export function TeacherDashboard() {
 
               {/* Quick Actions */}
               <div className="space-y-2">
-                <Button variant="outline" className="w-full justify-start">
+                <Button 
+                  variant="outline" 
+                  className="w-full justify-start"
+                  onClick={() => setShowStudentList(!showStudentList)}
+                >
                   <Users className="mr-2 w-4 h-4" />
-                  Xem danh sách lớp
+                  {showStudentList ? 'Ẩn danh sách lớp' : 'Xem danh sách lớp'}
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
                   <TrendingUp className="mr-2 w-4 h-4" />
                   Xuất báo cáo chi tiết
                 </Button>
               </div>
+
+              {/* Student List Modal */}
+              {showStudentList && (
+                <div className="mt-4 p-4 bg-white rounded-xl border-2 border-blue-200">
+                  <h4 className="font-medium text-gray-900 mb-3">
+                    Danh sách sinh viên ({classStats.totalStudents} sinh viên)
+                  </h4>
+                  <div className="space-y-2 max-h-96 overflow-y-auto">
+                    {studentsNeedHelp.map((student: any, idx: number) => (
+                      <div key={idx} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center text-blue-600 font-medium">
+                              {idx + 1}
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">{student.name}</p>
+                              <p className="text-xs text-gray-500">SV00{idx + 1}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium text-gray-900">{student.studyHealth}/100</p>
+                            <p className="text-xs text-gray-500">Study Health</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    {/* Add more mock students */}
+                    {Array.from({ length: Math.max(0, classStats.totalStudents - studentsNeedHelp.length) }).map((_, idx) => (
+                      <div key={`extra-${idx}`} className="p-3 bg-gray-50 rounded-lg hover:bg-gray-100 transition-colors">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 bg-green-100 rounded-full flex items-center justify-center text-green-600 font-medium">
+                              {studentsNeedHelp.length + idx + 1}
+                            </div>
+                            <div>
+                              <p className="font-medium text-gray-900">Sinh viên {studentsNeedHelp.length + idx + 1}</p>
+                              <p className="text-xs text-gray-500">SV0{studentsNeedHelp.length + idx + 1}</p>
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <p className="text-sm font-medium text-green-600">{Math.floor(Math.random() * 20) + 75}/100</p>
+                            <p className="text-xs text-gray-500">Study Health</p>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </Card>
           </motion.div>
         </div>

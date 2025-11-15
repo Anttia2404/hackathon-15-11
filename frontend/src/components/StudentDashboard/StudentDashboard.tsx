@@ -9,6 +9,9 @@ import {
   Target,
   ArrowRight,
   Loader2,
+  Bell,
+  CheckCircle,
+  Users,
 } from "lucide-react";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -35,6 +38,9 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
   const { dashboard, loading, error } = useStudentDashboard();
   const [analyticsData, setAnalyticsData] = useState<any>(null);
   const [optimalTime, setOptimalTime] = useState<any>(null);
+  const [helpRequested, setHelpRequested] = useState(false);
+  const [sendingHelp, setSendingHelp] = useState(false);
+  const [notifications, setNotifications] = useState<any[]>([]);
 
   // Fetch analytics data from API - MUST be before early returns
   useEffect(() => {
@@ -79,6 +85,28 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
 
     if (dashboard) {
       fetchAnalytics();
+    }
+  }, [user, dashboard]);
+
+  // Poll for notifications every 5 seconds
+  useEffect(() => {
+    const fetchNotifications = async () => {
+      try {
+        const studentId = (user as any)?.student_id || (dashboard as any)?.student_id;
+        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/notifications/student/${studentId}`);
+        if (response.ok) {
+          const data = await response.json();
+          setNotifications(data.notifications || []);
+        }
+      } catch (error) {
+        console.error('Error fetching notifications:', error);
+      }
+    };
+
+    if (dashboard) {
+      fetchNotifications();
+      const interval = setInterval(fetchNotifications, 5000);
+      return () => clearInterval(interval);
     }
   }, [user, dashboard]);
 
@@ -128,8 +156,37 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
   const studyInsight = analyticsData?.insight || 'Bạn đã tăng 3h học/tuần, hoàn thành 80% bài tập';
   const chartData = analyticsData?.chartData || defaultChartData;
 
+  const handleRequestHelp = async () => {
+    setSendingHelp(true);
+    try {
+      const studentId = (user as any)?.student_id || (dashboard as any)?.student_id;
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/notifications/request-help`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          studentId,
+          studentName: user?.full_name || 'Sinh viên',
+          message: 'Sinh viên cần hỗ trợ từ giảng viên',
+          studyHealth: studyHealth.score,
+        }),
+      });
+
+      if (response.ok) {
+        setHelpRequested(true);
+        setTimeout(() => setHelpRequested(false), 5000);
+      }
+    } catch (error) {
+      console.error('Error requesting help:', error);
+      alert('Không thể gửi yêu cầu. Vui lòng thử lại!');
+    } finally {
+      setSendingHelp(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 py-8">
+    <div className="min-h-screen py-8" style={{ backgroundColor: 'rgba(249, 250, 251, 0.65)' }}>
       <div className="container mx-auto px-4">
         {/* Header */}
         <motion.div
@@ -158,30 +215,31 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
+              whileHover={{ y: -4 }}
             >
               <Card
-                className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                className="p-8 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-blue-200 bg-gradient-to-br from-white to-blue-50/30"
                 onClick={() => onNavigate("smart-scheduler")}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-xl flex items-center justify-center">
-                      <Calendar className="w-6 h-6 text-white" />
+                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <Calendar className="w-7 h-7 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-gray-900">Smart Schedule</h3>
-                      <p className="text-gray-500">
+                      <h3 className="text-gray-900 font-semibold text-lg">Smart Schedule</h3>
+                      <p className="text-gray-500 text-sm">
                         Lịch học thông minh với AI
                       </p>
                     </div>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-gray-400" />
+                  <ArrowRight className="w-5 h-5 text-gray-400 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-6 leading-relaxed">
                   Tạo lịch học tối ưu dựa trên thời gian rảnh, mục tiêu GPA và
                   thói quen học tập của bạn
                 </p>
-                <Button className="w-full bg-blue-600 hover:bg-blue-700">
+                <Button className="w-full bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-xl transition-all duration-300">
                   Tạo lịch học mới
                 </Button>
               </Card>
@@ -192,41 +250,90 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.2 }}
+              whileHover={{ y: -4 }}
             >
               <Card
-                className="p-6 hover:shadow-lg transition-shadow cursor-pointer"
+                className="p-8 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-purple-200 bg-gradient-to-br from-white to-purple-50/30"
                 onClick={() => onNavigate("ai-summary")}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
-                      <FileText className="w-6 h-6 text-white" />
+                    <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <FileText className="w-7 h-7 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-gray-900">AI Summary</h3>
-                      <p className="text-gray-500">
+                      <h3 className="text-gray-900 font-semibold text-lg">AI Summary</h3>
+                      <p className="text-gray-500 text-sm">
                         Tóm tắt tài liệu thông minh
                       </p>
                     </div>
                   </div>
-                  <ArrowRight className="w-5 h-5 text-gray-400" />
+                  <ArrowRight className="w-5 h-5 text-gray-400 group-hover:translate-x-1 transition-transform" />
                 </div>
-                <p className="text-gray-600 mb-4">
+                <p className="text-gray-600 mb-6 leading-relaxed">
                   Upload PDF/slide, nhận tóm tắt tự động, flashcard và quiz để
                   ôn tập hiệu quả
                 </p>
                 <div className="grid grid-cols-3 gap-3">
-                  <div className="text-center p-3 bg-purple-50 rounded-lg">
-                    <FileText className="w-5 h-5 text-purple-600 mx-auto mb-1" />
-                    <span className="text-purple-700">Summary</span>
+                  <div className="text-center p-4 bg-purple-50 rounded-xl hover:bg-purple-100 transition-colors">
+                    <FileText className="w-6 h-6 text-purple-600 mx-auto mb-2" />
+                    <span className="text-sm font-medium text-purple-700">Summary</span>
                   </div>
-                  <div className="text-center p-3 bg-pink-50 rounded-lg">
-                    <BookOpen className="w-5 h-5 text-pink-600 mx-auto mb-1" />
-                    <span className="text-pink-700">Flashcard</span>
+                  <div className="text-center p-4 bg-pink-50 rounded-xl hover:bg-pink-100 transition-colors">
+                    <BookOpen className="w-6 h-6 text-pink-600 mx-auto mb-2" />
+                    <span className="text-sm font-medium text-pink-700">Flashcard</span>
                   </div>
-                  <div className="text-center p-3 bg-indigo-50 rounded-lg">
-                    <Target className="w-5 h-5 text-indigo-600 mx-auto mb-1" />
-                    <span className="text-indigo-700">Quiz</span>
+                  <div className="text-center p-4 bg-indigo-50 rounded-xl hover:bg-indigo-100 transition-colors">
+                    <Target className="w-6 h-6 text-indigo-600 mx-auto mb-2" />
+                    <span className="text-sm font-medium text-indigo-700">Quiz</span>
+                  </div>
+                </div>
+              </Card>
+            </motion.div>
+
+            {/* Study Room Card - NEW! */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.25 }}
+              whileHover={{ y: -4 }}
+            >
+              <Card
+                className="p-8 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-indigo-200 bg-gradient-to-br from-white to-indigo-50/30 relative overflow-hidden"
+                onClick={() => onNavigate("study-room")}
+              >
+                <div className="absolute top-0 right-0 px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-semibold rounded-bl-xl">
+                  NEW ✨
+                </div>
+                <div className="flex items-start justify-between mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <Users className="w-7 h-7 text-white" />
+                    </div>
+                    <div>
+                      <h3 className="text-gray-900 font-semibold text-lg">Study Room</h3>
+                      <p className="text-gray-500 text-sm">
+                        Học nhóm online
+                      </p>
+                    </div>
+                  </div>
+                  <ArrowRight className="w-5 h-5 text-gray-400 group-hover:translate-x-1 transition-transform" />
+                </div>
+                <p className="text-gray-600 mb-6 leading-relaxed">
+                  Tạo phòng học ảo với Pomodoro timer, shared notes và goals tracking cùng bạn bè
+                </p>
+                <div className="grid grid-cols-3 gap-3">
+                  <div className="text-center p-4 bg-indigo-50 rounded-xl">
+                    <Clock className="w-6 h-6 text-indigo-600 mx-auto mb-2" />
+                    <span className="text-sm font-medium text-indigo-700">Timer</span>
+                  </div>
+                  <div className="text-center p-4 bg-purple-50 rounded-xl">
+                    <Target className="w-6 h-6 text-purple-600 mx-auto mb-2" />
+                    <span className="text-sm font-medium text-purple-700">Goals</span>
+                  </div>
+                  <div className="text-center p-4 bg-pink-50 rounded-xl">
+                    <BookOpen className="w-6 h-6 text-pink-600 mx-auto mb-2" />
+                    <span className="text-sm font-medium text-pink-700">Notes</span>
                   </div>
                 </div>
               </Card>
@@ -238,18 +345,18 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
             >
-              <Card className="p-6 hover:shadow-lg transition-shadow">
+              <Card className="p-8 hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-green-200 bg-gradient-to-br from-white to-green-50/30">
                 <div className="flex items-center justify-between mb-6">
                   <div className="flex items-center gap-3">
-                    <div className="w-12 h-12 bg-gradient-to-br from-green-500 to-emerald-500 rounded-xl flex items-center justify-center">
-                      <TrendingUp className="w-6 h-6 text-white" />
+                    <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
+                      <TrendingUp className="w-7 h-7 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-gray-900">Study Health Score</h3>
-                      <p className="text-gray-500">7 ngày qua</p>
+                      <h3 className="text-gray-900 font-semibold text-lg">Study Health Score</h3>
+                      <p className="text-gray-500 text-sm">7 ngày qua</p>
                     </div>
                   </div>
-                  <div className="px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm font-medium">
+                  <div className="px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 rounded-full text-sm font-semibold shadow-sm">
                     ↑ {improvementPercent}%
                   </div>
                 </div>
@@ -437,6 +544,43 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
               >
                 Xem lịch đầy đủ
               </Button>
+
+              {/* Help Request Button */}
+              <div className="mt-6 p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border-2 border-orange-200">
+                <div className="flex items-center gap-2 mb-3">
+                  <Bell className="w-5 h-5 text-orange-600" />
+                  <h4 className="text-sm font-medium text-orange-900">Cần hỗ trợ?</h4>
+                </div>
+                <p className="text-sm text-orange-700 mb-3">
+                  Gửi thông báo cho giảng viên khi bạn cần giúp đỡ về bài tập hoặc học tập
+                </p>
+                <Button
+                  onClick={handleRequestHelp}
+                  disabled={sendingHelp || helpRequested}
+                  className={`w-full ${
+                    helpRequested
+                      ? "bg-green-600 hover:bg-green-700"
+                      : "bg-orange-600 hover:bg-orange-700"
+                  }`}
+                >
+                  {sendingHelp ? (
+                    <>
+                      <Loader2 className="mr-2 w-4 h-4 animate-spin" />
+                      Đang gửi...
+                    </>
+                  ) : helpRequested ? (
+                    <>
+                      <CheckCircle className="mr-2 w-4 h-4" />
+                      Đã gửi thành công!
+                    </>
+                  ) : (
+                    <>
+                      <Bell className="mr-2 w-4 h-4" />
+                      Yêu cầu hỗ trợ
+                    </>
+                  )}
+                </Button>
+              </div>
             </Card>
           </motion.div>
         </div>
