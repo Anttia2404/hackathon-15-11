@@ -15,14 +15,29 @@ interface Notification {
 
 interface PushNotificationProps {
   onClose?: () => void;
+  notifications?: any[]; // Accept notifications from parent
 }
 
-export function PushNotification({ onClose }: PushNotificationProps) {
+export function PushNotification({ onClose, notifications: externalNotifications }: PushNotificationProps) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [showAll, setShowAll] = useState(false);
 
   useEffect(() => {
-    // Simulate push notifications
+    // If external notifications provided, use them
+    if (externalNotifications && externalNotifications.length > 0) {
+      const formattedNotifications = externalNotifications.map((notif, index) => ({
+        id: notif.id || index,
+        title: "📢 Thông báo từ giảng viên",
+        message: notif.message,
+        time: new Date(notif.timestamp || notif.created_at).toLocaleString('vi-VN'),
+        icon: "book" as const,
+        type: "reminder" as const
+      }));
+      setNotifications(formattedNotifications);
+      return;
+    }
+
+    // Otherwise use mock notifications (for demo)
     const mockNotifications: Notification[] = [
       {
         id: 1,
@@ -31,40 +46,11 @@ export function PushNotification({ onClose }: PushNotificationProps) {
         time: "Vừa xong",
         icon: "clock",
         type: "reminder"
-      },
-      {
-        id: 2,
-        title: "📚 Nhắc nhở ôn tập",
-        message: "Bài tập Lý hạn nộp trong 2 giờ nữa. Hãy hoàn thành ngay!",
-        time: "5 phút trước",
-        icon: "book",
-        type: "reminder"
-      },
-      {
-        id: 3,
-        title: "💡 Insight từ AI",
-        message: "Bạn học tốt nhất vào thứ 3 & thứ 5. Hãy sắp xếp môn khó vào những ngày này!",
-        time: "10 phút trước",
-        icon: "clock",
-        type: "insight"
       }
     ];
 
-    // Show first notification after 3 seconds
-    setTimeout(() => {
-      setNotifications([mockNotifications[0]]);
-    }, 3000);
-
-    // Show second notification after 8 seconds
-    setTimeout(() => {
-      setNotifications(prev => [...prev, mockNotifications[1]]);
-    }, 8000);
-
-    // Show third notification after 13 seconds
-    setTimeout(() => {
-      setNotifications(prev => [...prev, mockNotifications[2]]);
-    }, 13000);
-  }, []);
+    setNotifications(mockNotifications);
+  }, [externalNotifications]);
 
   const removeNotification = (id: number) => {
     setNotifications(prev => prev.filter(n => n.id !== id));
@@ -75,63 +61,65 @@ export function PushNotification({ onClose }: PushNotificationProps) {
   // If onClose is provided, render as dropdown (from Navigation)
   if (onClose) {
     return (
-      <Card className="w-96 max-h-[500px] overflow-y-auto shadow-2xl">
-        <div className="sticky top-0 bg-white border-b p-4 flex items-center justify-between">
+      <Card className="w-96 max-h-[500px] overflow-hidden shadow-2xl border border-gray-200">
+        <div className="sticky top-0 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Bell className="w-5 h-5 text-blue-600" />
-            <h3 className="font-medium text-gray-900">Thông báo ({notifications.length})</h3>
+            <h3 className="font-semibold text-gray-900">Thông báo</h3>
+            {notifications.length > 0 && (
+              <span className="px-2 py-0.5 bg-blue-100 text-blue-700 text-xs font-semibold rounded-full">
+                {notifications.length}
+              </span>
+            )}
           </div>
-          <Button
-            variant="ghost"
-            size="sm"
+          <button
             onClick={onClose}
-            className="h-8 w-8 p-0"
+            className="p-1 hover:bg-gray-100 rounded-full transition-colors"
           >
-            <X className="w-4 h-4" />
-          </Button>
+            <X className="w-4 h-4 text-gray-500" />
+          </button>
         </div>
-        <div className="p-2">
+        <div className="overflow-y-auto max-h-[440px]">
           {notifications.length === 0 ? (
-            <div className="p-8 text-center text-gray-500">
-              <Bell className="w-12 h-12 mx-auto mb-2 text-gray-300" />
-              <p>Chưa có thông báo mới</p>
+            <div className="p-12 text-center text-gray-500">
+              <Bell className="w-16 h-16 mx-auto mb-3 text-gray-300" />
+              <p className="font-medium text-gray-700">Chưa có thông báo</p>
+              <p className="text-sm mt-1">Tin nhắn từ giảng viên sẽ hiển thị ở đây</p>
             </div>
           ) : (
-            notifications.map((notif) => (
-              <motion.div
-                key={notif.id}
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="p-3 hover:bg-gray-50 rounded-lg mb-2 border border-gray-100"
-              >
-                <div className="flex items-start gap-3">
-                  <div className={`w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0 ${
-                    notif.icon === "clock" 
-                      ? "bg-blue-100" 
-                      : "bg-purple-100"
-                  }`}>
-                    {notif.icon === "clock" ? (
-                      <Clock className="w-4 h-4 text-blue-600" />
-                    ) : (
-                      <BookOpen className="w-4 h-4 text-purple-600" />
-                    )}
+            <div className="divide-y divide-gray-100">
+              {notifications.map((notif) => (
+                <motion.div
+                  key={notif.id}
+                  initial={{ opacity: 0, y: -10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="p-4 hover:bg-blue-50 transition-colors group"
+                >
+                  <div className="flex gap-3">
+                    <div className="w-10 h-10 rounded-full bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center flex-shrink-0">
+                      <BookOpen className="w-5 h-5 text-white" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <h4 className="text-sm font-semibold text-gray-900 mb-1">
+                        {notif.title}
+                      </h4>
+                      <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                        {notif.message}
+                      </p>
+                      <span className="text-xs text-gray-500">
+                        {notif.time}
+                      </span>
+                    </div>
+                    <button
+                      onClick={() => removeNotification(notif.id)}
+                      className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-50 rounded-full transition-all flex-shrink-0"
+                    >
+                      <X className="w-4 h-4 text-gray-400 hover:text-red-600" />
+                    </button>
                   </div>
-                  <div className="flex-1">
-                    <h4 className="text-sm font-medium text-gray-900 mb-1">{notif.title}</h4>
-                    <p className="text-sm text-gray-600 mb-1">{notif.message}</p>
-                    <span className="text-xs text-gray-500">{notif.time}</span>
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => removeNotification(notif.id)}
-                    className="h-6 w-6 p-0"
-                  >
-                    <X className="w-3 h-3" />
-                  </Button>
-                </div>
-              </motion.div>
-            ))
+                </motion.div>
+              ))}
+            </div>
           )}
         </div>
       </Card>

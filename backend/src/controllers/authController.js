@@ -92,6 +92,16 @@ class AuthController {
       // Update last login
       await user.update({ last_login: new Date() });
 
+      // Get role-specific ID
+      let roleId = null;
+      if (user.user_type === 'student') {
+        const student = await Student.findOne({ where: { user_id: user.user_id } });
+        roleId = student?.student_id;
+      } else if (user.user_type === 'teacher') {
+        const teacher = await Teacher.findOne({ where: { user_id: user.user_id } });
+        roleId = teacher?.teacher_id;
+      }
+
       // Generate token
       const token = jwt.sign(
         { user_id: user.user_id, user_type: user.user_type },
@@ -99,15 +109,24 @@ class AuthController {
         { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
       );
 
+      const userResponse = {
+        user_id: user.user_id,
+        email: user.email,
+        full_name: user.full_name,
+        user_type: user.user_type,
+      };
+
+      // Add role-specific ID
+      if (user.user_type === 'student') {
+        userResponse.student_id = roleId;
+      } else if (user.user_type === 'teacher') {
+        userResponse.teacher_id = roleId;
+      }
+
       res.json({
         message: 'Login successful',
         token,
-        user: {
-          user_id: user.user_id,
-          email: user.email,
-          full_name: user.full_name,
-          user_type: user.user_type,
-        },
+        user: userResponse,
       });
     } catch (error) {
       console.error('Login error:', error);

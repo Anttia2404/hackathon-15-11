@@ -6,6 +6,7 @@ import { LoginPage } from "./components/LoginPage";
 import { StudentDashboard } from "./components/StudentDashboard";
 import { SmartScheduler } from "./components/SmartScheduler";
 import { SmartStudy } from "./components/SmartStudy";
+import { StudyRoom } from "./components/StudyRoom/StudyRoom";
 import { TeacherDashboard } from "./components/TeacherDashboard";
 import { TeacherClassManagement } from "./components/TeacherDashboard/TeacherClassManagement";
 import { InteractiveClassroom } from "./components/InteractiveClassroom";
@@ -52,6 +53,8 @@ function AppContent() {
         return <SmartScheduler />;
       case "smart-study":
         return <SmartStudy />;
+      case "study-room":
+        return <StudyRoom />;
       case "join-discussion":
         return <JoinDiscussion />;
       case "teacher-dashboard":
