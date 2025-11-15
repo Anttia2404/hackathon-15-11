@@ -8,7 +8,8 @@ import {
 } from "../ui/card";
 import { Checkbox } from "../ui/checkbox";
 import { Badge } from "../ui/badge";
-import { CalendarDays, Clock, Sparkles, CheckCircle2 } from "lucide-react";
+import { Button } from "../ui/button";
+import { CalendarDays, Clock, Sparkles, CheckCircle2, ChevronLeft, ChevronRight } from "lucide-react";
 
 interface ActionItem {
   id: string;
@@ -20,10 +21,20 @@ interface ActionItem {
   completed?: boolean;
 }
 
+interface WeekPlan {
+  weekNumber: number;
+  startDate: string;
+  endDate: string;
+  days: {
+    [key: string]: ActionItem[];
+  };
+}
+
 interface ActionPlanDisplayProps {
   plan: {
-    today: ActionItem[];
-    tomorrow: ActionItem[];
+    weeks?: WeekPlan[];
+    today?: ActionItem[];
+    tomorrow?: ActionItem[];
     summary?: string;
   } | null;
   isGenerating: boolean;
@@ -50,6 +61,7 @@ export function ActionPlanDisplay({
   isGenerating,
 }: ActionPlanDisplayProps) {
   const [completedItems, setCompletedItems] = useState<Set<string>>(new Set());
+  const [currentWeekIndex, setCurrentWeekIndex] = useState(0);
 
   const toggleComplete = (id: string) => {
     const newCompleted = new Set(completedItems);
@@ -111,12 +123,109 @@ export function ActionPlanDisplay({
     );
   }
 
-  const todayCompleted = plan.today.filter((item) =>
+  // Check if we have multi-week plan
+  if (plan.weeks && plan.weeks.length > 0) {
+    const currentWeek = plan.weeks[currentWeekIndex];
+    const dayNames = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+    
+    return (
+      <div className="space-y-6">
+        {/* Summary Card */}
+        {plan.summary && (
+          <Card className="border-violet-200 bg-gradient-to-br from-violet-50 to-blue-50 shadow-lg">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2 text-violet-900">
+                <Sparkles className="w-5 h-5" />
+                AI Insights
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-violet-900 text-sm">{plan.summary}</p>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Week Navigation */}
+        <Card className="border-blue-200 shadow-lg">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <CalendarDays className="w-5 h-5 text-blue-600" />
+                  Week {currentWeek.weekNumber} Schedule
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  {currentWeek.startDate} - {currentWeek.endDate}
+                </CardDescription>
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentWeekIndex(Math.max(0, currentWeekIndex - 1))}
+                  disabled={currentWeekIndex === 0}
+                >
+                  <ChevronLeft className="w-4 h-4" />
+                </Button>
+                <Badge className="bg-blue-100 text-blue-700 border-blue-300 px-3">
+                  {currentWeekIndex + 1} / {plan.weeks.length}
+                </Badge>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setCurrentWeekIndex(Math.min(plan.weeks!.length - 1, currentWeekIndex + 1))}
+                  disabled={currentWeekIndex === plan.weeks.length - 1}
+                >
+                  <ChevronRight className="w-4 h-4" />
+                </Button>
+              </div>
+            </div>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {dayNames.map((dayName) => {
+                const dayTasks = currentWeek.days[dayName] || [];
+                if (dayTasks.length === 0) return null;
+                
+                const dayCompleted = dayTasks.filter((item) =>
+                  completedItems.has(item.id)
+                ).length;
+
+                return (
+                  <div key={dayName} className="border-l-4 border-blue-400 pl-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <h3 className="font-semibold text-slate-700">{dayName}</h3>
+                      <Badge variant="outline" className="text-xs">
+                        {dayCompleted}/{dayTasks.length} done
+                      </Badge>
+                    </div>
+                    <div className="space-y-2">
+                      {dayTasks.map((item) => (
+                        <ActionItemCard
+                          key={item.id}
+                          item={item}
+                          isCompleted={completedItems.has(item.id)}
+                          onToggleComplete={() => toggleComplete(item.id)}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Fallback to old 2-day format
+  const todayCompleted = plan.today?.filter((item) =>
     completedItems.has(item.id)
-  ).length;
-  const tomorrowCompleted = plan.tomorrow.filter((item) =>
+  ).length || 0;
+  const tomorrowCompleted = plan.tomorrow?.filter((item) =>
     completedItems.has(item.id)
-  ).length;
+  ).length || 0;
 
   return (
     <div className="space-y-6">
@@ -136,72 +245,76 @@ export function ActionPlanDisplay({
       )}
 
       {/* Today's Plan */}
-      <Card className="border-blue-200 shadow-lg">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <CalendarDays className="w-5 h-5 text-blue-600" />
-                Today's Action Plan
-              </CardTitle>
-              <CardDescription className="mt-1">
-                {plan.today.length} tasks scheduled
-              </CardDescription>
+      {plan.today && plan.today.length > 0 && (
+        <Card className="border-blue-200 shadow-lg">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <CalendarDays className="w-5 h-5 text-blue-600" />
+                  Today's Action Plan
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  {plan.today.length} tasks scheduled
+                </CardDescription>
+              </div>
+              {plan.today.length > 0 && (
+                <Badge className="bg-blue-100 text-blue-700 border-blue-300">
+                  {todayCompleted}/{plan.today.length} done
+                </Badge>
+              )}
             </div>
-            {plan.today.length > 0 && (
-              <Badge className="bg-blue-100 text-blue-700 border-blue-300">
-                {todayCompleted}/{plan.today.length} done
-              </Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {plan.today.map((item) => (
-              <ActionItemCard
-                key={item.id}
-                item={item}
-                isCompleted={completedItems.has(item.id)}
-                onToggleComplete={() => toggleComplete(item.id)}
-              />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {plan.today.map((item) => (
+                <ActionItemCard
+                  key={item.id}
+                  item={item}
+                  isCompleted={completedItems.has(item.id)}
+                  onToggleComplete={() => toggleComplete(item.id)}
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
 
       {/* Tomorrow's Plan */}
-      <Card className="border-violet-200 shadow-lg">
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                <CalendarDays className="w-5 h-5 text-violet-600" />
-                Tomorrow's Action Plan
-              </CardTitle>
-              <CardDescription className="mt-1">
-                {plan.tomorrow.length} tasks scheduled
-              </CardDescription>
+      {plan.tomorrow && plan.tomorrow.length > 0 && (
+        <Card className="border-violet-200 shadow-lg">
+          <CardHeader>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle className="flex items-center gap-2">
+                  <CalendarDays className="w-5 h-5 text-violet-600" />
+                  Tomorrow's Action Plan
+                </CardTitle>
+                <CardDescription className="mt-1">
+                  {plan.tomorrow.length} tasks scheduled
+                </CardDescription>
+              </div>
+              {plan.tomorrow.length > 0 && (
+                <Badge className="bg-violet-100 text-violet-700 border-violet-300">
+                  {tomorrowCompleted}/{plan.tomorrow.length} done
+                </Badge>
+              )}
             </div>
-            {plan.tomorrow.length > 0 && (
-              <Badge className="bg-violet-100 text-violet-700 border-violet-300">
-                {tomorrowCompleted}/{plan.tomorrow.length} done
-              </Badge>
-            )}
-          </div>
-        </CardHeader>
-        <CardContent>
-          <div className="space-y-2">
-            {plan.tomorrow.map((item) => (
-              <ActionItemCard
-                key={item.id}
-                item={item}
-                isCompleted={completedItems.has(item.id)}
-                onToggleComplete={() => toggleComplete(item.id)}
-              />
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-2">
+              {plan.tomorrow.map((item) => (
+                <ActionItemCard
+                  key={item.id}
+                  item={item}
+                  isCompleted={completedItems.has(item.id)}
+                  onToggleComplete={() => toggleComplete(item.id)}
+                />
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }
