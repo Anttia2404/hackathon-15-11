@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "motion/react";
 import {
   GraduationCap,
@@ -14,15 +15,19 @@ import { Label } from "../ui/label";
 import { Card } from "../ui/card";
 import { useAuth } from "../../contexts/AuthContext";
 
-interface LoginPageProps {
-  onLoginSuccess: (userType: "student" | "teacher") => void;
-}
-
-export function LoginPage({ onLoginSuccess }: LoginPageProps) {
+export function LoginPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { login, register } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Set isLogin based on current route
+  useEffect(() => {
+    setIsLogin(location.pathname === "/login");
+    setError(""); // Clear error when switching
+  }, [location.pathname]);
 
   // Login form state
   const [loginData, setLoginData] = useState({
@@ -50,7 +55,15 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
     try {
       await login(loginData);
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-      onLoginSuccess(user.user_type);
+      
+      // Navigate based on user type
+      if (user.user_type === "admin") {
+        navigate("/admin-dashboard");
+      } else if (user.user_type === "student") {
+        navigate("/student-dashboard");
+      } else if (user.user_type === "teacher") {
+        navigate("/teacher-dashboard");
+      }
     } catch (err: any) {
       setError(
         err.response?.data?.message ||
@@ -84,7 +97,15 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
 
       await register(data);
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-      onLoginSuccess(user.user_type);
+      
+      // Navigate based on user type
+      if (user.user_type === "admin") {
+        navigate("/admin-dashboard");
+      } else if (user.user_type === "student") {
+        navigate("/student-dashboard");
+      } else if (user.user_type === "teacher") {
+        navigate("/teacher-dashboard");
+      }
     } catch (err: any) {
       setError(
         err.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại."
@@ -109,108 +130,140 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
   };
 
   return (
-    <div 
-      className="min-h-screen flex items-center justify-center p-4 relative"
-      style={{
-        backgroundImage: 'url(/images/1.jpg)',
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
-    >
-      {/* Overlay for better readability */}
-      <div className="absolute inset-0 bg-black/30"></div>
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 flex items-center justify-center p-4">
+      {/* Animated Background */}
+      <div className="absolute inset-0 overflow-hidden">
+        <motion.div
+          className="absolute top-20 left-20 w-96 h-96 bg-blue-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30"
+          animate={{
+            x: [0, 100, 0],
+            y: [0, 50, 0],
+          }}
+          transition={{
+            duration: 20,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+        <motion.div
+          className="absolute bottom-20 right-20 w-96 h-96 bg-purple-300 rounded-full mix-blend-multiply filter blur-3xl opacity-30"
+          animate={{
+            x: [0, -100, 0],
+            y: [0, -50, 0],
+          }}
+          transition={{
+            duration: 15,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      </div>
+
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        className="w-full max-w-2xl relative z-10"
+        className="w-full max-w-md relative z-10"
       >
-        <Card className="p-0 shadow-2xl overflow-hidden bg-white" style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)', borderRadius: '2rem' }}>
-          {/* Header with Gradient and Rounded Bottom */}
-          <div 
-            className="py-8 text-center relative"
-            style={{
-              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%)',
-              borderRadius: '2rem 2rem 3rem 3rem'
-            }}
-          >
-            <div className="w-20 h-20 bg-white/25 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
-              <GraduationCap className="w-12 h-12 text-white" />
+        <Card className="p-8 shadow-2xl">
+          {/* Logo & Title */}
+          <div className="text-center mb-8">
+            <div className="w-16 h-16 bg-gradient-to-br from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <GraduationCap className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-3xl font-black text-white mb-2">
-              {isLogin ? "Đăng Nhập" : "Đăng Ký"}
+            <h1 className="text-gray-900 mb-2">
+              {isLogin ? "Đăng nhập" : "Đăng ký"}
             </h1>
-            <p className="text-white/90 text-sm font-medium">
+            <p className="text-gray-600">
               {isLogin ? "Chào mừng bạn trở lại!" : "Tạo tài khoản mới"}
             </p>
           </div>
 
-          <div className="p-10">
-            {/* Error Message */}
-            {error && (
-              <motion.div
-                initial={{ opacity: 0, y: -10 }}
-                animate={{ opacity: 1, y: 0 }}
-                className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700"
+          {/* Error Message */}
+          {error && (
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700"
+            >
+              <AlertCircle className="w-5 h-5 flex-shrink-0" />
+              <span className="text-sm">{error}</span>
+            </motion.div>
+          )}
+
+          {/* Login Form */}
+          {isLogin ? (
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Input
+                    id="email"
+                    type="email"
+                    placeholder="your.email@student.edu"
+                    className="pl-10"
+                    value={loginData.email}
+                    onChange={(e) =>
+                      setLoginData({ ...loginData, email: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+              </div>
+
+              <div>
+                <Label htmlFor="password">Mật khẩu</Label>
+                <div className="relative">
+                  <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                  <Input
+                    id="password"
+                    type="password"
+                    placeholder="••••••••"
+                    className="pl-10"
+                    value={loginData.password}
+                    onChange={(e) =>
+                      setLoginData({ ...loginData, password: e.target.value })
+                    }
+                    required
+                  />
+                </div>
+              </div>
+
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                disabled={loading}
               >
-                <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                <span className="text-sm">{error}</span>
-              </motion.div>
-            )}
+                {loading ? "Đang đăng nhập..." : "Đăng nhập"}
+              </Button>
 
-            {/* Two Column Layout */}
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Left Column - Form */}
-              <div className="space-y-4">
-
-                {/* Login Form - Simple Style */}
-                {isLogin ? (
-                  <form onSubmit={handleLogin} className="space-y-4">
-                    <div>
-                      <Input
-                        id="email"
-                        type="email"
-                        placeholder="Email"
-                        className="w-full py-3 px-4 border-0 focus:ring-2 focus:ring-blue-500 text-sm bg-gray-100"
-                        style={{ borderRadius: '0.75rem' }}
-                        value={loginData.email}
-                        onChange={(e) =>
-                          setLoginData({ ...loginData, email: e.target.value })
-                        }
-                        required
-                      />
-                    </div>
-
-                    <div className="relative">
-                      <Input
-                        id="password"
-                        type="password"
-                        placeholder="Mật khẩu"
-                        className="w-full py-3 px-4 pr-10 border-0 focus:ring-2 focus:ring-blue-500 text-sm bg-gray-100"
-                        style={{ borderRadius: '0.75rem' }}
-                        value={loginData.password}
-                        onChange={(e) =>
-                          setLoginData({ ...loginData, password: e.target.value })
-                        }
-                        required
-                      />
-                      <button
-                        type="button"
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg"
-                      >
-                        👁️
-                      </button>
-                    </div>
-
-                    <Button
-                      type="submit"
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 transition-colors"
-                      style={{ borderRadius: '0.75rem' }}
-                      disabled={loading}
-                    >
-                      {loading ? "Đang đăng nhập..." : "Đăng nhập"}
-                    </Button>
-                  </form>
+              {/* Demo Accounts */}
+              <div className="pt-4 border-t">
+                <p className="text-sm text-gray-500 mb-3 text-center">
+                  Tài khoản demo:
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => fillDemoData("student")}
+                  >
+                    Sinh viên
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="flex-1"
+                    onClick={() => fillDemoData("teacher")}
+                  >
+                    Giảng viên
+                  </Button>
+                </div>
+              </div>
+            </form>
           ) : (
             /* Register Form */
             <form onSubmit={handleRegister} className="space-y-4">
@@ -387,94 +440,28 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
                 </>
               )}
 
-                    <Button
-                      type="submit"
-                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 rounded-lg"
-                      disabled={loading}
-                    >
-                      {loading ? "Đang đăng ký..." : "Đăng ký"}
-                    </Button>
-                  </form>
-                )}
+              <Button
+                type="submit"
+                className="w-full bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700"
+                disabled={loading}
+              >
+                {loading ? "Đang đăng ký..." : "Đăng ký"}
+              </Button>
+            </form>
+          )}
 
-                {/* Toggle Login/Register */}
-                <div className="text-center text-sm">
-                  <span className="text-gray-600">
-                    {isLogin ? "Chưa có tài khoản?" : "Đã có tài khoản?"}{" "}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setIsLogin(!isLogin);
-                      setError("");
-                    }}
-                    className="text-blue-600 hover:text-blue-700 font-semibold"
-                  >
-                    {isLogin ? "Đăng ký" : "Đăng nhập"}
-                  </button>
-                </div>
-              </div>
-
-              {/* Right Column - Social Login & Demo */}
-              <div className="space-y-4">
-                {/* Social Login Buttons */}
-                <div className="space-y-3">
-                  <button
-                    type="button"
-                    className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-white border-2 border-gray-300 rounded-xl hover:bg-gray-50 hover:border-gray-400 transition-all shadow-sm hover:shadow-md"
-                  >
-                    <svg className="w-5 h-5" viewBox="0 0 24 24">
-                      <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
-                      <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
-                      <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
-                      <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
-                    </svg>
-                    <span className="text-sm font-semibold text-gray-800">Đăng nhập với Google</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    className="w-full flex items-center justify-center gap-3 px-4 py-3.5 bg-[#1877F2] hover:bg-[#166FE5] text-white rounded-xl transition-all shadow-md hover:shadow-lg"
-                  >
-                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
-                    </svg>
-                    <span className="text-sm font-semibold">Đăng nhập với Facebook</span>
-                  </button>
-                </div>
-
-                {/* Demo Accounts with Colorful Badges */}
-                <div className="pt-4 border-t-2 border-gray-200">
-                  <p className="text-sm text-gray-700 mb-4 text-center font-bold">
-                    Tài khoản demo:
-                  </p>
-                  <div className="grid grid-cols-2 gap-3">
-                    <button
-                      type="button"
-                      onClick={() => fillDemoData("student")}
-                      className="px-4 py-3 rounded-2xl font-bold text-sm transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-                      style={{
-                        background: 'linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%)',
-                        color: '#5b21b6'
-                      }}
-                    >
-                      🎓 Sinh viên
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => fillDemoData("teacher")}
-                      className="px-4 py-3 rounded-2xl font-bold text-sm transition-all shadow-md hover:shadow-lg transform hover:-translate-y-0.5"
-                      style={{
-                        background: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-                        color: '#047857'
-                      }}
-                    >
-                      👨‍🏫 Giảng viên
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
+          {/* Toggle Login/Register */}
+          <div className="mt-6 text-center">
+            <p className="text-gray-600">
+              {isLogin ? "Chưa có tài khoản?" : "Đã có tài khoản?"}{" "}
+              <button
+                type="button"
+                onClick={() => navigate(isLogin ? "/register" : "/login")}
+                className="text-blue-600 hover:text-blue-700 font-medium"
+              >
+                {isLogin ? "Đăng ký ngay" : "Đăng nhập"}
+              </button>
+            </p>
           </div>
         </Card>
       </motion.div>
