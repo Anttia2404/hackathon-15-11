@@ -145,20 +145,21 @@ class QuizController {
 
       console.log(`Analyzing file for student: ${req.file.originalname}`);
 
-      // Use Gemini Vision to analyze file and generate questions
-      const questions = await geminiAIService.analyzeFileAndGenerateQuiz(
+      // Use Gemini Vision to analyze file and generate summary + questions
+      const result = await geminiAIService.analyzeFileWithSummary(
         req.file.buffer,
         req.file.mimetype,
         difficulty || 'medium',
         numQ
       );
 
-      console.log(`✅ Generated ${questions.length} questions from file`);
+      console.log(`✅ Generated summary and ${result.questions.length} questions from file`);
 
-      // Don't save to DB, just return questions
+      // Don't save to DB, just return summary and questions
       res.status(200).json({
         message: 'File analyzed successfully',
-        questions,
+        summary: result.summary,
+        questions: result.questions,
         fileName: req.file.originalname,
       });
     } catch (error) {

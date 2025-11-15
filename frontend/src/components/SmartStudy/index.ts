@@ -1,0 +1,1 @@
+export { SmartStudy } from './SmartStudy';

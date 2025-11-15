@@ -27,7 +27,14 @@ export default function EditClassModal({ classData, onClose, onUpdate }: EditCla
 
   useEffect(() => {
     loadData();
-  }, []);
+    
+    // Handle ESC key to close modal
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
 
   const loadData = async () => {
     try {
@@ -50,11 +57,17 @@ export default function EditClassModal({ classData, onClose, onUpdate }: EditCla
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
         className="w-full max-w-2xl"
+        onClick={(e) => e.stopPropagation()}
       >
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
@@ -77,6 +90,7 @@ export default function EditClassModal({ classData, onClose, onUpdate }: EditCla
                   </label>
                   <select
                     required
+                    autoFocus
                     value={formData.course_id}
                     onChange={(e) => setFormData({ ...formData, course_id: e.target.value })}
                     className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"

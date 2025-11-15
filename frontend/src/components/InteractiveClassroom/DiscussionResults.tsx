@@ -17,8 +17,18 @@ export default function DiscussionResults({ discussion, onClose }: DiscussionRes
   useEffect(() => {
     loadResults();
     const interval = setInterval(loadResults, 5000); // Auto refresh every 5s
-    return () => clearInterval(interval);
-  }, [discussion.discussion_id]);
+    
+    // Handle ESC key to close modal
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    
+    return () => {
+      clearInterval(interval);
+      window.removeEventListener('keydown', handleEsc);
+    };
+  }, [discussion.discussion_id, onClose]);
 
   const loadResults = async () => {
     try {
@@ -52,11 +62,17 @@ export default function DiscussionResults({ discussion, onClose }: DiscussionRes
   }
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 overflow-y-auto"
+      onClick={onClose}
+    >
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
         className="w-full max-w-4xl my-8"
+        onClick={(e) => e.stopPropagation()}
       >
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">

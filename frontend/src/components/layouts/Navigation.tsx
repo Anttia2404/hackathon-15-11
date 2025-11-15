@@ -31,14 +31,13 @@ export function Navigation({
     { id: "student-dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "join-discussion", label: "Join Discussion", icon: MessageSquare },
     { id: "smart-scheduler", label: "Smart Schedule", icon: Calendar },
-    { id: "ai-summary", label: "AI Summary", icon: FileText },
+    { id: "smart-study", label: "Smart Study", icon: FileText },
   ];
 
   const teacherPages = [
     { id: "teacher-dashboard", label: "Dashboard", icon: LayoutDashboard },
     { id: "teacher-classes", label: "My Classes", icon: LayoutDashboard },
     { id: "interactive-classroom", label: "Interactive Class", icon: MessageSquare },
-    { id: "quiz-generator", label: "Quiz Generator", icon: FileText },
   ];
 
   const adminPages = [

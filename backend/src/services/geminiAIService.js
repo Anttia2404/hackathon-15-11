@@ -112,6 +112,100 @@ Trả về JSON array với format:
     throw new Error(`Không thể phân tích file. Chi tiết: ${lastError?.message}`);
   }
 
+  async analyzeFileWithSummary(fileBuffer, mimeType, difficulty, numQuestions) {
+    if (!this.genAI) {
+      throw new Error('Gemini AI chưa được khởi tạo');
+    }
+
+    const visionModels = ['gemini-2.0-flash', 'gemini-1.5-pro'];
+    let lastError;
+
+    for (const modelName of visionModels) {
+      try {
+        console.log(`🧪 Trying vision model for summary: ${modelName}`);
+
+        const model = this.genAI.getGenerativeModel({ model: modelName });
+
+        const prompt = `Phân tích tài liệu này và thực hiện 2 nhiệm vụ:
+
+1. TÓM TẮT: Viết một đoạn tóm tắt ngắn gọn (3-5 câu) về nội dung chính của tài liệu.
+
+2. CÂU HỎI: Tạo ${numQuestions} câu hỏi trắc nghiệm từ nội dung tài liệu.
+
+Trả về theo định dạng JSON:
+{
+  "summary": "Đoạn tóm tắt ở đây...",
+  "questions": [
+    {
+      "question": "Câu hỏi?",
+      "options": ["A", "B", "C", "D"],
+      "correct_answer": "A",
+      "explanation": "Giải thích"
+    }
+  ]
+}`;
+
+        const imagePart = {
+          inlineData: {
+            data: fileBuffer.toString('base64'),
+            mimeType: mimeType,
+          },
+        };
+
+        const result = await model.generateContent([prompt, imagePart]);
+        const text = result.response.text();
+
+        // Parse response
+        const jsonMatch = text.match(/\{[\s\S]*\}/);
+        if (!jsonMatch) {
+          throw new Error('Invalid response format');
+        }
+
+        const parsed = JSON.parse(jsonMatch[0]);
+        
+        // Format questions
+        const questions = parsed.questions.map((q, index) => {
+          let correctAnswer = q.correct_answer;
+          const options = q.options || [];
+
+          // Find correct answer index
+          const matchIndex = options.findIndex(
+            opt => opt.trim().toLowerCase() === correctAnswer.trim().toLowerCase()
+          );
+
+          if (matchIndex !== -1) {
+            correctAnswer = matchIndex;
+          } else {
+            correctAnswer = 0;
+          }
+
+          return {
+            question: q.question,
+            type: 'multiple_choice',
+            options: options,
+            correctAnswer: correctAnswer,
+            explanation: q.explanation || '',
+            points: 1,
+            order: index + 1,
+          };
+        });
+
+        console.log(`✅ Successfully analyzed file with summary using model: ${modelName}`);
+
+        return {
+          summary: parsed.summary || 'Đã phân tích tài liệu thành công.',
+          questions: questions,
+        };
+      } catch (error) {
+        console.error(`❌ Model ${modelName} failed:`, error.message);
+        lastError = error;
+        continue;
+      }
+    }
+
+    throw new Error(`Không thể phân tích file. Chi tiết: ${lastError?.message}`);
+  }
+
   buildQuizPrompt(topic, difficulty, numQuestions, description) {
     const difficultyMap = {
       easy: 'dễ, phù hợp cho người mới bắt đầu',

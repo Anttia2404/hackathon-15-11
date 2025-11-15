@@ -22,7 +22,14 @@ export default function ManageStudentsModal({ classData, onClose, isTeacher = fa
 
   useEffect(() => {
     loadData();
-  }, []);
+    
+    // Handle ESC key to close modal
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
 
   const loadData = async () => {
     try {
@@ -82,11 +89,17 @@ export default function ManageStudentsModal({ classData, onClose, isTeacher = fa
   });
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
         className="w-full max-w-4xl max-h-[90vh] overflow-hidden"
+        onClick={(e) => e.stopPropagation()}
       >
         <Card className="flex flex-col h-full">
           <div className="p-6 border-b border-gray-200">
@@ -171,6 +184,7 @@ export default function ManageStudentsModal({ classData, onClose, isTeacher = fa
                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
                     <input
                       type="text"
+                      autoFocus
                       value={searchTerm}
                       onChange={(e) => setSearchTerm(e.target.value)}
                       placeholder="Tìm kiếm sinh viên..."

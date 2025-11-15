@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { X, BarChart3, HelpCircle, Cloud, MessageCircle, CheckCircle } from 'lucide-react';
 import { Card } from '../ui/card';
@@ -11,6 +11,15 @@ interface CreateDiscussionModalProps {
 
 export default function CreateDiscussionModal({ onClose, onCreate }: CreateDiscussionModalProps) {
   const [step, setStep] = useState(1);
+
+  useEffect(() => {
+    // Handle ESC key to close modal
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') onClose();
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [onClose]);
   const [formData, setFormData] = useState<{
     type: string;
     title: string;
@@ -71,11 +80,17 @@ export default function CreateDiscussionModal({ onClose, onCreate }: CreateDiscu
   };
 
   return (
-    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+    <div 
+      className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      onClick={onClose}
+    >
       <motion.div
-        initial={{ opacity: 0, scale: 0.9 }}
-        animate={{ opacity: 1, scale: 1 }}
+        initial={{ opacity: 0, scale: 0.95, y: 20 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        exit={{ opacity: 0, scale: 0.95, y: 20 }}
+        transition={{ duration: 0.2, ease: "easeOut" }}
         className="w-full max-w-2xl"
+        onClick={(e) => e.stopPropagation()}
       >
         <Card className="p-6">
           <div className="flex items-center justify-between mb-6">
@@ -121,6 +136,7 @@ export default function CreateDiscussionModal({ onClose, onCreate }: CreateDiscu
                   <input
                     type="text"
                     required
+                    autoFocus
                     value={formData.title}
                     onChange={e => setFormData({ ...formData, title: e.target.value })}
                     placeholder="VD: Bạn nghĩ gì về bài học hôm nay?"

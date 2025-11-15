@@ -12,6 +12,7 @@ class StudentController {
         include: [
           {
             model: require('../models/User'),
+            as: 'User',
             attributes: ['full_name', 'email'],
           },
         ],

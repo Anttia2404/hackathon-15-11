@@ -5,9 +5,8 @@ import { HomePage } from "./components/HomePage";
 import { LoginPage } from "./components/LoginPage";
 import { StudentDashboard } from "./components/StudentDashboard";
 import { SmartScheduler } from "./components/SmartScheduler";
-import { AISummary } from "./components/AISummary";
+import { SmartStudy } from "./components/SmartStudy";
 import { TeacherDashboard } from "./components/TeacherDashboard";
-import { QuizGenerator } from "./components/QuizGenerator";
 import { TeacherClassManagement } from "./components/TeacherDashboard/TeacherClassManagement";
 import { InteractiveClassroom } from "./components/InteractiveClassroom";
 import { JoinDiscussion } from "./components/StudentDashboard/JoinDiscussion";
@@ -51,16 +50,14 @@ function AppContent() {
         return <StudentDashboard onNavigate={handleNavigate} />;
       case "smart-scheduler":
         return <SmartScheduler />;
-      case "ai-summary":
-        return <AISummary />;
+      case "smart-study":
+        return <SmartStudy />;
       case "join-discussion":
         return <JoinDiscussion />;
       case "teacher-dashboard":
         return <TeacherDashboard onNavigate={handleNavigate} />;
       case "teacher-classes":
         return <TeacherClassManagement />;
-      case "quiz-generator":
-        return <QuizGenerator />;
       case "interactive-classroom":
         return <InteractiveClassroom />;
       case "admin-dashboard":

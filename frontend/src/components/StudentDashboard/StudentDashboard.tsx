@@ -47,11 +47,18 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
     );
   }
 
+  const healthScore = dashboard.health_score || {
+    overall_score: 0,
+    attendance_score: 0,
+    assignment_completion_score: 0,
+    performance_score: 0,
+  };
+
   const studyHealth = {
-    score: dashboard.study_health_score || 0,
-    attendance: dashboard.attendance_rate || 0,
-    assignments: dashboard.assignment_completion_rate || 0,
-    performance: Math.round(dashboard.current_gpa * 10) || 0,
+    score: healthScore.overall_score,
+    attendance: healthScore.attendance_score,
+    assignments: healthScore.assignment_completion_score,
+    performance: healthScore.performance_score,
   };
 
   return (

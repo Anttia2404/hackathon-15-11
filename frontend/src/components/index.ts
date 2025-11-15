@@ -6,8 +6,7 @@ export * from "./TeacherDashboard";
 
 // Features
 export * from "./SmartScheduler";
-export * from "./AISummary";
-export * from "./QuizGenerator";
+export * from "./SmartStudy";
 
 // Layouts
 export * from "./layouts";

@@ -64,11 +64,15 @@ class QuizService {
     return response.data;
   }
 
-  async analyzeFileForStudents(
+  async analyzeFile(
     file: File,
-    difficulty: "easy" | "medium" | "hard" | "mixed" = "medium",
-    numQuestions: number = 5
-  ): Promise<{ questions: QuizQuestion[]; fileName: string }> {
+    numQuestions: number = 5,
+    difficulty: "easy" | "medium" | "hard" | "mixed" = "medium"
+  ): Promise<{ 
+    questions: any[]; 
+    summary: string;
+    fileName: string;
+  }> {
     const formData = new FormData();
     formData.append("file", file);
     formData.append("difficulty", difficulty);

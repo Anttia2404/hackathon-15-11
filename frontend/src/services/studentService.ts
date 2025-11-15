@@ -35,10 +35,15 @@ export interface StudyPlan {
 export interface Dashboard {
   student: {
     student_id: string;
-    full_name: string;
-    gpa: number;
-    target_gpa: number;
+    student_code?: string;
+    user_id?: string;
+    gpa?: number;
+    target_gpa?: number;
     total_classes: number;
+    User?: {
+      full_name: string;
+      email: string;
+    };
   };
   pending_deadlines: number;
   deadlines: Deadline[];
