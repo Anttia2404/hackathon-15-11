@@ -9,16 +9,23 @@ import {
   ChevronRight,
   Check,
   X,
+  Loader2,
 } from "lucide-react";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { useState } from "react";
+import { aiService } from "../../services/aiService";
 
 export function AISummary() {
   const [uploadedFile, setUploadedFile] = useState(false);
   const [currentFlashcard, setCurrentFlashcard] = useState(0);
   const [currentQuiz, setCurrentQuiz] = useState(0);
   const [quizAnswers, setQuizAnswers] = useState<number[]>([]);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [aiSummary, setAiSummary] = useState<string>("");
+  const [useRealAI, setUseRealAI] = useState(false);
+  const [processingProgress, setProcessingProgress] = useState(0);
+  const [processingStep, setProcessingStep] = useState("");
 
   const summary = {
     title: "Bài giảng: Trí tuệ nhân tạo - Machine Learning",
@@ -129,6 +136,60 @@ export function AISummary() {
     }
   };
 
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    setIsGenerating(true);
+    setUploadedFile(true);
+    setProcessingProgress(0);
+
+    try {
+      // Simulate processing steps with progress
+      setProcessingStep("Đang tải file...");
+      setProcessingProgress(10);
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      setProcessingStep("Đang phân tích tài liệu... 1/10 trang");
+      setProcessingProgress(20);
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      setProcessingStep("Đang phân tích tài liệu... 3/10 trang");
+      setProcessingProgress(40);
+      await new Promise(resolve => setTimeout(resolve, 800));
+
+      setProcessingStep("Đang phân tích tài liệu... 6/10 trang");
+      setProcessingProgress(60);
+      
+      // Extract text from PDF
+      const extractedText = await aiService.extractTextFromPDF(file);
+      
+      setProcessingStep("Đang phân tích tài liệu... 8/10 trang");
+      setProcessingProgress(75);
+      await new Promise(resolve => setTimeout(resolve, 500));
+
+      setProcessingStep("Đang tạo tóm tắt với AI...");
+      setProcessingProgress(85);
+      
+      // Generate AI summary if HF token is available
+      const hfToken = (import.meta as any).env?.VITE_HF_TOKEN;
+      if (hfToken) {
+        const summary = await aiService.generateSummary(extractedText);
+        setAiSummary(summary);
+        setUseRealAI(true);
+      }
+
+      setProcessingStep("Hoàn thành!");
+      setProcessingProgress(100);
+      await new Promise(resolve => setTimeout(resolve, 500));
+    } catch (error) {
+      console.error('Error processing file:', error);
+      setProcessingStep("Lỗi xử lý file");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 py-8">
       <div className="container mx-auto px-4">
@@ -162,32 +223,154 @@ export function AISummary() {
                 Hỗ trợ PDF, PNG, JPG. AI sẽ tự động phân tích và tạo nội dung
                 học tập
               </p>
-              <Button
-                className="bg-purple-600 hover:bg-purple-700"
-                onClick={() => setUploadedFile(true)}
-              >
-                <Upload className="mr-2 w-4 h-4" />
-                Chọn file hoặc kéo thả vào đây
-              </Button>
-              <p className="text-gray-500 mt-4">Tối đa 10MB</p>
+              <input
+                type="file"
+                id="file-upload"
+                className="hidden"
+                accept=".pdf,.png,.jpg,.jpeg"
+                onChange={handleFileUpload}
+              />
+              <label htmlFor="file-upload">
+                <Button
+                  className="bg-purple-600 hover:bg-purple-700"
+                  onClick={() => document.getElementById('file-upload')?.click()}
+                  type="button"
+                >
+                  <Upload className="mr-2 w-4 h-4" />
+                  Chọn file hoặc kéo thả vào đây
+                </Button>
+              </label>
+              <p className="text-gray-500 mt-4">Tối đa 10MB • {useRealAI ? '🤖 Real AI' : '📝 Demo Mode'}</p>
             </Card>
           </motion.div>
         ) : (
           <div className="space-y-6">
-            {/* Summary Section */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-            >
-              <Card className="p-6">
-                <div className="flex items-center gap-2 mb-4">
-                  <FileText className="w-5 h-5 text-purple-600" />
-                  <h3 className="text-gray-900">Tóm tắt nội dung</h3>
-                </div>
+            {/* Loading State with Progress */}
+            {isGenerating && (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+              >
+                <Card className="p-8">
+                  <div className="text-center mb-6">
+                    <div className="relative w-24 h-24 mx-auto mb-4">
+                      <Loader2 className="w-24 h-24 text-purple-600 animate-spin" />
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <Sparkles className="w-10 h-10 text-purple-400 animate-pulse" />
+                      </div>
+                    </div>
+                    <h3 className="text-xl font-bold text-gray-900 mb-2">
+                      AI đang phân tích tài liệu...
+                    </h3>
+                    <p className="text-purple-600 font-medium mb-4">{processingStep}</p>
+                  </div>
 
-                <div className="mb-4 p-4 bg-purple-50 rounded-xl">
-                  <div className="text-gray-900 mb-2">{summary.title}</div>
+                  {/* Progress Bar */}
+                  <div className="mb-4">
+                    <div className="flex items-center justify-between mb-2">
+                      <span className="text-sm text-gray-600">Tiến độ</span>
+                      <span className="text-sm font-medium text-purple-600">
+                        {processingProgress}%
+                      </span>
+                    </div>
+                    <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                      <motion.div
+                        className="h-full bg-gradient-to-r from-purple-500 to-pink-500"
+                        initial={{ width: 0 }}
+                        animate={{ width: `${processingProgress}%` }}
+                        transition={{ duration: 0.5 }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Processing Steps */}
+                  <div className="space-y-2">
+                    <div className={`flex items-center gap-2 p-2 rounded ${processingProgress >= 10 ? 'bg-green-50' : 'bg-gray-50'}`}>
+                      {processingProgress >= 10 ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : (
+                        <div className="w-4 h-4 border-2 border-gray-300 rounded-full" />
+                      )}
+                      <span className={`text-sm ${processingProgress >= 10 ? 'text-green-700' : 'text-gray-600'}`}>
+                        Tải file lên
+                      </span>
+                    </div>
+                    <div className={`flex items-center gap-2 p-2 rounded ${processingProgress >= 60 ? 'bg-green-50' : 'bg-gray-50'}`}>
+                      {processingProgress >= 60 ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : processingProgress >= 20 ? (
+                        <Loader2 className="w-4 h-4 text-purple-600 animate-spin" />
+                      ) : (
+                        <div className="w-4 h-4 border-2 border-gray-300 rounded-full" />
+                      )}
+                      <span className={`text-sm ${processingProgress >= 60 ? 'text-green-700' : processingProgress >= 20 ? 'text-purple-700' : 'text-gray-600'}`}>
+                        Phân tích nội dung
+                      </span>
+                    </div>
+                    <div className={`flex items-center gap-2 p-2 rounded ${processingProgress >= 85 ? 'bg-green-50' : 'bg-gray-50'}`}>
+                      {processingProgress >= 85 ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : processingProgress >= 75 ? (
+                        <Loader2 className="w-4 h-4 text-purple-600 animate-spin" />
+                      ) : (
+                        <div className="w-4 h-4 border-2 border-gray-300 rounded-full" />
+                      )}
+                      <span className={`text-sm ${processingProgress >= 85 ? 'text-green-700' : processingProgress >= 75 ? 'text-purple-700' : 'text-gray-600'}`}>
+                        Tạo tóm tắt AI
+                      </span>
+                    </div>
+                    <div className={`flex items-center gap-2 p-2 rounded ${processingProgress >= 100 ? 'bg-green-50' : 'bg-gray-50'}`}>
+                      {processingProgress >= 100 ? (
+                        <Check className="w-4 h-4 text-green-600" />
+                      ) : processingProgress >= 85 ? (
+                        <Loader2 className="w-4 h-4 text-purple-600 animate-spin" />
+                      ) : (
+                        <div className="w-4 h-4 border-2 border-gray-300 rounded-full" />
+                      )}
+                      <span className={`text-sm ${processingProgress >= 100 ? 'text-green-700' : processingProgress >= 85 ? 'text-purple-700' : 'text-gray-600'}`}>
+                        Tạo Flashcard & Quiz
+                      </span>
+                    </div>
+                  </div>
+                </Card>
+              </motion.div>
+            )}
+
+            {/* AI Summary Badge */}
+            {!isGenerating && useRealAI && aiSummary && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <div className="flex items-center gap-2 p-3 bg-gradient-to-r from-purple-100 to-pink-100 rounded-lg">
+                  <Sparkles className="w-5 h-5 text-purple-600" />
+                  <span className="text-purple-900 font-medium">Real AI Summary từ Hugging Face</span>
                 </div>
+              </motion.div>
+            )}
+
+            {/* Summary Section */}
+            {!isGenerating && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                <Card className="p-6">
+                  <div className="flex items-center gap-2 mb-4">
+                    <FileText className="w-5 h-5 text-purple-600" />
+                    <h3 className="text-gray-900">Tóm tắt nội dung</h3>
+                    {useRealAI && <span className="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">AI Generated</span>}
+                  </div>
+
+                  {useRealAI && aiSummary ? (
+                    <div className="p-4 bg-purple-50 rounded-xl">
+                      <p className="text-gray-800 leading-relaxed">{aiSummary}</p>
+                    </div>
+                  ) : (
+                    <>
+                      <div className="mb-4 p-4 bg-purple-50 rounded-xl">
+                        <div className="text-gray-900 mb-2">{summary.title}</div>
+                      </div>
 
                 <ul className="space-y-3">
                   {summary.points.map((point, index) => (
@@ -205,15 +388,19 @@ export function AISummary() {
                     </motion.li>
                   ))}
                 </ul>
-              </Card>
-            </motion.div>
+                    </>
+                  )}
+                </Card>
+              </motion.div>
+            )}
 
             {/* Key Insights */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
+            {!isGenerating && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.2 }}
+              >
               <Card className="p-6 bg-gradient-to-br from-purple-50 to-pink-50">
                 <div className="flex items-center gap-2 mb-4">
                   <Sparkles className="w-5 h-5 text-purple-600" />
@@ -232,10 +419,12 @@ export function AISummary() {
                   ))}
                 </div>
               </Card>
-            </motion.div>
+              </motion.div>
+            )}
 
             {/* Flashcards */}
-            <motion.div
+            {!isGenerating && (
+              <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
@@ -295,10 +484,12 @@ export function AISummary() {
                   </div>
                 </div>
               </Card>
-            </motion.div>
+              </motion.div>
+            )}
 
             {/* Quiz */}
-            <motion.div
+            {!isGenerating && (
+              <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
@@ -379,7 +570,8 @@ export function AISummary() {
                     </div>
                   )}
               </Card>
-            </motion.div>
+              </motion.div>
+            )}
           </div>
         )}
       </div>

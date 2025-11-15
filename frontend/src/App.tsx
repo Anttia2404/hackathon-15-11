@@ -8,6 +8,7 @@ import { SmartScheduler } from "./components/SmartScheduler";
 import { AISummary } from "./components/AISummary";
 import { TeacherDashboard } from "./components/TeacherDashboard";
 import { QuizGenerator } from "./components/QuizGenerator";
+import { VoiceAssistant } from "./components/VoiceAssistant/VoiceAssistant";
 
 function AppContent() {
   const { user, isAuthenticated } = useAuth();
@@ -48,7 +49,7 @@ function AppContent() {
       case "ai-summary":
         return <AISummary />;
       case "teacher-dashboard":
-        return <TeacherDashboard onNavigate={handleNavigate} />;
+        return <TeacherDashboard />;
       case "quiz-generator":
         return <QuizGenerator />;
       default:
@@ -64,6 +65,9 @@ function AppContent() {
         userType={userType}
       />
       {renderPage()}
+      
+      {/* Voice Assistant - Show for students */}
+      {userType === "student" && <VoiceAssistant />}
     </div>
   );
 }

@@ -6,13 +6,18 @@ import {
   LayoutDashboard,
   ClipboardList,
   LogOut,
+  Users,
+  BookOpen,
+  Bell,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useAuth } from "../../contexts/AuthContext";
+import { useState } from "react";
+import { PushNotification } from "../PushNotification/PushNotification";
 
 interface NavigationProps {
   currentPage: string;
-  onNavigate: (page: string) => void;
+  onNavigate: (page: string, type?: "student" | "teacher") => void;
   userType: "student" | "teacher" | null;
 }
 
@@ -22,6 +27,7 @@ export function Navigation({
   userType,
 }: NavigationProps) {
   const { user, logout } = useAuth();
+  const [showNotifications, setShowNotifications] = useState(false);
 
   const handleLogout = async () => {
     await logout();
@@ -88,6 +94,49 @@ export function Navigation({
           {/* User Info & Logout */}
           {userType && user && (
             <div className="flex items-center gap-3">
+              {/* Switch Mode Button */}
+              {userType === "student" ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onNavigate("teacher-dashboard", "teacher")}
+                  className="gap-2 border-purple-200 text-purple-700 hover:bg-purple-50"
+                >
+                  <Users className="w-4 h-4" />
+                  Dành cho Giảng viên
+                </Button>
+              ) : (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => onNavigate("student-dashboard", "student")}
+                  className="gap-2 border-blue-200 text-blue-700 hover:bg-blue-50"
+                >
+                  <BookOpen className="w-4 h-4" />
+                  Chế độ Sinh viên
+                </Button>
+              )}
+
+              {/* Notification Bell - Only for Students */}
+              {userType === "student" && (
+                <div className="relative">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setShowNotifications(!showNotifications)}
+                    className="relative"
+                  >
+                    <Bell className="w-5 h-5" />
+                    <span className="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+                  </Button>
+                  {showNotifications && (
+                    <div className="absolute right-0 mt-2 z-50">
+                      <PushNotification onClose={() => setShowNotifications(false)} />
+                    </div>
+                  )}
+                </div>
+              )}
+              
               <div className="text-right">
                 <p className="text-sm font-medium text-gray-900">
                   {user.full_name}
