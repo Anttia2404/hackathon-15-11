@@ -43,8 +43,12 @@ const Student = sequelize.define(
   }
 );
 
-// Associations
-Student.belongsTo(User, { foreignKey: 'user_id', onDelete: 'CASCADE' });
+// Associations - explicitly set the association
+Student.belongsTo(User, { 
+  foreignKey: 'user_id',
+  as: 'User',
+  onDelete: 'CASCADE' 
+});
 User.hasOne(Student, { foreignKey: 'user_id' });
 
 module.exports = Student;

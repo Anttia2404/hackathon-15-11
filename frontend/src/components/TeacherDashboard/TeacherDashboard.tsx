@@ -18,8 +18,6 @@ import {
   CartesianGrid,
   Tooltip,
   ResponsiveContainer,
-  LineChart,
-  Line,
 } from "recharts";
 import { useTeacherDashboard, useAtRiskStudents } from "../../hooks/useTeacher";
 import { useAuth } from "../../contexts/AuthContext";
@@ -28,10 +26,10 @@ interface TeacherDashboardProps {
   onNavigate: (page: string) => void;
 }
 
-export function TeacherDashboard({ onNavigate }: TeacherDashboardProps) {
+export function TeacherDashboard({ onNavigate: _onNavigate }: TeacherDashboardProps) {
   const { user } = useAuth();
   const { dashboard, loading, error } = useTeacherDashboard();
-  const { atRiskStudents, loading: loadingAtRisk } = useAtRiskStudents();
+  const { students: atRiskStudents, loading: loadingAtRisk } = useAtRiskStudents();
 
   if (loading) {
     return (

@@ -8,6 +8,10 @@ import { SmartScheduler } from "./components/SmartScheduler";
 import { AISummary } from "./components/AISummary";
 import { TeacherDashboard } from "./components/TeacherDashboard";
 import { QuizGenerator } from "./components/QuizGenerator";
+import { TeacherClassManagement } from "./components/TeacherDashboard/TeacherClassManagement";
+import { InteractiveClassroom } from "./components/InteractiveClassroom";
+import { JoinDiscussion } from "./components/StudentDashboard/JoinDiscussion";
+import { AdminDashboard } from "./components/AdminDashboard";
 
 function AppContent() {
   const { user, isAuthenticated } = useAuth();
@@ -27,11 +31,13 @@ function AppContent() {
     }
   };
 
-  const handleLoginSuccess = (type: "student" | "teacher") => {
-    setUserType(type);
-    setCurrentPage(
-      type === "student" ? "student-dashboard" : "teacher-dashboard"
-    );
+  const handleLoginSuccess = (type: "student" | "teacher" | "admin") => {
+    setUserType(type as any);
+    if (type === "admin") {
+      setCurrentPage("admin-dashboard");
+    } else {
+      setCurrentPage(type === "student" ? "student-dashboard" : "teacher-dashboard");
+    }
   };
 
   // Show login page if not authenticated
@@ -47,10 +53,18 @@ function AppContent() {
         return <SmartScheduler />;
       case "ai-summary":
         return <AISummary />;
+      case "join-discussion":
+        return <JoinDiscussion />;
       case "teacher-dashboard":
         return <TeacherDashboard onNavigate={handleNavigate} />;
+      case "teacher-classes":
+        return <TeacherClassManagement />;
       case "quiz-generator":
         return <QuizGenerator />;
+      case "interactive-classroom":
+        return <InteractiveClassroom />;
+      case "admin-dashboard":
+        return <AdminDashboard />;
       default:
         return <HomePage onNavigate={handleNavigate} />;
     }

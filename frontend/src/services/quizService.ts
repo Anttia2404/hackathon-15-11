@@ -42,6 +42,46 @@ class QuizService {
     return response.data;
   }
 
+  async generateQuizFromFile(
+    file: File,
+    difficulty: "easy" | "medium" | "hard" | "mixed" = "medium",
+    numQuestions: number = 5,
+    title?: string,
+    classId?: string
+  ): Promise<{ quiz: Quiz; questions: QuizQuestion[] }> {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("difficulty", difficulty);
+    formData.append("num_questions", numQuestions.toString());
+    if (title) formData.append("title", title);
+    if (classId) formData.append("class_id", classId);
+
+    const response = await api.post("/quizzes/generate-from-file", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  }
+
+  async analyzeFileForStudents(
+    file: File,
+    difficulty: "easy" | "medium" | "hard" | "mixed" = "medium",
+    numQuestions: number = 5
+  ): Promise<{ questions: QuizQuestion[]; fileName: string }> {
+    const formData = new FormData();
+    formData.append("file", file);
+    formData.append("difficulty", difficulty);
+    formData.append("num_questions", numQuestions.toString());
+
+    const response = await api.post("/quizzes/analyze-file", formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+    return response.data;
+  }
+
   async getQuiz(quizId: string): Promise<Quiz> {
     const response = await api.get(`/quizzes/${quizId}`);
     return response.data.quiz;

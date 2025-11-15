@@ -3,6 +3,8 @@ const authRoutes = require('./authRoutes');
 const studentRoutes = require('./studentRoutes');
 const teacherRoutes = require('./teacherRoutes');
 const quizRoutes = require('./quizRoutes');
+const discussionRoutes = require('./discussionRoutes');
+const adminRoutes = require('./adminRoutes');
 
 const router = express.Router();
 
@@ -11,6 +13,8 @@ router.use('/auth', authRoutes);
 router.use('/students', studentRoutes);
 router.use('/teachers', teacherRoutes);
 router.use('/quizzes', quizRoutes);
+router.use('/discussions', discussionRoutes);
+router.use('/admin', adminRoutes);
 
 // Health check
 router.get('/health', (req, res) => {

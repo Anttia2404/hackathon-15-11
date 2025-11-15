@@ -126,6 +126,194 @@ class TeacherController {
       res.status(500).json({ message: 'Server error', error: error.message });
     }
   }
+
+  // Get teacher's classes
+  async getTeacherClasses(req, res) {
+    try {
+      const teacherId = req.teacher.teacher_id;
+
+      const classes = await Class.findAll({
+        where: { teacher_id: teacherId },
+        include: [
+          {
+            model: Course,
+            attributes: ['course_name', 'course_code', 'credits'],
+          },
+        ],
+        order: [['created_at', 'DESC']],
+      });
+
+      // Get enrollment count for each class
+      const classesWithCount = await Promise.all(
+        classes.map(async (cls) => {
+          const enrollmentCount = await sequelize.query(
+            `SELECT COUNT(*) as count FROM class_enrollments WHERE class_id = :classId AND status = 'active'`,
+            {
+              replacements: { classId: cls.class_id },
+              type: sequelize.QueryTypes.SELECT,
+            }
+          );
+
+          return {
+            ...cls.toJSON(),
+            enrollment_count: enrollmentCount[0].count,
+          };
+        })
+      );
+
+      res.json({ classes: classesWithCount });
+    } catch (error) {
+      console.error('Get teacher classes error:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  }
+
+  // Get class enrollments
+  async getClassEnrollments(req, res) {
+    try {
+      const { id } = req.params;
+      const teacherId = req.teacher.teacher_id;
+
+      // Verify class belongs to teacher
+      const classExists = await Class.findOne({
+        where: { class_id: id, teacher_id: teacherId },
+      });
+
+      if (!classExists) {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+
+      const enrollments = await sequelize.query(`
+        SELECT 
+          ce.enrollment_id,
+          ce.status,
+          ce.enrolled_at,
+          s.student_id,
+          s.student_code,
+          u.full_name,
+          u.email
+        FROM class_enrollments ce
+        JOIN students s ON ce.student_id = s.student_id
+        JOIN users u ON s.user_id = u.user_id
+        WHERE ce.class_id = :classId
+        ORDER BY u.full_name ASC
+      `, {
+        replacements: { classId: id },
+        type: sequelize.QueryTypes.SELECT,
+      });
+
+      res.json({ enrollments });
+    } catch (error) {
+      console.error('Get class enrollments error:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  }
+
+  // Add students to class
+  async addStudentsToClass(req, res) {
+    try {
+      const { class_id, student_ids } = req.body;
+      const teacherId = req.teacher.teacher_id;
+
+      // Verify class belongs to teacher
+      const classExists = await Class.findOne({
+        where: { class_id, teacher_id: teacherId },
+      });
+
+      if (!classExists) {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+
+      // Add enrollments
+      const enrollments = student_ids.map(student_id => ({
+        class_id,
+        student_id,
+        status: 'active',
+      }));
+
+      await sequelize.query(`
+        INSERT INTO class_enrollments (class_id, student_id, status, enrolled_at)
+        VALUES ${enrollments.map(e => `('${e.class_id}', '${e.student_id}', '${e.status}', NOW())`).join(',')}
+        ON CONFLICT (class_id, student_id) DO NOTHING
+      `);
+
+      res.json({
+        message: `Đã thêm ${student_ids.length} sinh viên vào lớp`,
+      });
+    } catch (error) {
+      console.error('Add students to class error:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  }
+
+  // Remove student from class
+  async removeStudentFromClass(req, res) {
+    try {
+      const { enrollment_id } = req.params;
+      const teacherId = req.teacher.teacher_id;
+
+      // Verify enrollment belongs to teacher's class
+      const enrollment = await sequelize.query(`
+        SELECT ce.* FROM class_enrollments ce
+        JOIN classes c ON ce.class_id = c.class_id
+        WHERE ce.enrollment_id = :enrollmentId AND c.teacher_id = :teacherId
+      `, {
+        replacements: { enrollmentId: enrollment_id, teacherId },
+        type: sequelize.QueryTypes.SELECT,
+      });
+
+      if (enrollment.length === 0) {
+        return res.status(403).json({ message: 'Unauthorized' });
+      }
+
+      await sequelize.query(`
+        DELETE FROM class_enrollments WHERE enrollment_id = :enrollmentId
+      `, {
+        replacements: { enrollmentId: enrollment_id },
+      });
+
+      res.json({ message: 'Đã xóa sinh viên khỏi lớp' });
+    } catch (error) {
+      console.error('Remove student from class error:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  }
+
+  // Get all students (for adding to class)
+  async getAllStudents(req, res) {
+    try {
+      const students = await sequelize.query(`
+        SELECT 
+          s.student_id,
+          s.student_code,
+          s.major,
+          u.full_name,
+          u.email
+        FROM students s
+        JOIN users u ON s.user_id = u.user_id
+        WHERE u.is_active = true
+        ORDER BY u.full_name ASC
+      `, {
+        type: sequelize.QueryTypes.SELECT,
+      });
+
+      // Transform to match frontend expectations
+      const transformedStudents = students.map(s => ({
+        student_id: s.student_id,
+        student_code: s.student_code,
+        major: s.major,
+        User: {
+          full_name: s.full_name,
+          email: s.email,
+        },
+      }));
+
+      res.json({ students: transformedStudents });
+    } catch (error) {
+      console.error('Get all students error:', error);
+      res.status(500).json({ message: 'Server error', error: error.message });
+    }
+  }
 }
 
 module.exports = new TeacherController();

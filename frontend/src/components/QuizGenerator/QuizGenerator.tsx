@@ -1,5 +1,14 @@
 import { motion } from "motion/react";
-import { Brain, Sparkles, Plus, Copy, Download, RefreshCw } from "lucide-react";
+import {
+  Brain,
+  Sparkles,
+  Plus,
+  Copy,
+  Download,
+  RefreshCw,
+  Loader2,
+  AlertCircle,
+} from "lucide-react";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Input } from "../ui/input";
@@ -13,77 +22,97 @@ import {
 } from "../ui/select";
 import { Textarea } from "../ui/textarea";
 import { useState } from "react";
+import quizService, {
+  QuizQuestion as ApiQuizQuestion,
+} from "../../services/quizService";
+
+interface QuizQuestion {
+  question: string;
+  type: string;
+  options: string[];
+  correctAnswer: number;
+  explanation: string;
+}
 
 export function QuizGenerator() {
-  const [generated, setGenerated] = useState(false);
+  const [topic, setTopic] = useState("");
+  const [description, setDescription] = useState("");
+  const [numQuestions, setNumQuestions] = useState("5");
+  const [difficulty, setDifficulty] = useState("medium");
+  const [questionType, setQuestionType] = useState("multiple");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [generatedQuestions, setGeneratedQuestions] = useState<QuizQuestion[]>(
+    []
+  );
 
-  const generatedQuestions = [
-    {
-      question: "Machine Learning là gì?",
-      type: "multiple",
-      options: [
-        "Phương pháp lập trình truyền thống",
-        "Nhánh của AI cho phép máy tính học từ dữ liệu",
-        "Ngôn ngữ lập trình mới",
-        "Hệ điều hành cho AI",
-      ],
-      correctAnswer: 1,
-      explanation:
-        "Machine Learning là nhánh của AI tập trung vào việc xây dựng các thuật toán có khả năng học từ dữ liệu và cải thiện hiệu suất theo thời gian.",
-    },
-    {
-      question: "Supervised Learning yêu cầu điều kiện gì?",
-      type: "multiple",
-      options: [
-        "Dữ liệu không có nhãn",
-        "Dữ liệu có nhãn (labeled data)",
-        "Không cần dữ liệu",
-        "Chỉ cần thuật toán",
-      ],
-      correctAnswer: 1,
-      explanation:
-        "Supervised Learning cần dữ liệu được gán nhãn để model có thể học mối quan hệ giữa input và output.",
-    },
-    {
-      question: "Neural Network được lấy cảm hứng từ đâu?",
-      type: "multiple",
-      options: [
-        "Mạng Internet",
-        "Não người",
-        "Hệ thống máy tính",
-        "Mạng xã hội",
-      ],
-      correctAnswer: 1,
-      explanation:
-        "Neural Network mô phỏng cấu trúc và cách hoạt động của các tế bào thần kinh trong não người.",
-    },
-    {
-      question: "Overfitting là hiện tượng gì?",
-      type: "multiple",
-      options: [
-        "Model học quá tốt trên training data nhưng kém trên test data",
-        "Model không học được gì",
-        "Model học quá nhanh",
-        "Model có quá ít parameters",
-      ],
-      correctAnswer: 0,
-      explanation:
-        "Overfitting xảy ra khi model học quá chi tiết từ training data, bao gồm cả nhiễu, dẫn đến hiệu suất kém trên dữ liệu mới.",
-    },
-    {
-      question: "Regularization giúp giải quyết vấn đề gì?",
-      type: "multiple",
-      options: [
-        "Tăng tốc độ training",
-        "Giảm overfitting",
-        "Tăng độ chính xác training",
-        "Giảm số lượng features",
-      ],
-      correctAnswer: 1,
-      explanation:
-        "Regularization là kỹ thuật thêm penalty vào loss function để tránh model học quá phức tạp, giúp giảm overfitting.",
-    },
-  ];
+  const handleGenerate = async () => {
+    if (!topic.trim()) {
+      setError("Vui lòng nhập chủ đề");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const response = await quizService.generateQuiz({
+        title: topic.trim(),
+        description: description.trim(),
+        topic: topic.trim(),
+        difficulty: difficulty as "easy" | "medium" | "hard" | "mixed",
+        num_questions: parseInt(numQuestions),
+      });
+
+      // Transform API response to local format
+      const questions: QuizQuestion[] = (response.questions || []).map((q) => ({
+        question: q.question_text,
+        type: q.question_type,
+        options: q.options || [],
+        correctAnswer: 0, // API should provide this
+        explanation: q.explanation || "",
+      }));
+
+      setGeneratedQuestions(questions);
+    } catch (err: any) {
+      setError(
+        err.response?.data?.message || "Không thể tạo quiz. Vui lòng thử lại."
+      );
+      setGeneratedQuestions([]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleCopy = () => {
+    const text = generatedQuestions
+      .map((q, i) => {
+        const options = q.options
+          .map((opt, idx) => `${String.fromCharCode(65 + idx)}. ${opt}`)
+          .join("\n");
+        return `Câu ${i + 1}: ${
+          q.question
+        }\n${options}\nĐáp án: ${String.fromCharCode(
+          65 + q.correctAnswer
+        )}\nGiải thích: ${q.explanation}\n`;
+      })
+      .join("\n---\n\n");
+
+    navigator.clipboard.writeText(text);
+    alert("Đã copy vào clipboard!");
+  };
+
+  const handleExport = () => {
+    const dataStr = JSON.stringify(generatedQuestions, null, 2);
+    const dataUri =
+      "data:application/json;charset=utf-8," + encodeURIComponent(dataStr);
+    const exportFileDefaultName = `quiz_${topic.replace(/\s+/g, "_")}.json`;
+
+    const linkElement = document.createElement("a");
+    linkElement.setAttribute("href", dataUri);
+    linkElement.setAttribute("download", exportFileDefaultName);
+    linkElement.click();
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -116,11 +145,12 @@ export function QuizGenerator() {
 
               <div className="space-y-4">
                 <div>
-                  <Label htmlFor="topic">Chủ đề</Label>
+                  <Label htmlFor="topic">Chủ đề *</Label>
                   <Input
                     id="topic"
                     placeholder="VD: Machine Learning cơ bản"
-                    defaultValue="Machine Learning"
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
                   />
                 </div>
 
@@ -130,13 +160,14 @@ export function QuizGenerator() {
                     id="description"
                     placeholder="Nhập mô tả về nội dung cần kiểm tra..."
                     rows={4}
-                    defaultValue="Kiểm tra kiến thức cơ bản về ML, bao gồm supervised learning, neural network, overfitting"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
                   />
                 </div>
 
                 <div>
                   <Label htmlFor="num-questions">Số câu hỏi</Label>
-                  <Select defaultValue="5">
+                  <Select value={numQuestions} onValueChange={setNumQuestions}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -151,7 +182,7 @@ export function QuizGenerator() {
 
                 <div>
                   <Label htmlFor="difficulty">Độ khó</Label>
-                  <Select defaultValue="medium">
+                  <Select value={difficulty} onValueChange={setDifficulty}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -166,7 +197,7 @@ export function QuizGenerator() {
 
                 <div>
                   <Label htmlFor="type">Loại câu hỏi</Label>
-                  <Select defaultValue="multiple">
+                  <Select value={questionType} onValueChange={setQuestionType}>
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
@@ -179,12 +210,29 @@ export function QuizGenerator() {
                   </Select>
                 </div>
 
+                {error && (
+                  <div className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 text-red-600 mt-0.5" />
+                    <p className="text-sm text-red-700">{error}</p>
+                  </div>
+                )}
+
                 <Button
                   className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 gap-2"
-                  onClick={() => setGenerated(true)}
+                  onClick={handleGenerate}
+                  disabled={loading}
                 >
-                  <Sparkles className="w-4 h-4" />
-                  Generate với AI
+                  {loading ? (
+                    <>
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                      Đang tạo...
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      Generate với AI
+                    </>
+                  )}
                 </Button>
               </div>
             </Card>
@@ -197,7 +245,7 @@ export function QuizGenerator() {
             transition={{ delay: 0.2 }}
             className="lg:col-span-2"
           >
-            {!generated ? (
+            {generatedQuestions.length === 0 ? (
               <Card className="p-12 text-center">
                 <div className="w-20 h-20 bg-indigo-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Brain className="w-10 h-10 text-indigo-600" />
@@ -212,15 +260,15 @@ export function QuizGenerator() {
                 <div className="grid grid-cols-3 gap-4 max-w-lg mx-auto">
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <Sparkles className="w-6 h-6 text-indigo-600 mx-auto mb-2" />
-                    <span className="text-gray-700">AI-Powered</span>
+                    <span className="text-sm text-gray-700">AI-Powered</span>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <RefreshCw className="w-6 h-6 text-purple-600 mx-auto mb-2" />
-                    <span className="text-gray-700">Tự động</span>
+                    <span className="text-sm text-gray-700">Tự động</span>
                   </div>
                   <div className="p-4 bg-gray-50 rounded-lg">
                     <Copy className="w-6 h-6 text-pink-600 mx-auto mb-2" />
-                    <span className="text-gray-700">Dễ sử dụng</span>
+                    <span className="text-sm text-gray-700">Dễ sử dụng</span>
                   </div>
                 </div>
               </Card>
@@ -228,19 +276,30 @@ export function QuizGenerator() {
               <div className="space-y-6">
                 {/* Action Buttons */}
                 <div className="flex items-center justify-between">
-                  <div className="text-gray-600">
+                  <div className="text-sm text-gray-600">
                     Đã tạo {generatedQuestions.length} câu hỏi
                   </div>
                   <div className="flex gap-2">
-                    <Button variant="outline" className="gap-2">
+                    <Button
+                      variant="outline"
+                      className="gap-2"
+                      onClick={() => setGeneratedQuestions([])}
+                    >
                       <RefreshCw className="w-4 h-4" />
-                      Tạo lại
+                      Tạo mới
                     </Button>
-                    <Button variant="outline" className="gap-2">
+                    <Button
+                      variant="outline"
+                      className="gap-2"
+                      onClick={handleCopy}
+                    >
                       <Copy className="w-4 h-4" />
                       Copy
                     </Button>
-                    <Button className="bg-indigo-600 hover:bg-indigo-700 gap-2">
+                    <Button
+                      className="bg-indigo-600 hover:bg-indigo-700 gap-2"
+                      onClick={handleExport}
+                    >
                       <Download className="w-4 h-4" />
                       Export
                     </Button>
@@ -324,9 +383,22 @@ export function QuizGenerator() {
                   <p className="text-gray-600 mb-4">
                     AI có thể tạo thêm câu hỏi với các góc độ khác nhau
                   </p>
-                  <Button className="bg-indigo-600 hover:bg-indigo-700 gap-2">
-                    <Plus className="w-4 h-4" />
-                    Tạo thêm 5 câu
+                  <Button
+                    className="bg-indigo-600 hover:bg-indigo-700 gap-2"
+                    onClick={handleGenerate}
+                    disabled={loading || !topic.trim()}
+                  >
+                    {loading ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                        Đang tạo...
+                      </>
+                    ) : (
+                      <>
+                        <Plus className="w-4 h-4" />
+                        Tạo thêm {numQuestions} câu
+                      </>
+                    )}
                   </Button>
                 </Card>
               </div>

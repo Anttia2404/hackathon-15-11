@@ -4,8 +4,8 @@ import {
   Calendar,
   FileText,
   LayoutDashboard,
-  ClipboardList,
   LogOut,
+  MessageSquare,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { useAuth } from "../../contexts/AuthContext";
@@ -13,7 +13,7 @@ import { useAuth } from "../../contexts/AuthContext";
 interface NavigationProps {
   currentPage: string;
   onNavigate: (page: string) => void;
-  userType: "student" | "teacher" | null;
+  userType: "student" | "teacher" | "admin" | null;
 }
 
 export function Navigation({
@@ -29,13 +29,20 @@ export function Navigation({
   };
   const studentPages = [
     { id: "student-dashboard", label: "Dashboard", icon: LayoutDashboard },
+    { id: "join-discussion", label: "Join Discussion", icon: MessageSquare },
     { id: "smart-scheduler", label: "Smart Schedule", icon: Calendar },
     { id: "ai-summary", label: "AI Summary", icon: FileText },
   ];
 
   const teacherPages = [
     { id: "teacher-dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "quiz-generator", label: "Quiz Generator", icon: ClipboardList },
+    { id: "teacher-classes", label: "My Classes", icon: LayoutDashboard },
+    { id: "interactive-classroom", label: "Interactive Class", icon: MessageSquare },
+    { id: "quiz-generator", label: "Quiz Generator", icon: FileText },
+  ];
+
+  const adminPages = [
+    { id: "admin-dashboard", label: "Admin Dashboard", icon: LayoutDashboard },
   ];
 
   const pages =
@@ -43,6 +50,8 @@ export function Navigation({
       ? studentPages
       : userType === "teacher"
       ? teacherPages
+      : userType === "admin"
+      ? adminPages
       : [];
 
   return (
@@ -93,7 +102,7 @@ export function Navigation({
                   {user.full_name}
                 </p>
                 <span className="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full capitalize">
-                  {userType === "student" ? "Sinh viên" : "Giảng viên"}
+                  {userType === "student" ? "Sinh viên" : userType === "teacher" ? "Giảng viên" : "Admin"}
                 </span>
               </div>
               <Button

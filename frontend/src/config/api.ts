@@ -2,7 +2,7 @@ import axios from "axios";
 
 // API Base URL
 export const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api/v1";
+  import.meta.env.VITE_API_BASE_URL || "http://localhost:5002/api/v1";
 
 // Create axios instance
 const api = axios.create({
@@ -10,7 +10,7 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-  timeout: 10000,
+  timeout: 120000, // 2 minutes for AI operations
 });
 
 // Request interceptor - Add auth token

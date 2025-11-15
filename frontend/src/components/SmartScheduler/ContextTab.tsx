@@ -129,7 +129,7 @@ Tuesday 10:00-12:00 ENG150 Technical Writing
             <Checkbox
               id="no-after-23"
               checked={hardLimits.noAfter23}
-              onCheckedChange={(checked) =>
+              onCheckedChange={(checked: boolean) =>
                 setHardLimits({ ...hardLimits, noAfter23: checked as boolean })
               }
             />
@@ -145,7 +145,7 @@ Tuesday 10:00-12:00 ENG150 Technical Writing
             <Checkbox
               id="no-sundays"
               checked={hardLimits.noSundays}
-              onCheckedChange={(checked) =>
+              onCheckedChange={(checked: boolean) =>
                 setHardLimits({ ...hardLimits, noSundays: checked as boolean })
               }
             />
