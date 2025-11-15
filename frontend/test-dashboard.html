@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Dashboard API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        button:hover {
+            background: #2563eb;
+        }
+        .success {
+            color: #10b981;
+            font-weight: bold;
+        }
+        .error {
+            color: #ef4444;
+            font-weight: bold;
+        }
+        pre {
+            background: #1f2937;
+            color: #10b981;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>🔍 EduSmart Dashboard API Test</h1>
+    
+    <div class="test-box">
+        <h2>1. Test Backend Connection</h2>
+        <button onclick="testBackend()">Test Backend</button>
+        <div id="backend-result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>2. Test Study Health API</h2>
+        <button onclick="testStudyHealth()">Test Study Health</button>
+        <div id="health-result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>3. Test Optimal Time API</h2>
+        <button onclick="testOptimalTime()">Test Optimal Time</button>
+        <div id="time-result"></div>
+    </div>
+
+    <div class="test-box">
+        <h2>4. Test Frontend</h2>
+        <button onclick="window.open('http://localhost:5173', '_blank')">Open Frontend</button>
+        <p>Kiểm tra Console (F12) để xem logs</p>
+    </div>
+
+    <script>
+        const API_BASE = 'http://localhost:5000/api/v1';
+        const TEST_STUDENT_ID = 'test-student-123';
+
+        async function testBackend() {
+            const result = document.getElementById('backend-result');
+            result.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/health`);
+                const data = await response.json();
+                
+                result.innerHTML = `
+                    <p class="success">✅ Backend is running!</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <p class="error">❌ Backend not running</p>
+                    <p>Error: ${error.message}</p>
+                    <p><strong>Solution:</strong> Run <code>cd backend && npm run dev</code></p>
+                `;
+            }
+        }
+
+        async function testStudyHealth() {
+            const result = document.getElementById('health-result');
+            result.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/analytics/study-health/${TEST_STUDENT_ID}`);
+                const data = await response.json();
+                
+                result.innerHTML = `
+                    <p class="success">✅ Study Health API working!</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <p class="error">❌ API call failed</p>
+                    <p>Error: ${error.message}</p>
+                    <p><strong>Note:</strong> Frontend will use mock data (this is OK!)</p>
+                `;
+            }
+        }
+
+        async function testOptimalTime() {
+            const result = document.getElementById('time-result');
+            result.innerHTML = '<p>Testing...</p>';
+            
+            try {
+                const response = await fetch(`${API_BASE}/analytics/optimal-time/${TEST_STUDENT_ID}`);
+                const data = await response.json();
+                
+                result.innerHTML = `
+                    <p class="success">✅ Optimal Time API working!</p>
+                    <pre>${JSON.stringify(data, null, 2)}</pre>
+                `;
+            } catch (error) {
+                result.innerHTML = `
+                    <p class="error">❌ API call failed</p>
+                    <p>Error: ${error.message}</p>
+                    <p><strong>Note:</strong> Frontend will use mock data (this is OK!)</p>
+                `;
+            }
+        }
+
+        // Auto test on load
+        window.onload = () => {
+            console.log('🚀 EduSmart Dashboard Test Page Loaded');
+            console.log('Click buttons to test each endpoint');
+        };
+    </script>
+</body>
+</html>

@@ -48,125 +48,47 @@ export function HomePage({ onNavigate }: HomePageProps) {
   ];
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 via-white to-white">
-      {/* Hero Section */}
-      <section className="pt-20 pb-32 relative overflow-hidden">
-        {/* Animated Background */}
-        <div className="absolute inset-0 overflow-hidden">
-          <motion.div
-            className="absolute top-20 left-20 w-96 h-96 bg-blue-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30"
-            animate={{
-              x: [0, 100, 0],
-              y: [0, 50, 0],
-            }}
-            transition={{
-              duration: 20,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-          <motion.div
-            className="absolute bottom-20 right-20 w-96 h-96 bg-indigo-200 rounded-full mix-blend-multiply filter blur-3xl opacity-30"
-            animate={{
-              x: [0, -100, 0],
-              y: [0, -50, 0],
-            }}
-            transition={{
-              duration: 15,
-              repeat: Infinity,
-              ease: "easeInOut",
-            }}
-          />
-        </div>
+    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: '#ffffff' }}>
+      {/* Hero Section with HCMUTE Background */}
+      <section 
+        className="pt-20 pb-32 relative overflow-hidden min-h-screen"
+        style={{
+          backgroundImage: 'url(/images/2.jpg)',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center center',
+          backgroundRepeat: 'no-repeat',
+        }}
+      >
+        {/* Overlay for readability */}
+        <div className="absolute inset-0 bg-white/40"></div>
 
         <div className="container mx-auto px-4 relative z-10">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left Content */}
+          <div className="flex items-center justify-center min-h-[70vh]">
+            {/* Only Buttons - Centered */}
             <motion.div
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8 }}
-              className="text-center lg:text-left"
+              className="flex flex-col sm:flex-row gap-6"
             >
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full mb-6"
+              <Button
+                size="lg"
+                className="bg-blue-600 hover:bg-blue-700 group text-lg px-8 py-6"
+                onClick={() => onNavigate("student-dashboard", "student")}
               >
-                <Sparkles className="w-4 h-4 text-blue-600" />
-                <span className="text-blue-700">
-                  Hackathon 2024 - AI for Education
-                </span>
-              </motion.div>
-
-              <motion.h1
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
-                className="mb-6 text-gray-900"
+                <GraduationCap className="mr-2 w-6 h-6" />
+                Dành cho Sinh viên
+                <ArrowRight className="ml-2 w-5 h-5 group-hover:translate-x-1 transition-transform" />
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                className="border-blue-600 text-blue-600 hover:bg-blue-50 text-lg px-8 py-6"
+                onClick={() => onNavigate("teacher-dashboard", "teacher")}
               >
-                EduSmart – <br />
-                <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-                  Đại học thông minh
-                </span>
-                <br />
-                Nâng tầm giáo dục
-              </motion.h1>
-
-              <motion.p
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.4 }}
-                className="mb-8 text-gray-600 max-w-xl mx-auto lg:mx-0"
-              >
-                Hỗ trợ sinh viên và giảng viên bằng AI để học và dạy hiệu quả
-                hơn. Tối ưu hóa thời gian, nâng cao kết quả học tập với công
-                nghệ tiên tiến.
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0, y: -20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.5 }}
-                className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
-              >
-                <Button
-                  size="lg"
-                  className="bg-blue-600 hover:bg-blue-700 group"
-                  onClick={() => onNavigate("student-dashboard", "student")}
-                >
-                  <GraduationCap className="mr-2 w-5 h-5" />
-                  Dành cho Sinh viên
-                  <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </Button>
-                <Button
-                  size="lg"
-                  variant="outline"
-                  className="border-blue-600 text-blue-600 hover:bg-blue-50"
-                  onClick={() => onNavigate("teacher-dashboard", "teacher")}
-                >
-                  <Brain className="mr-2 w-5 h-5" />
-                  Dành cho Giảng viên
-                </Button>
-              </motion.div>
-            </motion.div>
-
-            {/* Right Image */}
-            <motion.div
-              initial={{ opacity: 0, x: 50 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="relative"
-            >
-              <div className="relative rounded-2xl overflow-hidden shadow-2xl">
-                <ImageWithFallback
-                  src="https://images.unsplash.com/photo-1701576766277-c6160505581d?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxzdHVkZW50cyUyMHN0dWR5aW5nJTIwbGFwdG9wfGVufDF8fHx8MTc2MzE3NDI1M3ww&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral"
-                  alt="Students studying with laptop"
-                  className="w-full h-auto"
-                />
-                <div className="absolute inset-0 bg-gradient-to-t from-blue-900/20 to-transparent" />
-              </div>
+                <Brain className="mr-2 w-6 h-6" />
+                Dành cho Giảng viên
+              </Button>
             </motion.div>
           </div>
         </div>

@@ -52,8 +52,8 @@ class AuthController {
       // Generate token
       const token = jwt.sign(
         { user_id: user.user_id, user_type: user.user_type },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN }
+        process.env.JWT_SECRET || 'default-secret-key',
+        { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
       );
 
       res.status(201).json({
@@ -95,8 +95,8 @@ class AuthController {
       // Generate token
       const token = jwt.sign(
         { user_id: user.user_id, user_type: user.user_type },
-        process.env.JWT_SECRET,
-        { expiresIn: process.env.JWT_EXPIRES_IN }
+        process.env.JWT_SECRET || 'default-secret-key',
+        { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
       );
 
       res.json({
