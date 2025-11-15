@@ -207,23 +207,24 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-8">
           {/* Left Column - Main Features */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-8">
             {/* Smart Schedule Card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1 }}
               whileHover={{ y: -4 }}
+              className="group"
             >
               <Card
-                className="p-8 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-blue-200 bg-gradient-to-br from-white to-blue-50/30"
+                className="p-8 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-blue-300 bg-white"
                 onClick={() => onNavigate("smart-scheduler")}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-14 h-14 bg-gradient-to-br from-blue-500 to-cyan-500 rounded-2xl flex items-center justify-center shadow-lg">
+                    <div className="w-14 h-14 bg-blue-600 rounded-2xl flex items-center justify-center shadow-md">
                       <Calendar className="w-7 h-7 text-white" />
                     </div>
                     <div>
@@ -253,12 +254,12 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
               whileHover={{ y: -4 }}
             >
               <Card
-                className="p-8 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-purple-200 bg-gradient-to-br from-white to-purple-50/30"
+                className="p-8 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-purple-300 bg-white"
                 onClick={() => onNavigate("ai-summary")}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-14 h-14 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center shadow-lg">
+                    <div className="w-14 h-14 bg-purple-600 rounded-2xl flex items-center justify-center shadow-md">
                       <FileText className="w-7 h-7 text-white" />
                     </div>
                     <div>
@@ -299,15 +300,15 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
               whileHover={{ y: -4 }}
             >
               <Card
-                className="p-8 hover:shadow-2xl transition-all duration-300 cursor-pointer border-2 border-transparent hover:border-indigo-200 bg-gradient-to-br from-white to-indigo-50/30 relative overflow-hidden"
+                className="p-8 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-indigo-300 bg-white relative overflow-hidden"
                 onClick={() => onNavigate("study-room")}
               >
-                <div className="absolute top-0 right-0 px-3 py-1 bg-gradient-to-r from-green-500 to-emerald-500 text-white text-xs font-semibold rounded-bl-xl">
+                <div className="absolute top-0 right-0 px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-bl-xl">
                   NEW ✨
                 </div>
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className="w-14 h-14 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center shadow-lg">
+                    <div className="w-14 h-14 bg-indigo-600 rounded-2xl flex items-center justify-center shadow-md">
                       <Users className="w-7 h-7 text-white" />
                     </div>
                     <div>
@@ -344,71 +345,95 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3 }}
+              whileHover={{ y: -6, scale: 1.02 }}
             >
-              <Card className="p-8 hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-green-200 bg-gradient-to-br from-white to-green-50/30">
-                <div className="flex items-center justify-between mb-6">
-                  <div className="flex items-center gap-3">
-                    <div className="w-14 h-14 bg-gradient-to-br from-green-500 to-emerald-500 rounded-2xl flex items-center justify-center shadow-lg">
-                      <TrendingUp className="w-7 h-7 text-white" />
+              <Card className="p-8 hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-green-50/40 to-emerald-50/60 shadow-lg hover:shadow-green-200/50">
+                <div className="flex items-center justify-between mb-8">
+                  <div className="flex items-center gap-4">
+                    <div className="w-16 h-16 bg-gradient-to-br from-green-500 via-green-600 to-emerald-500 rounded-2xl flex items-center justify-center shadow-xl hover:shadow-green-300/50 transition-all duration-300">
+                      <TrendingUp className="w-8 h-8 text-white" />
                     </div>
                     <div>
-                      <h3 className="text-gray-900 font-semibold text-lg">Study Health Score</h3>
-                      <p className="text-gray-500 text-sm">7 ngày qua</p>
+                      <h3 className="text-gray-900 font-bold text-xl">Study Health Score</h3>
+                      <p className="text-gray-600 text-sm font-medium">7 ngày qua</p>
                     </div>
                   </div>
-                  <div className="px-4 py-2 bg-gradient-to-r from-green-100 to-emerald-100 text-green-700 rounded-full text-sm font-semibold shadow-sm">
-                    ↑ {improvementPercent}%
+                  <div className="px-5 py-3 bg-gradient-to-r from-green-100 via-emerald-100 to-green-200 text-green-800 rounded-2xl text-sm font-bold shadow-lg">
+                    📈 ↑ {improvementPercent}%
                   </div>
                 </div>
 
                 {/* Overall Score with Badge */}
-                <div className="mb-6 p-4 bg-gradient-to-r from-green-50 to-emerald-50 rounded-xl">
-                  <div className="flex items-center justify-between mb-2">
-                    <span className="text-gray-700">Điểm hiện tại</span>
-                    <div className="flex items-center gap-2">
-                      <span className="text-2xl font-bold text-green-600">
+                <div className="mb-8 p-6 bg-gradient-to-r from-green-50 via-emerald-50 to-green-100 rounded-2xl shadow-inner">
+                  <div className="flex items-center justify-between mb-4">
+                    <span className="text-gray-800 font-semibold text-lg">Điểm hiện tại</span>
+                    <div className="flex items-center gap-3">
+                      <span className="text-3xl font-black bg-gradient-to-r from-green-600 to-emerald-600 bg-clip-text text-transparent">
                         {studyHealth.score}/100
                       </span>
-                      <span className="px-2 py-1 bg-yellow-400 text-yellow-900 rounded text-xs font-bold">
+                      <div className="px-3 py-2 bg-gradient-to-r from-yellow-400 to-orange-400 text-white rounded-xl text-sm font-bold shadow-lg animate-bounce">
                         ⭐ Xuất sắc!
-                      </span>
+                      </div>
                     </div>
                   </div>
-                  <Progress value={studyHealth.score} className="h-3 mb-3" />
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <span className="px-2 py-1 bg-white rounded">💡 {studyInsight}</span>
+                  <div className="relative mb-4">
+                    <div className="w-full bg-gray-200 rounded-full h-4 shadow-inner">
+                      <div 
+                        className="bg-gradient-to-r from-green-400 via-green-500 to-emerald-500 h-4 rounded-full shadow-lg transition-all duration-1000 ease-out"
+                        style={{ width: `${studyHealth.score}%` }}
+                      ></div>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-gray-700">
+                    <span className="px-3 py-2 bg-white rounded-xl shadow-sm font-medium">💡 {studyInsight}</span>
                   </div>
                 </div>
 
                 {/* 7 Days Line Chart */}
                 {chartData.length > 0 && (
-                  <div className="mb-6 p-4 bg-white rounded-xl border">
-                    <h4 className="text-sm font-medium text-gray-700 mb-3">Tiến độ 7 ngày</h4>
-                    <ResponsiveContainer width="100%" height={200}>
+                  <div className="mb-8 p-6 bg-white rounded-2xl shadow-lg border-2 border-gray-100">
+                    <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
+                      📊 Tiến độ 7 ngày
+                    </h4>
+                    <ResponsiveContainer width="100%" height={220}>
                       <LineChart data={chartData}>
                         <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                        <XAxis dataKey="day" tick={{ fontSize: 12 }} />
-                        <YAxis tick={{ fontSize: 12 }} domain={[0, 100]} />
+                        <XAxis dataKey="day" tick={{ fontSize: 12, fill: '#6b7280' }} />
+                        <YAxis tick={{ fontSize: 12, fill: '#6b7280' }} domain={[0, 100]} />
                         <Tooltip 
                           contentStyle={{ 
                             backgroundColor: 'white', 
-                            border: '1px solid #e5e7eb',
-                            borderRadius: '8px',
-                            fontSize: '12px'
+                            border: '2px solid #10b981',
+                            borderRadius: '12px',
+                            fontSize: '13px',
+                            boxShadow: '0 10px 25px rgba(0,0,0,0.1)'
                           }}
                         />
                         <Line 
                           type="monotone" 
                           dataKey="score" 
-                          stroke="#10b981" 
-                          strokeWidth={3}
-                          dot={{ fill: '#10b981', r: 4 }}
-                          activeDot={{ r: 6 }}
+                          stroke="url(#gradient)" 
+                          strokeWidth={4}
+                          dot={{ fill: '#10b981', r: 5, strokeWidth: 2, stroke: '#fff' }}
+                          activeDot={{ 
+                            r: 8, 
+                            fill: '#fbbf24', 
+                            stroke: '#fff', 
+                            strokeWidth: 3,
+                            filter: 'drop-shadow(0 4px 8px rgba(251, 191, 36, 0.4))'
+                          }}
                         />
+                        <defs>
+                          <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                            <stop offset="0%" stopColor="#10b981" />
+                            <stop offset="50%" stopColor="#059669" />
+                            <stop offset="100%" stopColor="#047857" />
+                          </linearGradient>
+                        </defs>
                       </LineChart>
                     </ResponsiveContainer>
-                    <p className="text-xs text-gray-500 text-center mt-2">
-                      {chartData[0]?.label} → {chartData[chartData.length - 1]?.label} trong 7 ngày 🎉
+                    <p className="text-sm text-gray-600 text-center mt-3 font-medium">
+                      🚀 {chartData[0]?.label} → {chartData[chartData.length - 1]?.label} trong 7 ngày 🎉
                     </p>
                   </div>
                 )}
@@ -434,33 +459,56 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
                 )}
 
                 {/* Detailed Metrics */}
-                <div className="space-y-3">
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-700">Tỷ lệ tham gia lớp</span>
-                      <span className="text-sm font-medium text-blue-600">
+                <div className="space-y-5">
+                  <div className="p-4 bg-blue-50 rounded-xl">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                        👥 Tỷ lệ tham gia lớp
+                      </span>
+                      <span className="text-lg font-bold text-blue-600">
                         {studyHealth.attendance}%
                       </span>
                     </div>
-                    <Progress value={studyHealth.attendance} className="h-2" />
+                    <div className="w-full bg-blue-200 rounded-full h-3 shadow-inner">
+                      <div 
+                        className="bg-gradient-to-r from-blue-400 to-blue-600 h-3 rounded-full shadow-lg transition-all duration-1000"
+                        style={{ width: `${studyHealth.attendance}%` }}
+                      ></div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-700">Hoàn thành bài tập</span>
-                      <span className="text-sm font-medium text-blue-600">
+                  
+                  <div className="p-4 bg-purple-50 rounded-xl">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                        📝 Hoàn thành bài tập
+                      </span>
+                      <span className="text-lg font-bold text-purple-600">
                         {studyHealth.assignments}%
                       </span>
                     </div>
-                    <Progress value={studyHealth.assignments} className="h-2" />
+                    <div className="w-full bg-purple-200 rounded-full h-3 shadow-inner">
+                      <div 
+                        className="bg-gradient-to-r from-purple-400 to-purple-600 h-3 rounded-full shadow-lg transition-all duration-1000"
+                        style={{ width: `${studyHealth.assignments}%` }}
+                      ></div>
+                    </div>
                   </div>
-                  <div>
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm text-gray-700">Điểm trung bình</span>
-                      <span className="text-sm font-medium text-blue-600">
+                  
+                  <div className="p-4 bg-cyan-50 rounded-xl">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="text-sm font-semibold text-gray-800 flex items-center gap-2">
+                        🎯 Điểm trung bình
+                      </span>
+                      <span className="text-lg font-bold text-cyan-600">
                         {studyHealth.performance}%
                       </span>
                     </div>
-                    <Progress value={studyHealth.performance} className="h-2" />
+                    <div className="w-full bg-cyan-200 rounded-full h-3 shadow-inner">
+                      <div 
+                        className="bg-gradient-to-r from-cyan-400 to-cyan-600 h-3 rounded-full shadow-lg transition-all duration-1000"
+                        style={{ width: `${studyHealth.performance}%` }}
+                      ></div>
+                    </div>
                   </div>
                 </div>
               </Card>
@@ -495,25 +543,25 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
                       return (
                         <div
                           key={index}
-                          className={`p-4 rounded-xl border-2 transition-all ${
+                          className={`p-4 rounded-xl border-2 transition-all shadow-md ${
                             isCurrent
-                              ? "border-blue-500 bg-blue-50"
+                              ? "border-blue-500 bg-gradient-to-r from-blue-50 to-blue-100 shadow-blue-200/50"
                               : isCompleted
                               ? "border-gray-200 bg-gray-50 opacity-60"
-                              : "border-gray-200 hover:border-blue-300"
+                              : "border-gray-200 hover:border-blue-300 hover:shadow-lg"
                           }`}
                         >
                           <div className="flex items-start justify-between mb-2">
-                            <span className="text-gray-900">
+                            <span className="text-gray-900 font-semibold">
                               {classItem.course_name}
                             </span>
                             {isCurrent && (
-                              <span className="px-2 py-1 bg-blue-600 text-white rounded-full text-xs">
-                                Đang diễn ra
+                              <span className="px-3 py-1 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full text-xs font-bold animate-pulse">
+                                🔴 Đang diễn ra
                               </span>
                             )}
                           </div>
-                          <div className="text-sm text-gray-600">
+                          <div className="text-sm text-gray-600 font-medium">
                             {startTime.toLocaleTimeString("vi-VN", {
                               hour: "2-digit",
                               minute: "2-digit",
@@ -525,15 +573,19 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
                             })}
                           </div>
                           <div className="text-sm text-gray-500">
-                            Phòng {classItem.room || "TBA"}
+                            📍 Phòng {classItem.room || "TBA"}
                           </div>
                         </div>
                       );
                     })
                 ) : (
-                  <p className="text-gray-500 text-center py-8">
-                    Không có lớp học hôm nay
-                  </p>
+                  <div className="text-center py-8">
+                    <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <Clock className="w-8 h-8 text-gray-400" />
+                    </div>
+                    <p className="text-gray-500 font-medium">Không có lớp học hôm nay</p>
+                    <p className="text-gray-400 text-sm">Hãy tận dụng thời gian để tự học! 📚</p>
+                  </div>
                 )}
               </div>
 
@@ -546,7 +598,7 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
               </Button>
 
               {/* Help Request Button */}
-              <div className="mt-6 p-4 bg-gradient-to-r from-orange-50 to-red-50 rounded-xl border-2 border-orange-200">
+              <div className="mt-6 p-4 bg-orange-50 rounded-xl border-2 border-orange-200">
                 <div className="flex items-center gap-2 mb-3">
                   <Bell className="w-5 h-5 text-orange-600" />
                   <h4 className="text-sm font-medium text-orange-900">Cần hỗ trợ?</h4>
@@ -560,7 +612,7 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
                   className={`w-full ${
                     helpRequested
                       ? "bg-green-600 hover:bg-green-700"
-                      : "bg-orange-600 hover:bg-orange-700"
+                      : "bg-red-600 hover:bg-red-700"
                   }`}
                 >
                   {sendingHelp ? (

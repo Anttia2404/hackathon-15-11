@@ -21,6 +21,7 @@ import {
   PenTool,
   Share2,
   CheckCircle2,
+  ArrowRight,
 } from "lucide-react";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
@@ -204,136 +205,207 @@ export function StudyRoom() {
   if (!isInRoom) {
     // Landing Page - Create/Join Room
     return (
-      <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-12">
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
+        {/* Compact Header Banner */}
+        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+        
         <div className="container mx-auto px-4">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="max-w-2xl mx-auto"
+            className="max-w-4xl mx-auto"
           >
-            {/* Header */}
-            <div className="text-center mb-12">
-              <motion.div
-                initial={{ scale: 0 }}
-                animate={{ scale: 1 }}
-                transition={{ type: "spring", duration: 0.6 }}
-                className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl"
-              >
-                <Users className="w-10 h-10 text-white" />
-              </motion.div>
-              <h1 className="text-4xl font-bold mb-4">
+            {/* Compact Header */}
+            <div className="text-center mb-8">
+              <h1 className="text-4xl font-black mb-4 text-gray-900">
                 <span className="bg-gradient-to-r from-indigo-600 to-purple-600 bg-clip-text text-transparent">
                   Study Room
                 </span>
               </h1>
-              <p className="text-gray-600 text-lg">
-                Học nhóm online với Pomodoro timer, shared notes và goals tracking 🚀
+              <p className="text-gray-600 text-lg font-medium max-w-xl mx-auto">
+                Không gian học nhóm thông minh với AI-powered tools 🚀
               </p>
             </div>
 
-            {/* Create/Join Cards */}
-            <div className="grid md:grid-cols-2 gap-6">
-              {/* Create Room */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.2 }}
-              >
-                <Card className="p-8 hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-indigo-200 bg-gradient-to-br from-white to-indigo-50/30">
-                  <div className="w-16 h-16 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                    <Plus className="w-8 h-8 text-white" />
-                  </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                    Tạo Study Room
-                  </h3>
-                  <p className="text-gray-600 mb-4 leading-relaxed">
-                    Tạo phòng học mới và mời bạn bè cùng học
-                  </p>
-                  <Input
-                    type="text"
-                    placeholder="Tên của bạn"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    className="w-full mb-4"
-                    onKeyPress={(e) => e.key === "Enter" && handleCreateRoom()}
-                  />
-                  <Button
-                    onClick={handleCreateRoom}
-                    disabled={!userName.trim()}
-                    className="w-full bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 shadow-lg hover:shadow-xl transition-all duration-300"
+            {/* Main Card Container */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1 }}
+              className="max-w-4xl mx-auto mb-6"
+              style={{ 
+                boxShadow: '0 8px 32px rgba(0, 0, 0, 0.08)' 
+              }}
+            >
+              <Card className="p-8 bg-white border-0 rounded-3xl">
+                {/* Name Input */}
+                <div className="text-center mb-8">
+                  <label className="text-sm font-semibold text-gray-700 block mb-4">Tên của bạn</label>
+                  <div 
+                    className="w-full max-w-sm mx-auto rounded-xl"
+                    style={{ 
+                      boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)' 
+                    }}
                   >
-                    <Plus className="mr-2 w-5 h-5" />
-                    Tạo phòng mới
-                  </Button>
-                </Card>
-              </motion.div>
-
-              {/* Join Room */}
-              <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: 0.3 }}
-              >
-                <Card className="p-8 hover:shadow-2xl transition-all duration-300 border-2 border-transparent hover:border-purple-200 bg-gradient-to-br from-white to-purple-50/30">
-                  <div className="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-2xl flex items-center justify-center mb-6 shadow-lg">
-                    <Users className="w-8 h-8 text-white" />
+                    <input
+                      type="text"
+                      placeholder="Nhập tên..."
+                      value={userName}
+                      onChange={(e) => setUserName(e.target.value)}
+                      className="w-full px-6 py-4 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all bg-gray-50 hover:bg-gray-100 font-medium text-center"
+                    />
                   </div>
-                  <h3 className="text-xl font-semibold text-gray-900 mb-3">
-                    Tham gia phòng
-                  </h3>
-                  <p className="text-gray-600 mb-4 leading-relaxed">
-                    Nhập tên và mã phòng để tham gia
-                  </p>
-                  <input
-                    type="text"
-                    placeholder="Tên của bạn"
-                    value={userName}
-                    onChange={(e) => setUserName(e.target.value)}
-                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl mb-3 focus:outline-none focus:border-purple-500 transition-colors"
-                  />
-                  <Input
-                    type="text"
-                    placeholder="Mã phòng (VD: ABC123)"
-                    value={joinRoomId}
-                    onChange={(e) => setJoinRoomId(e.target.value.toUpperCase())}
-                    className="w-full mb-4"
-                    onKeyPress={(e) => e.key === "Enter" && handleJoinRoom()}
-                  />
-                  <Button
-                    onClick={handleJoinRoom}
-                    disabled={!userName.trim()}
-                    className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 shadow-lg hover:shadow-xl transition-all duration-300"
-                  >
-                    <Users className="mr-2 w-5 h-5" />
-                    Tham gia
-                  </Button>
-                </Card>
-              </motion.div>
-            </div>
+                </div>
 
-            {/* Features */}
+                {/* Action Cards */}
+                <div className="grid md:grid-cols-2 gap-8">
+                  {/* Create Room */}
+                  <motion.div
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.2 }}
+                    className="relative"
+                  >
+                    <div 
+                      className="p-6 hover:shadow-xl transition-all duration-500 bg-white rounded-2xl"
+                      style={{ 
+                        boxShadow: '0 6px 20px rgba(0, 0, 0, 0.08)' 
+                      }}
+                    >
+                      <div className="absolute -top-2 -right-2 w-7 h-7 bg-gradient-to-r from-orange-400 to-red-400 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white text-xs font-bold">1</span>
+                      </div>
+                      
+                      <div className="w-16 h-16 bg-gradient-to-br from-orange-500 to-red-500 rounded-xl flex items-center justify-center mb-5 shadow-lg mx-auto">
+                        <Plus className="w-8 h-8 text-white" />
+                      </div>
+                      
+                      <h3 className="text-lg font-bold text-gray-900 mb-3 text-center">
+                        Khởi tạo phòng học nhóm
+                      </h3>
+                      <p className="text-gray-600 mb-6 leading-relaxed text-center text-sm">
+                        Tạo không gian học tập riêng tư và mời bạn bè cùng tham gia
+                      </p>
+                      
+                      <Button
+                        onClick={handleCreateRoom}
+                        disabled={!userName.trim()}
+                        className="w-full py-4 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-500 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-600 font-bold rounded-xl transition-all duration-300"
+                        style={{ 
+                          boxShadow: '0 8px 25px rgba(168, 85, 247, 0.4)' 
+                        }}
+                      >
+                        <Plus className="mr-2 w-5 h-5" />
+                        🚀 Tạo phòng mới
+                      </Button>
+                    </div>
+                  </motion.div>
+
+                  {/* Join Room */}
+                  <motion.div
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: 0.3 }}
+                    className="relative"
+                  >
+                    <div 
+                      className="p-6 hover:shadow-xl transition-all duration-500 bg-white rounded-2xl"
+                      style={{ 
+                        boxShadow: '0 6px 20px rgba(0, 0, 0, 0.08)' 
+                      }}
+                    >
+                      <div className="absolute -top-2 -right-2 w-7 h-7 bg-gradient-to-r from-cyan-400 to-blue-400 rounded-full flex items-center justify-center shadow-lg">
+                        <span className="text-white text-xs font-bold">2</span>
+                      </div>
+                      
+                      <div className="w-16 h-16 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-xl flex items-center justify-center mb-5 shadow-lg mx-auto">
+                        <ArrowRight className="w-8 h-8 text-white" />
+                      </div>
+                      
+                      <h3 className="text-lg font-bold text-gray-900 mb-3 text-center">
+                        Vào phòng học cùng bạn bè
+                      </h3>
+                      <p className="text-gray-600 mb-6 leading-relaxed text-center text-sm">
+                        Nhập mã phòng để nhanh chóng tham gia học nhóm đã có sẵn
+                      </p>
+                      
+                      <div className="space-y-4">
+                        <div 
+                          className="rounded-xl"
+                          style={{ 
+                            boxShadow: '0 4px 12px rgba(0, 0, 0, 0.05)' 
+                          }}
+                        >
+                          <input
+                            type="text"
+                            placeholder="Mã phòng (VD: ABC123)"
+                            value={joinRoomId}
+                            onChange={(e) => setJoinRoomId(e.target.value.toUpperCase())}
+                            className="w-full px-4 py-4 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-cyan-300 transition-all bg-gray-50 hover:bg-gray-100 font-medium text-center"
+                            onKeyPress={(e) => e.key === "Enter" && handleJoinRoom()}
+                          />
+                        </div>
+                        <Button
+                          onClick={handleJoinRoom}
+                          disabled={!userName.trim() || !joinRoomId.trim()}
+                          className="w-full py-4 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-600 hover:to-blue-600 font-bold rounded-xl transition-all duration-300"
+                          style={{ 
+                            boxShadow: '0 8px 25px rgba(6, 182, 212, 0.4)' 
+                          }}
+                        >
+                          <ArrowRight className="mr-2 w-5 h-5" />
+                          Tham gia ngay! 🎯
+                        </Button>
+                      </div>
+                    </div>
+                  </motion.div>
+                </div>
+              </Card>
+            </motion.div>
+
+            {/* Study Room Tools */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.4 }}
-              className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-4"
+              className="max-w-2xl mx-auto"
             >
-              {[
-                { icon: Clock, label: "Pomodoro Timer", color: "from-blue-500 to-cyan-500" },
-                { icon: Target, label: "Study Goals", color: "from-green-500 to-emerald-500" },
-                { icon: BookOpen, label: "Shared Notes", color: "from-orange-500 to-red-500" },
-                { icon: Sparkles, label: "Real-time Sync", color: "from-purple-500 to-pink-500" },
-              ].map((feature, idx) => (
-                <div
-                  key={idx}
-                  className="text-center p-4 bg-white/50 backdrop-blur-sm rounded-xl border border-gray-200"
-                >
-                  <div className={`w-12 h-12 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center mx-auto mb-2 shadow-md`}>
-                    <feature.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <p className="text-sm font-medium text-gray-700">{feature.label}</p>
+              <div 
+                className="p-6 bg-white rounded-2xl border-0"
+                style={{ 
+                  boxShadow: '0 6px 20px rgba(0, 0, 0, 0.08)' 
+                }}
+              >
+                <div className="text-center mb-6">
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">🛠️ Study Room Tools</h3>
+                  <p className="text-gray-500 text-sm">Real-time Tools</p>
                 </div>
-              ))}
+                
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-5">
+                  {[
+                    { icon: Clock, label: "Pomodoro Timer", color: "from-blue-500 to-cyan-500" },
+                    { icon: Target, label: "Study Goals", color: "from-green-500 to-emerald-500" },
+                    { icon: BookOpen, label: "Shared Notes", color: "from-orange-500 to-red-500" },
+                    { icon: Sparkles, label: "Real-time Sync", color: "from-purple-500 to-pink-500" },
+                  ].map((feature, idx) => (
+                    <motion.div
+                      key={idx}
+                      initial={{ opacity: 0, scale: 0.8 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.5 + idx * 0.1 }}
+                      className="text-center p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-all duration-300"
+                      style={{ 
+                        boxShadow: '0 2px 8px rgba(0, 0, 0, 0.04)' 
+                      }}
+                    >
+                      <div className={`w-14 h-14 bg-gradient-to-br ${feature.color} rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg`}>
+                        <feature.icon className="w-7 h-7 text-white" />
+                      </div>
+                      <p className="text-sm font-semibold text-gray-700 leading-tight">{feature.label}</p>
+                    </motion.div>
+                  ))}
+                </div>
+              </div>
             </motion.div>
           </motion.div>
         </div>
@@ -359,10 +431,12 @@ export function StudyRoom() {
               <div>
                 <h1 className="text-2xl font-bold text-gray-900">Study Room</h1>
                 <div className="flex items-center gap-2">
-                  <span className="text-sm text-gray-600">Room ID: {roomId}</span>
+                  <span className="px-3 py-1 bg-gradient-to-r from-indigo-100 to-purple-100 text-indigo-700 rounded-full text-sm font-medium border border-indigo-200">
+                    ID: {roomId}
+                  </span>
                   <button
                     onClick={handleCopyRoomCode}
-                    className="text-indigo-600 hover:text-indigo-700 transition-colors"
+                    className="p-1.5 text-indigo-600 hover:text-indigo-700 hover:bg-indigo-50 rounded-lg transition-all"
                     title="Copy mã phòng"
                   >
                     {copied ? (
@@ -374,14 +448,23 @@ export function StudyRoom() {
                 </div>
               </div>
             </div>
-            <Button
-              variant="outline"
-              onClick={() => setIsInRoom(false)}
-              className="border-red-200 text-red-600 hover:bg-red-50"
-            >
-              <LogOut className="mr-2 w-4 h-4" />
-              Rời phòng
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="border-gray-300 text-gray-600 hover:bg-gray-50"
+              >
+                ⚙️ Settings
+              </Button>
+              <Button
+                variant="outline"
+                onClick={() => setIsInRoom(false)}
+                className="border-red-200 text-red-600 hover:bg-red-50"
+              >
+                <LogOut className="mr-2 w-4 h-4" />
+                🚪 Rời phòng
+              </Button>
+            </div>
           </div>
         </motion.div>
 
@@ -571,7 +654,9 @@ export function StudyRoom() {
             >
               <Card className="p-6 bg-white shadow-xl">
                 <div className="flex items-center gap-2 mb-4">
-                  <Target className="w-5 h-5 text-green-600" />
+                  <div className="w-8 h-8 bg-gradient-to-r from-green-500 to-emerald-500 rounded-lg flex items-center justify-center">
+                    <Target className="w-5 h-5 text-white" />
+                  </div>
                   <h3 className="text-lg font-semibold text-gray-900">Study Goals</h3>
                 </div>
 
@@ -583,27 +668,27 @@ export function StudyRoom() {
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
                         exit={{ opacity: 0, x: 20 }}
-                        className={`flex items-center gap-3 p-3 rounded-xl border-2 transition-all ${
+                        className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all shadow-sm ${
                           goal.completed
-                            ? "bg-green-50 border-green-200"
-                            : "bg-gray-50 border-gray-200 hover:border-indigo-200"
+                            ? "bg-gradient-to-r from-green-50 to-emerald-50 border-green-300 shadow-green-100"
+                            : "bg-gradient-to-r from-blue-50 to-indigo-50 border-blue-200 hover:border-blue-300 hover:shadow-md"
                         }`}
                       >
                         <button
                           onClick={() => toggleGoal(goal.id)}
-                          className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-all ${
+                          className={`w-7 h-7 rounded-lg border-2 flex items-center justify-center transition-all shadow-sm ${
                             goal.completed
-                              ? "bg-green-500 border-green-500"
-                              : "border-gray-300 hover:border-indigo-500"
+                              ? "bg-gradient-to-r from-green-500 to-emerald-500 border-green-400 shadow-green-200"
+                              : "border-blue-300 hover:border-blue-500 hover:bg-blue-50"
                           }`}
                         >
                           {goal.completed && <Check className="w-4 h-4 text-white" />}
                         </button>
                         <span
-                          className={`flex-1 ${
+                          className={`flex-1 font-medium ${
                             goal.completed
-                              ? "line-through text-gray-500"
-                              : "text-gray-700"
+                              ? "line-through text-green-700"
+                              : "text-gray-800"
                           }`}
                         >
                           {goal.text}
@@ -640,7 +725,9 @@ export function StudyRoom() {
             >
               <Card className="p-6 bg-white shadow-xl">
                 <div className="flex items-center gap-2 mb-4">
-                  <BookOpen className="w-5 h-5 text-orange-600" />
+                  <div className="w-8 h-8 bg-gradient-to-r from-orange-500 to-red-500 rounded-lg flex items-center justify-center">
+                    <BookOpen className="w-5 h-5 text-white" />
+                  </div>
                   <h3 className="text-lg font-semibold text-gray-900">Shared Notes</h3>
                   <span className="ml-auto text-xs text-gray-500">Real-time sync ✨</span>
                 </div>
@@ -670,36 +757,65 @@ export function StudyRoom() {
               </div>
 
               <div className="space-y-3">
-                {participants.map((participant, idx) => (
-                  <motion.div
-                    key={participant.id}
-                    initial={{ opacity: 0, x: 20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: idx * 0.1 }}
-                    className="flex items-center gap-3 p-3 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl border border-indigo-100"
-                  >
-                    <div className="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-500 rounded-xl flex items-center justify-center text-2xl shadow-md">
-                      {participant.avatar}
-                    </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900">{participant.name}</p>
-                      <div className="flex items-center gap-2">
-                        <div
-                          className={`w-2 h-2 rounded-full ${
-                            participant.status === "active"
-                              ? "bg-green-500"
-                              : participant.status === "break"
-                              ? "bg-yellow-500"
-                              : "bg-gray-400"
-                          }`}
-                        />
-                        <span className="text-xs text-gray-600">
-                          {participant.studyTime} mins
-                        </span>
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
+                {participants
+                  .sort((a, b) => b.studyTime - a.studyTime) // Sort by study time
+                  .map((participant, idx) => {
+                    const isTopPerformer = idx === 0; // Highest study time
+                    const gradientColors = [
+                      "from-purple-100 to-pink-100",
+                      "from-orange-100 to-red-100", 
+                      "from-blue-100 to-cyan-100"
+                    ];
+                    
+                    return (
+                      <motion.div
+                        key={participant.id}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: idx * 0.1 }}
+                        className={`flex items-center gap-3 p-4 rounded-xl border-2 transition-all shadow-sm ${
+                          isTopPerformer 
+                            ? "bg-gradient-to-r from-yellow-50 to-orange-50 border-yellow-300 shadow-yellow-200 ring-2 ring-yellow-200" 
+                            : `bg-gradient-to-r ${gradientColors[idx % gradientColors.length]} border-gray-200 hover:shadow-md`
+                        }`}
+                      >
+                        <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-2xl shadow-md ${
+                          isTopPerformer 
+                            ? "bg-gradient-to-br from-yellow-400 to-orange-500 ring-2 ring-yellow-300" 
+                            : "bg-gradient-to-br from-indigo-500 to-purple-500"
+                        }`}>
+                          {participant.avatar}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center gap-2">
+                            <p className="font-semibold text-gray-900">{participant.name}</p>
+                            {isTopPerformer && (
+                              <span className="px-2 py-1 bg-gradient-to-r from-yellow-400 to-orange-400 text-white text-xs font-bold rounded-full">
+                                👑 Top
+                              </span>
+                            )}
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <div
+                              className={`w-2.5 h-2.5 rounded-full ${
+                                participant.status === "active"
+                                  ? "bg-green-500 animate-pulse"
+                                  : participant.status === "break"
+                                  ? "bg-yellow-500"
+                                  : "bg-gray-400"
+                              }`}
+                            />
+                            <span className="text-sm font-medium text-gray-700">
+                              {participant.studyTime} mins
+                            </span>
+                            <span className="text-xs text-gray-500 capitalize">
+                              {participant.status}
+                            </span>
+                          </div>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
               </div>
 
               <Dialog open={showInviteDialog} onOpenChange={setShowInviteDialog}>

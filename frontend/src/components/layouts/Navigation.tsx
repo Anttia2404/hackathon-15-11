@@ -89,47 +89,51 @@ export function Navigation({
 
   return (
     <nav className="bg-white border-b border-gray-200 sticky top-0 z-50">
-      <div className="container mx-auto px-4">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <button
-            onClick={() => onNavigate("home")}
-            className="flex items-center gap-2 group"
-          >
-            <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-700 transition-colors">
-              <GraduationCap className="w-6 h-6 text-white" />
-            </div>
-            <span className="text-gray-900">EduSmart</span>
-          </button>
+      <div className="container mx-auto px-6">
+        <div className="flex items-center h-16">
+          {/* Logo - Fixed width */}
+          <div className="flex-shrink-0 w-48">
+            <button
+              onClick={() => onNavigate("home")}
+              className="flex items-center gap-2 group"
+            >
+              <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-700 transition-colors">
+                <GraduationCap className="w-6 h-6 text-white" />
+              </div>
+              <span className="text-gray-900 font-semibold">EduSmart</span>
+            </button>
+          </div>
 
-          {/* Navigation Links */}
+          {/* Navigation Links - Centered */}
           {userType && (
-            <div className="flex items-center gap-2">
-              <Button
-                variant={currentPage === "home" ? "default" : "ghost"}
-                onClick={() => onNavigate("home")}
-                className="gap-2"
-              >
-                <Home className="w-4 h-4" />
-                Home
-              </Button>
-              {pages.map((page) => (
+            <div className="flex-1 flex items-center justify-center">
+              <div className="flex items-center gap-4">
                 <Button
-                  key={page.id}
-                  variant={currentPage === page.id ? "default" : "ghost"}
-                  onClick={() => onNavigate(page.id)}
-                  className="gap-2"
+                  variant={currentPage === "home" ? "default" : "ghost"}
+                  onClick={() => onNavigate("home")}
+                  className="gap-2 px-5 py-2 mx-1"
                 >
-                  <page.icon className="w-4 h-4" />
-                  {page.label}
+                  <Home className="w-4 h-4" />
+                  Home
                 </Button>
-              ))}
+                {pages.map((page) => (
+                  <Button
+                    key={page.id}
+                    variant={currentPage === page.id ? "default" : "ghost"}
+                    onClick={() => onNavigate(page.id)}
+                    className="gap-2 px-5 py-2 mx-1"
+                  >
+                    <page.icon className="w-4 h-4" />
+                    {page.label}
+                  </Button>
+                ))}
+              </div>
             </div>
           )}
 
-          {/* User Info & Logout */}
+          {/* User Info & Logout - Fixed width */}
           {userType && user && (
-            <div className="flex items-center gap-3">
+            <div className="flex-shrink-0 flex items-center gap-3">
               {/* Notification Bell for Students */}
               {userType === 'student' && (
                 <div className="relative">
