@@ -1,5 +1,5 @@
-// Mock AI scheduler that generates optimized study plans
-import { Deadline, LifestylePrefs, StudyMode } from '../components/ScheduleGeneratorTab';
+// AI scheduler that generates optimized study plans with Gemini AI
+import { Deadline, LifestylePrefs, StudyMode } from '../components/SmartScheduler/ScheduleGeneratorTab';
 
 interface ScheduleInput {
   deadlines: Deadline[];
@@ -10,9 +10,68 @@ interface ScheduleInput {
     noAfter23: boolean;
     noSundays: boolean;
   };
+  scheduleWeeks?: number;
+  useAI?: boolean;
 }
 
-export function generateAISchedule(input: ScheduleInput) {
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000/api/v1';
+
+// Generate schedule using backend API (with Gemini AI or fallback)
+export async function generateAISchedule(input: ScheduleInput) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/schedule/generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        deadlines: input.deadlines,
+        lifestyle: input.lifestyle,
+        studyMode: input.studyMode,
+        timetableData: input.timetableData,
+        hardLimits: input.hardLimits,
+        scheduleWeeks: input.scheduleWeeks || 1,
+        useAI: input.useAI !== false, // Default to true
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Failed to generate schedule:', error);
+    // Fallback to local generation
+    return generateLocalSchedule(input);
+  }
+}
+
+// Parse timetable text using Gemini AI
+export async function parseTimetableWithAI(text: string) {
+  try {
+    const response = await fetch(`${API_BASE_URL}/schedule/parse-text`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ text }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`API error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    return data.schedule || [];
+  } catch (error) {
+    console.error('Failed to parse timetable with AI:', error);
+    throw error;
+  }
+}
+
+// Local fallback function
+function generateLocalSchedule(input: ScheduleInput) {
   const { deadlines, lifestyle, studyMode, timetableData, hardLimits } = input;
 
   // Sort deadlines by due date

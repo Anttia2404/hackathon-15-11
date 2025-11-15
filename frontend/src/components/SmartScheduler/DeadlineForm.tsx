@@ -32,6 +32,17 @@ export function DeadlineForm({
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (title && dueDate && estimatedHours) {
+      // Check duplicate
+      const isDuplicate = deadlines.some(
+        d => d.title.toLowerCase() === title.toLowerCase() && 
+             d.dueDate === dueDate
+      );
+
+      if (isDuplicate) {
+        alert(`⚠️ Deadline "${title}" với ngày ${new Date(dueDate).toLocaleDateString('vi-VN')} đã tồn tại!`);
+        return;
+      }
+
       onAddDeadline({
         title,
         dueDate,
@@ -148,14 +159,34 @@ export function DeadlineForm({
                       </p>
                     )}
                   </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onRemoveDeadline(deadline.id)}
-                    className="text-slate-400 hover:text-red-600"
-                  >
-                    <X className="w-4 h-4" />
-                  </Button>
+                  <div className="flex gap-1">
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        if (confirm(`Đánh dấu "${deadline.title}" là hoàn thành?`)) {
+                          onRemoveDeadline(deadline.id);
+                        }
+                      }}
+                      className="text-green-600 hover:text-green-700 hover:bg-green-50"
+                      title="Hoàn thành"
+                    >
+                      ✓
+                    </Button>
+                    <Button
+                      size="sm"
+                      variant="ghost"
+                      onClick={() => {
+                        if (confirm(`Xóa deadline "${deadline.title}"?`)) {
+                          onRemoveDeadline(deadline.id);
+                        }
+                      }}
+                      className="text-red-600 hover:text-red-700 hover:bg-red-50"
+                      title="Xóa"
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
                 </div>
               </div>
             ))}
