@@ -1,16 +1,19 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Send, ArrowLeft, CheckCircle } from 'lucide-react';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import discussionService from '../../services/discussionService';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { Send, ArrowLeft, CheckCircle } from "lucide-react";
+import { Card } from "../ui/card";
+import { Button } from "../ui/button";
+import discussionService from "../../services/discussionService";
 
 interface DiscussionParticipateProps {
   discussion: any;
   onBack: () => void;
 }
 
-export default function DiscussionParticipate({ discussion, onBack }: DiscussionParticipateProps) {
+export default function DiscussionParticipate({
+  discussion,
+  onBack,
+}: DiscussionParticipateProps) {
   const [response, setResponse] = useState<any>({});
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -28,8 +31,8 @@ export default function DiscussionParticipate({ discussion, onBack }: Discussion
       });
       setSubmitted(true);
     } catch (error) {
-      console.error('Submit error:', error);
-      alert('Có lỗi xảy ra. Vui lòng thử lại.');
+      console.error("Submit error:", error);
+      alert("Có lỗi xảy ra. Vui lòng thử lại.");
     } finally {
       setLoading(false);
     }
@@ -49,9 +52,7 @@ export default function DiscussionParticipate({ discussion, onBack }: Discussion
           <h2 className="text-3xl font-bold text-gray-900 mb-2">
             Đã gửi thành công!
           </h2>
-          <p className="text-gray-600 mb-6">
-            Cảm ơn bạn đã tham gia thảo luận
-          </p>
+          <p className="text-gray-600 mb-6">Cảm ơn bạn đã tham gia thảo luận</p>
           <Button onClick={onBack} variant="outline" className="gap-2">
             <ArrowLeft className="w-4 h-4" />
             Tham gia thảo luận khác
@@ -73,8 +74,8 @@ export default function DiscussionParticipate({ discussion, onBack }: Discussion
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <Card className="p-8">
-            <div className="mb-6">
+          <Card className="p-4">
+            <div className="mb-4">
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
                 {discussion.title}
               </h2>
@@ -83,45 +84,49 @@ export default function DiscussionParticipate({ discussion, onBack }: Discussion
               )}
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Poll */}
-              {discussion.type === 'poll' && discussion.settings.options && (
+              {discussion.type === "poll" && discussion.settings.options && (
                 <div className="space-y-3">
                   <label className="block text-sm font-medium text-gray-700 mb-3">
                     Chọn câu trả lời của bạn:
                   </label>
-                  {discussion.settings.options.map((option: string, index: number) => (
-                    <label
-                      key={index}
-                      className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                        response.answer === option
-                          ? 'border-blue-500 bg-blue-50'
-                          : 'border-gray-200 hover:border-blue-300'
-                      }`}
-                    >
-                      <input
-                        type="radio"
-                        name="poll-option"
-                        value={option}
-                        checked={response.answer === option}
-                        onChange={(e) => setResponse({ answer: e.target.value })}
-                        className="w-5 h-5 text-blue-600"
-                        required
-                      />
-                      <span className="ml-3 text-gray-900">{option}</span>
-                    </label>
-                  ))}
+                  {discussion.settings.options.map(
+                    (option: string, index: number) => (
+                      <label
+                        key={index}
+                        className={`flex items-center p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                          response.answer === option
+                            ? "border-blue-500 bg-blue-50"
+                            : "border-gray-200 hover:border-blue-300"
+                        }`}
+                      >
+                        <input
+                          type="radio"
+                          name="poll-option"
+                          value={option}
+                          checked={response.answer === option}
+                          onChange={(e) =>
+                            setResponse({ answer: e.target.value })
+                          }
+                          className="w-5 h-5 text-blue-600"
+                          required
+                        />
+                        <span className="ml-3 text-gray-900">{option}</span>
+                      </label>
+                    )
+                  )}
                 </div>
               )}
 
               {/* Q&A */}
-              {discussion.type === 'qna' && (
+              {discussion.type === "qna" && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Câu hỏi của bạn:
                   </label>
                   <textarea
-                    value={response.question || ''}
+                    value={response.question || ""}
                     onChange={(e) => setResponse({ question: e.target.value })}
                     placeholder="Nhập câu hỏi của bạn..."
                     rows={4}
@@ -132,14 +137,14 @@ export default function DiscussionParticipate({ discussion, onBack }: Discussion
               )}
 
               {/* Word Cloud */}
-              {discussion.type === 'wordcloud' && (
+              {discussion.type === "wordcloud" && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Nhập từ khóa hoặc ý kiến ngắn:
                   </label>
                   <input
                     type="text"
-                    value={response.text || ''}
+                    value={response.text || ""}
                     onChange={(e) => setResponse({ text: e.target.value })}
                     placeholder="VD: Thú vị, Hữu ích, Cần cải thiện..."
                     required
@@ -149,13 +154,13 @@ export default function DiscussionParticipate({ discussion, onBack }: Discussion
               )}
 
               {/* Feedback */}
-              {discussion.type === 'feedback' && (
+              {discussion.type === "feedback" && (
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-2">
                     Ý kiến của bạn:
                   </label>
                   <textarea
-                    value={response.text || ''}
+                    value={response.text || ""}
                     onChange={(e) => setResponse({ text: e.target.value })}
                     placeholder="Chia sẻ ý kiến của bạn..."
                     rows={5}
@@ -187,7 +192,7 @@ export default function DiscussionParticipate({ discussion, onBack }: Discussion
                 className="w-full py-4 text-lg gap-2 bg-gradient-to-r from-blue-600 to-purple-600"
               >
                 {loading ? (
-                  'Đang gửi...'
+                  "Đang gửi..."
                 ) : (
                   <>
                     <Send className="w-5 h-5" />

@@ -21,7 +21,7 @@ export function SmartScheduler() {
     const loadData = async () => {
       try {
         setIsLoading(true);
-        
+
         // Load timetable
         const timetableRes = await api.timetable.load();
         if (timetableRes.success && timetableRes.timetable) {
@@ -37,7 +37,7 @@ export function SmartScheduler() {
           });
         }
       } catch (error) {
-        console.error('Error loading data:', error);
+        console.error("Error loading data:", error);
       } finally {
         setIsLoading(false);
       }
@@ -96,7 +96,7 @@ export function SmartScheduler() {
       </header>
 
       {/* Main Content */}
-      <main className="container max-w-7xl mx-auto p-6">
+      <main className="container max-w-7xl mx-auto p-4">
         {isLoading ? (
           <div className="flex items-center justify-center min-h-[400px]">
             <div className="text-center">
@@ -116,9 +116,11 @@ export function SmartScheduler() {
                     setScheduleWeeks(data[0].weeks);
                   }
                   // Auto-save to database
-                  api.timetable.save(data).catch(err => 
-                    console.error('Failed to save timetable:', err)
-                  );
+                  api.timetable
+                    .save(data)
+                    .catch((err) =>
+                      console.error("Failed to save timetable:", err)
+                    );
                 }}
               />
             )}

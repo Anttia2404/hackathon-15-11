@@ -1,10 +1,10 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Users, UserPlus, School } from 'lucide-react';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import teacherService from '../../services/teacherService';
-import ManageStudentsModal from '../AdminDashboard/ManageStudentsModal';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
+import { Users, UserPlus, School } from "lucide-react";
+import { Card } from "../ui/card";
+import { Button } from "../ui/button";
+import teacherService from "../../services/teacherService";
+import ManageStudentsModal from "../AdminDashboard/ManageStudentsModal";
 
 export function TeacherClassManagement() {
   const [classes, setClasses] = useState<any[]>([]);
@@ -22,7 +22,7 @@ export function TeacherClassManagement() {
       const data = await teacherService.getTeacherClasses();
       setClasses(data.classes);
     } catch (error) {
-      console.error('Load classes error:', error);
+      console.error("Load classes error:", error);
     } finally {
       setLoading(false);
     }
@@ -57,12 +57,12 @@ export function TeacherClassManagement() {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
           </div>
         ) : classes.length === 0 ? (
-          <Card className="p-12 text-center">
+          <Card className="p-6 text-center">
             <School className="w-16 h-16 text-gray-300 mx-auto mb-4" />
             <p className="text-gray-500 text-lg">Bạn chưa có lớp học nào</p>
           </Card>
         ) : (
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-4">
             {classes.map((cls, index) => (
               <motion.div
                 key={cls.class_id}
@@ -70,14 +70,12 @@ export function TeacherClassManagement() {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                <Card className="p-6 hover:shadow-xl transition-shadow">
+                <Card className="p-4 hover:shadow-xl transition-shadow">
                   <div className="mb-4">
                     <h3 className="font-bold text-xl text-gray-900 mb-1">
                       {cls.class_code}
                     </h3>
-                    <p className="text-gray-600">
-                      {cls.Course?.course_name}
-                    </p>
+                    <p className="text-gray-600">{cls.Course?.course_name}</p>
                   </div>
 
                   <div className="space-y-2 mb-4 text-sm text-gray-600">
@@ -90,7 +88,7 @@ export function TeacherClassManagement() {
                     <div className="flex justify-between">
                       <span>Phòng:</span>
                       <span className="font-medium text-gray-900">
-                        {cls.room || 'Chưa có'}
+                        {cls.room || "Chưa có"}
                       </span>
                     </div>
                     <div className="flex justify-between">

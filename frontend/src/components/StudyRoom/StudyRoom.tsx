@@ -313,7 +313,7 @@ export function StudyRoom() {
                 boxShadow: "0 8px 32px rgba(0, 0, 0, 0.08)",
               }}
             >
-              <Card className="p-8 bg-white border-0 rounded-3xl">
+              <Card className="p-4 bg-white border-0 rounded-3xl">
                 {/* Welcome Message */}
                 <div className="text-center mb-8">
                   <p className="text-gray-700 font-medium">
@@ -326,7 +326,7 @@ export function StudyRoom() {
                 </div>
 
                 {/* Action Cards */}
-                <div className="grid md:grid-cols-2 gap-8">
+                <div className="grid md:grid-cols-2 gap-4">
                   {/* Create Room */}
                   <motion.div
                     initial={{ opacity: 0, x: -20 }}
@@ -378,7 +378,7 @@ export function StudyRoom() {
                     className="relative"
                   >
                     <div
-                      className="p-6 hover:shadow-xl transition-all duration-500 bg-white rounded-2xl"
+                      className="p-4 hover:shadow-xl transition-all duration-500 bg-white rounded-2xl"
                       style={{
                         boxShadow: "0 6px 20px rgba(0, 0, 0, 0.08)",
                       }}
@@ -444,7 +444,7 @@ export function StudyRoom() {
               className="max-w-2xl mx-auto"
             >
               <div
-                className="p-6 bg-white rounded-2xl border-0"
+                className="p-4 bg-white rounded-2xl border-0"
                 style={{
                   boxShadow: "0 6px 20px rgba(0, 0, 0, 0.08)",
                 }}
@@ -567,7 +567,7 @@ export function StudyRoom() {
           {/* Left Column - Main Features */}
           <div className="lg:col-span-2 space-y-6">
             {/* Feature Tabs */}
-            <Card className="p-6 bg-white shadow-xl rounded-2xl border border-gray-100">
+            <Card className="p-4 bg-white shadow-xl rounded-2xl border border-gray-100">
               <Tabs
                 value={activeTab}
                 onValueChange={(v) => setActiveTab(v as typeof activeTab)}
@@ -604,14 +604,14 @@ export function StudyRoom() {
                 </TabsList>
 
                 {/* Timer Tab */}
-                <TabsContent value="timer" className="space-y-6 mt-0">
+                <TabsContent value="timer" className="space-y-4 mt-0">
                   {/* Pomodoro Timer */}
                   <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.1 }}
                   >
-                    <Card className="p-8 bg-gradient-to-br from-white to-indigo-50/50 border-2 border-indigo-100 rounded-xl">
+                    <Card className="p-4 bg-gradient-to-br from-white to-indigo-50/50 border-2 border-indigo-100 rounded-xl">
                       <div className="text-center">
                         <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-100 rounded-full mb-6">
                           <Clock className="w-4 h-4 text-indigo-600" />
@@ -885,7 +885,7 @@ export function StudyRoom() {
             transition={{ delay: 0.2 }}
             className="lg:col-span-1"
           >
-            <Card className="p-6 bg-white shadow-xl sticky top-24">
+            <Card className="p-4 bg-white shadow-xl sticky top-24">
               <div className="flex items-center gap-2 mb-6">
                 <Users className="w-5 h-5 text-indigo-600" />
                 <h3 className="text-lg font-semibold text-gray-900">

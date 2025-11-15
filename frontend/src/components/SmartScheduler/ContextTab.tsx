@@ -98,7 +98,7 @@ export function ContextTab({
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Import Timetable Section */}
       {!hasTimetable || showImportForm ? (
         <Card className="border-blue-200 shadow-sm">

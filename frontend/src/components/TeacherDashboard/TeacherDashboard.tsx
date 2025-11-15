@@ -1,5 +1,13 @@
 import { motion } from "motion/react";
-import { Users, TrendingUp, AlertCircle, Send, CheckCircle, Clock, Loader2 } from "lucide-react";
+import {
+  Users,
+  TrendingUp,
+  AlertCircle,
+  Send,
+  CheckCircle,
+  Clock,
+  Loader2,
+} from "lucide-react";
 import { Card } from "../ui/card";
 import { Button } from "../ui/button";
 import { Progress } from "../ui/progress";
@@ -22,17 +30,17 @@ export function TeacherDashboard() {
   const [loading, setLoading] = useState(true);
   const [classData, setClassData] = useState<any>(null);
   const [helpRequests, setHelpRequests] = useState<any[]>([]);
-  const [customMessage, setCustomMessage] = useState('');
+  const [customMessage, setCustomMessage] = useState("");
   const [sendingCustom, setSendingCustom] = useState(false);
   const [showStudentList, setShowStudentList] = useState(false);
   const [allStudents, setAllStudents] = useState<any[]>([]);
   const [loadingStudents, setLoadingStudents] = useState(false);
   const [teacherClasses, setTeacherClasses] = useState<any[]>([]);
-  const [selectedClassId, setSelectedClassId] = useState<string>('');
+  const [selectedClassId, setSelectedClassId] = useState<string>("");
   const [loadingClasses, setLoadingClasses] = useState(true);
-  
+
   // Get teacher info from localStorage
-  const userStr = localStorage.getItem('user');
+  const userStr = localStorage.getItem("user");
   const user = userStr ? JSON.parse(userStr) : null;
   const teacherId = user?.teacher_id;
 
@@ -48,13 +56,13 @@ export function TeacherDashboard() {
         setLoadingClasses(true);
         const data = await analyticsService.getTeacherClasses(teacherId);
         setTeacherClasses(data.classes || []);
-        
+
         // Auto-select first class if available
         if (data.classes && data.classes.length > 0) {
           setSelectedClassId(data.classes[0].class_id);
         }
       } catch (error) {
-        console.error('Error fetching teacher classes:', error);
+        console.error("Error fetching teacher classes:", error);
       } finally {
         setLoadingClasses(false);
       }
@@ -76,7 +84,7 @@ export function TeacherDashboard() {
         const data = await analyticsService.getClassAnalytics(selectedClassId);
         setClassData(data);
       } catch (error) {
-        console.error('Error fetching class analytics:', error);
+        console.error("Error fetching class analytics:", error);
       } finally {
         setLoading(false);
       }
@@ -94,7 +102,7 @@ export function TeacherDashboard() {
           const data = await analyticsService.getClassStudents(selectedClassId);
           setAllStudents(data.students || []);
         } catch (error) {
-          console.error('Error fetching all students:', error);
+          console.error("Error fetching all students:", error);
         } finally {
           setLoadingStudents(false);
         }
@@ -116,13 +124,17 @@ export function TeacherDashboard() {
 
     const fetchHelpRequests = async () => {
       try {
-        const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/notifications/help-requests/${selectedClassId}`);
+        const response = await fetch(
+          `${
+            import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1"
+          }/notifications/help-requests/${selectedClassId}`
+        );
         if (response.ok) {
           const data = await response.json();
           setHelpRequests(data.requests || []);
         }
       } catch (error) {
-        console.error('Error fetching help requests:', error);
+        console.error("Error fetching help requests:", error);
       }
     };
 
@@ -134,37 +146,42 @@ export function TeacherDashboard() {
 
   const handleSendCustomMessage = async () => {
     if (!customMessage.trim()) {
-      alert('Vui lòng nhập nội dung tin nhắn!');
+      alert("Vui lòng nhập nội dung tin nhắn!");
       return;
     }
 
     if (!selectedClassId) {
-      alert('Vui lòng chọn lớp học!');
+      alert("Vui lòng chọn lớp học!");
       return;
     }
 
     setSendingCustom(true);
     try {
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'http://localhost:5000/api/v1'}/notifications/send-message`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          classId: selectedClassId,
-          message: customMessage,
-          teacherName: user?.full_name || 'Giảng viên',
-          type: 'announcement'
-        }),
-      });
+      const response = await fetch(
+        `${
+          import.meta.env.VITE_API_URL || "http://localhost:5000/api/v1"
+        }/notifications/send-message`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            classId: selectedClassId,
+            message: customMessage,
+            teacherName: user?.full_name || "Giảng viên",
+            type: "announcement",
+          }),
+        }
+      );
 
       if (response.ok) {
-        alert('Đã gửi tin nhắn đến tất cả sinh viên!');
-        setCustomMessage('');
+        alert("Đã gửi tin nhắn đến tất cả sinh viên!");
+        setCustomMessage("");
       }
     } catch (error) {
-      console.error('Error sending custom message:', error);
-      alert('Không thể gửi tin nhắn. Vui lòng thử lại!');
+      console.error("Error sending custom message:", error);
+      alert("Không thể gửi tin nhắn. Vui lòng thử lại!");
     } finally {
       setSendingCustom(false);
     }
@@ -175,8 +192,12 @@ export function TeacherDashboard() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <AlertCircle className="w-16 h-16 text-red-500 mx-auto mb-4" />
-          <p className="text-red-600 mb-4">Vui lòng đăng nhập với tài khoản giáo viên</p>
-          <Button onClick={() => window.location.href = '/'}>Về trang chủ</Button>
+          <p className="text-red-600 mb-4">
+            Vui lòng đăng nhập với tài khoản giáo viên
+          </p>
+          <Button onClick={() => (window.location.href = "/")}>
+            Về trang chủ
+          </Button>
         </div>
       </div>
     );
@@ -198,7 +219,9 @@ export function TeacherDashboard() {
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
           <Users className="w-16 h-16 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-600 mb-4">Bạn chưa được phân công dạy lớp nào</p>
+          <p className="text-gray-600 mb-4">
+            Bạn chưa được phân công dạy lớp nào
+          </p>
           <Button onClick={() => window.location.reload()}>Làm mới</Button>
         </div>
       </div>
@@ -237,7 +260,7 @@ export function TeacherDashboard() {
   // Calculate student performance distribution from real data
   const totalStudents = classStats.totalStudents;
   const excellent = Math.round(totalStudents * 0.27); // 27%
-  const good = Math.round(totalStudents * 0.40); // 40%
+  const good = Math.round(totalStudents * 0.4); // 40%
   const average = Math.round(totalStudents * 0.22); // 22%
   const needHelp = totalStudents - excellent - good - average; // remaining
 
@@ -260,7 +283,12 @@ export function TeacherDashboard() {
     name: student.full_name,
     studyHealth: student.study_health || 0,
     assignments: student.assignment_completion || 0,
-    status: student.study_health < 50 ? "Cần hỗ trợ gấp" : student.study_health < 60 ? "Cần theo dõi" : "Cần động viên",
+    status:
+      student.study_health < 50
+        ? "Cần hỗ trợ gấp"
+        : student.study_health < 60
+        ? "Cần theo dõi"
+        : "Cần động viên",
   }));
 
   return (
@@ -275,7 +303,10 @@ export function TeacherDashboard() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="mb-2 text-gray-900">Dashboard Giảng viên 👨‍🏫</h1>
-              <p className="text-gray-600">Xin chào, {user?.full_name}! Quản lý và theo dõi tiến độ học tập của sinh viên</p>
+              <p className="text-gray-600">
+                Xin chào, {user?.full_name}! Quản lý và theo dõi tiến độ học tập
+                của sinh viên
+              </p>
             </div>
             <div className="flex items-center gap-3">
               {helpRequests.length > 0 && (
@@ -303,21 +334,20 @@ export function TeacherDashboard() {
             >
               {teacherClasses.map((cls: any) => (
                 <option key={cls.class_id} value={cls.class_id}>
-                  {cls.class_code} - {cls.course_name} ({cls.student_count} sinh viên) - {cls.semester} {cls.year}
+                  {cls.class_code} - {cls.course_name} ({cls.student_count} sinh
+                  viên) - {cls.semester} {cls.year}
                 </option>
               ))}
             </select>
             <div className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg">
-              <span className="font-medium">
-                {teacherClasses.length} lớp
-              </span>
+              <span className="font-medium">{teacherClasses.length} lớp</span>
             </div>
           </div>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-6">
+        <div className="grid lg:grid-cols-3 gap-4">
           {/* Left Column - Overview Stats */}
-          <div className="lg:col-span-2 space-y-6">
+          <div className="lg:col-span-2 space-y-4">
             {/* Quick Stats */}
             <div className="grid md:grid-cols-4 gap-4">
               <motion.div
@@ -331,7 +361,9 @@ export function TeacherDashboard() {
                       <Users className="w-5 h-5 text-blue-600" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-gray-900">{classStats.totalStudents}</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {classStats.totalStudents}
+                      </p>
                       <p className="text-xs text-gray-600">Sinh viên</p>
                     </div>
                   </div>
@@ -349,7 +381,9 @@ export function TeacherDashboard() {
                       <CheckCircle className="w-5 h-5 text-green-600" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-gray-900">{classStats.assignmentCompletion}%</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {classStats.assignmentCompletion}%
+                      </p>
                       <p className="text-xs text-gray-600">Hoàn thành BT</p>
                     </div>
                   </div>
@@ -367,7 +401,9 @@ export function TeacherDashboard() {
                       <TrendingUp className="w-5 h-5 text-purple-600" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-gray-900">{classStats.averageStudyHealth}</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {classStats.averageStudyHealth}
+                      </p>
                       <p className="text-xs text-gray-600">Study Health TB</p>
                     </div>
                   </div>
@@ -385,7 +421,9 @@ export function TeacherDashboard() {
                       <Clock className="w-5 h-5 text-orange-600" />
                     </div>
                     <div>
-                      <p className="text-2xl font-bold text-gray-900">{classStats.attendanceRate}%</p>
+                      <p className="text-2xl font-bold text-gray-900">
+                        {classStats.attendanceRate}%
+                      </p>
                       <p className="text-xs text-gray-600">Tỷ lệ tham gia</p>
                     </div>
                   </div>
@@ -399,7 +437,7 @@ export function TeacherDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.5 }}
             >
-              <Card className="p-6">
+              <Card className="p-4">
                 <h3 className="text-gray-900 mb-4">Tiến độ tuần này</h3>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart data={weeklyProgress}>
@@ -407,7 +445,11 @@ export function TeacherDashboard() {
                     <XAxis dataKey="week" />
                     <YAxis />
                     <Tooltip />
-                    <Bar dataKey="completion" fill="#3b82f6" name="Hoàn thành BT (%)" />
+                    <Bar
+                      dataKey="completion"
+                      fill="#3b82f6"
+                      name="Hoàn thành BT (%)"
+                    />
                     <Bar dataKey="health" fill="#10b981" name="Study Health" />
                   </BarChart>
                 </ResponsiveContainer>
@@ -420,9 +462,11 @@ export function TeacherDashboard() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.6 }}
             >
-              <Card className="p-6">
-                <h3 className="text-gray-900 mb-4">Phân bố hiệu suất học tập</h3>
-                <div className="flex items-center gap-8">
+              <Card className="p-4">
+                <h3 className="text-gray-900 mb-4">
+                  Phân bố hiệu suất học tập
+                </h3>
+                <div className="flex items-center gap-4">
                   <ResponsiveContainer width="50%" height={250}>
                     <PieChart>
                       <Pie
@@ -444,7 +488,10 @@ export function TeacherDashboard() {
                   </ResponsiveContainer>
                   <div className="flex-1 space-y-3">
                     {studentPerformance.map((item, index) => (
-                      <div key={index} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                      <div
+                        key={index}
+                        className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                      >
                         <div className="flex items-center gap-3">
                           <div
                             className="w-4 h-4 rounded-full"
@@ -452,7 +499,9 @@ export function TeacherDashboard() {
                           />
                           <span className="text-gray-700">{item.name}</span>
                         </div>
-                        <span className="font-medium text-gray-900">{item.value} SV</span>
+                        <span className="font-medium text-gray-900">
+                          {item.value} SV
+                        </span>
                       </div>
                     ))}
                   </div>
@@ -468,34 +517,48 @@ export function TeacherDashboard() {
             transition={{ delay: 0.3 }}
             className="lg:col-span-1"
           >
-            <Card className="p-6 sticky top-24">
+            <Card className="p-3 sticky top-24">
               {/* Help Requests Alert */}
               {helpRequests.length > 0 && (
-                <div className="mb-6 p-4 bg-red-50 border-2 border-red-200 rounded-xl">
+                <div className="mb-4 p-3 bg-red-50 border-2 border-red-200 rounded-xl">
                   <div className="flex items-center gap-2 mb-3">
                     <div className="relative">
                       <AlertCircle className="w-6 h-6 text-red-600" />
                       <div className="absolute -top-1 -right-1 w-3 h-3 bg-red-600 rounded-full animate-ping" />
                     </div>
-                    <h4 className="font-medium text-red-900">Yêu cầu hỗ trợ mới!</h4>
+                    <h4 className="font-medium text-red-900">
+                      Yêu cầu hỗ trợ mới!
+                    </h4>
                   </div>
                   <div className="space-y-2">
-                    {helpRequests.slice(0, 3).map((request: any, idx: number) => (
-                      <div key={idx} className="p-3 bg-white rounded-lg border border-red-200">
-                        <div className="flex items-center justify-between mb-1">
-                          <span className="font-medium text-gray-900">{request.studentName}</span>
-                          <span className="text-xs text-red-600">
-                            {new Date(request.timestamp).toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' })}
-                          </span>
+                    {helpRequests
+                      .slice(0, 3)
+                      .map((request: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className="p-3 bg-white rounded-lg border border-red-200"
+                        >
+                          <div className="flex items-center justify-between mb-1">
+                            <span className="font-medium text-gray-900">
+                              {request.studentName}
+                            </span>
+                            <span className="text-xs text-red-600">
+                              {new Date(request.timestamp).toLocaleTimeString(
+                                "vi-VN",
+                                { hour: "2-digit", minute: "2-digit" }
+                              )}
+                            </span>
+                          </div>
+                          <p className="text-sm text-gray-600">
+                            {request.message}
+                          </p>
+                          <div className="mt-2 flex items-center gap-2">
+                            <span className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded">
+                              Study Health: {request.studyHealth}/100
+                            </span>
+                          </div>
                         </div>
-                        <p className="text-sm text-gray-600">{request.message}</p>
-                        <div className="mt-2 flex items-center gap-2">
-                          <span className="text-xs px-2 py-1 bg-red-100 text-red-700 rounded">
-                            Study Health: {request.studyHealth}/100
-                          </span>
-                        </div>
-                      </div>
-                    ))}
+                      ))}
                   </div>
                 </div>
               )}
@@ -513,7 +576,9 @@ export function TeacherDashboard() {
                   >
                     <div className="flex items-start justify-between mb-3">
                       <div>
-                        <p className="font-medium text-gray-900">{student.name}</p>
+                        <p className="font-medium text-gray-900">
+                          {student.name}
+                        </p>
                         <span className="text-xs px-2 py-1 bg-red-200 text-red-800 rounded-full">
                           {student.status}
                         </span>
@@ -522,7 +587,9 @@ export function TeacherDashboard() {
                     <div className="space-y-2">
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-gray-600">Study Health</span>
+                          <span className="text-xs text-gray-600">
+                            Study Health
+                          </span>
                           <span className="text-xs font-medium text-red-600">
                             {student.studyHealth}/100
                           </span>
@@ -531,7 +598,9 @@ export function TeacherDashboard() {
                       </div>
                       <div>
                         <div className="flex items-center justify-between mb-1">
-                          <span className="text-xs text-gray-600">Hoàn thành BT</span>
+                          <span className="text-xs text-gray-600">
+                            Hoàn thành BT
+                          </span>
                           <span className="text-xs font-medium text-red-600">
                             {student.assignments}%
                           </span>
@@ -576,13 +645,13 @@ export function TeacherDashboard() {
 
               {/* Quick Actions */}
               <div className="space-y-2">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="outline"
                   className="w-full justify-start"
                   onClick={() => setShowStudentList(!showStudentList)}
                 >
                   <Users className="mr-2 w-4 h-4" />
-                  {showStudentList ? 'Ẩn danh sách lớp' : 'Xem danh sách lớp'}
+                  {showStudentList ? "Ẩn danh sách lớp" : "Xem danh sách lớp"}
                 </Button>
                 <Button variant="outline" className="w-full justify-start">
                   <TrendingUp className="mr-2 w-4 h-4" />
@@ -594,37 +663,70 @@ export function TeacherDashboard() {
               {showStudentList && (
                 <div className="mt-4 p-4 bg-white rounded-xl border-2 border-blue-200">
                   <h4 className="font-medium text-gray-900 mb-3">
-                    Danh sách sinh viên ({allStudents.length > 0 ? allStudents.length : classStats.totalStudents} sinh viên)
+                    Danh sách sinh viên (
+                    {allStudents.length > 0
+                      ? allStudents.length
+                      : classStats.totalStudents}{" "}
+                    sinh viên)
                   </h4>
                   {loadingStudents ? (
                     <div className="flex items-center justify-center py-8">
                       <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
-                      <span className="ml-2 text-gray-600">Đang tải danh sách...</span>
+                      <span className="ml-2 text-gray-600">
+                        Đang tải danh sách...
+                      </span>
                     </div>
                   ) : allStudents.length > 0 ? (
                     <div className="space-y-2 max-h-96 overflow-y-auto">
                       {allStudents.map((student: any, idx: number) => {
                         const studyHealth = student.study_health || 0;
                         const isAtRisk = studyHealth < 60;
-                        const bgColor = isAtRisk ? 'bg-red-50' : studyHealth >= 80 ? 'bg-green-50' : 'bg-gray-50';
-                        const iconBg = isAtRisk ? 'bg-red-100 text-red-600' : studyHealth >= 80 ? 'bg-green-100 text-green-600' : 'bg-blue-100 text-blue-600';
-                        const healthColor = isAtRisk ? 'text-red-600' : studyHealth >= 80 ? 'text-green-600' : 'text-gray-900';
-                        
+                        const bgColor = isAtRisk
+                          ? "bg-red-50"
+                          : studyHealth >= 80
+                          ? "bg-green-50"
+                          : "bg-gray-50";
+                        const iconBg = isAtRisk
+                          ? "bg-red-100 text-red-600"
+                          : studyHealth >= 80
+                          ? "bg-green-100 text-green-600"
+                          : "bg-blue-100 text-blue-600";
+                        const healthColor = isAtRisk
+                          ? "text-red-600"
+                          : studyHealth >= 80
+                          ? "text-green-600"
+                          : "text-gray-900";
+
                         return (
-                          <div key={student.student_id} className={`p-3 ${bgColor} rounded-lg hover:bg-opacity-80 transition-colors`}>
+                          <div
+                            key={student.student_id}
+                            className={`p-3 ${bgColor} rounded-lg hover:bg-opacity-80 transition-colors`}
+                          >
                             <div className="flex items-center justify-between">
                               <div className="flex items-center gap-3">
-                                <div className={`w-8 h-8 ${iconBg} rounded-full flex items-center justify-center font-medium text-sm`}>
+                                <div
+                                  className={`w-8 h-8 ${iconBg} rounded-full flex items-center justify-center font-medium text-sm`}
+                                >
                                   {idx + 1}
                                 </div>
                                 <div>
-                                  <p className="font-medium text-gray-900">{student.full_name}</p>
-                                  <p className="text-xs text-gray-500">{student.student_code}</p>
+                                  <p className="font-medium text-gray-900">
+                                    {student.full_name}
+                                  </p>
+                                  <p className="text-xs text-gray-500">
+                                    {student.student_code}
+                                  </p>
                                 </div>
                               </div>
                               <div className="text-right">
-                                <p className={`text-sm font-medium ${healthColor}`}>{studyHealth}/100</p>
-                                <p className="text-xs text-gray-500">Study Health</p>
+                                <p
+                                  className={`text-sm font-medium ${healthColor}`}
+                                >
+                                  {studyHealth}/100
+                                </p>
+                                <p className="text-xs text-gray-500">
+                                  Study Health
+                                </p>
                               </div>
                             </div>
                           </div>

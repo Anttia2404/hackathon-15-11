@@ -37,6 +37,8 @@ class AuthController {
         user_type,
       });
 
+      let roleId = null;
+
       // Create role-specific record
       if (user_type === 'student') {
         const studentRecord = await Student.create({
@@ -44,6 +46,7 @@ class AuthController {
           student_code: student_code || `SV${Date.now()}`,
           major,
         });
+        roleId = studentRecord.student_id;
         console.log('✅ Student record created:', studentRecord.student_id);
       } else if (user_type === 'teacher') {
         const teacherRecord = await Teacher.create({
@@ -51,6 +54,7 @@ class AuthController {
           teacher_code: teacher_code || `TC${Date.now()}`,
           department,
         });
+        roleId = teacherRecord.teacher_id;
         console.log('✅ Teacher record created:', teacherRecord.teacher_id);
       }
 
@@ -61,15 +65,24 @@ class AuthController {
         { expiresIn: process.env.JWT_EXPIRES_IN || '24h' }
       );
 
+      const userResponse = {
+        user_id: user.user_id,
+        email: user.email,
+        full_name: user.full_name,
+        user_type: user.user_type,
+      };
+
+      // Add role-specific ID
+      if (user_type === 'student') {
+        userResponse.student_id = roleId;
+      } else if (user_type === 'teacher') {
+        userResponse.teacher_id = roleId;
+      }
+
       res.status(201).json({
         message: 'User registered successfully',
         token,
-        user: {
-          user_id: user.user_id,
-          email: user.email,
-          full_name: user.full_name,
-          user_type: user.user_type,
-        },
+        user: userResponse,
       });
     } catch (error) {
       console.error('❌ Register error:', error);

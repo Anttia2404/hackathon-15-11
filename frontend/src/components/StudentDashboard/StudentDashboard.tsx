@@ -315,9 +315,9 @@ export function StudentDashboard() {
           </p>
         </motion.div>
 
-        <div className="grid lg:grid-cols-3 gap-8">
+        <div className="grid lg:grid-cols-3 gap-4">
           {/* Left Column - Main Features */}
-          <div className="lg:col-span-2 space-y-8">
+          <div className="lg:col-span-2 space-y-4">
             {/* Smart Schedule Card */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -327,7 +327,7 @@ export function StudentDashboard() {
               className="group"
             >
               <Card
-                className="p-8 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-blue-300 bg-white"
+                className="p-4 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-blue-300 bg-white"
                 onClick={() => navigate("/smart-scheduler")}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -364,7 +364,7 @@ export function StudentDashboard() {
               whileHover={{ y: -4 }}
             >
               <Card
-                className="p-8 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-purple-300 bg-white"
+                className="p-4 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-purple-300 bg-white"
                 onClick={() => navigate("/smart-study")}
               >
                 <div className="flex items-start justify-between mb-4">
@@ -418,8 +418,8 @@ export function StudentDashboard() {
               whileHover={{ y: -4 }}
             >
               <Card
-                className="p-8 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-indigo-300 bg-white relative overflow-hidden"
-                onClick={() => navigate("/study-room")}
+                className="p-4 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-indigo-300 bg-white relative overflow-hidden"
+                onClick={() => navigate("/study-rooms")}
               >
                 <div className="absolute top-0 right-0 px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-bl-xl">
                   NEW ✨
@@ -472,7 +472,7 @@ export function StudentDashboard() {
               transition={{ delay: 0.3 }}
               whileHover={{ y: -6, scale: 1.02 }}
             >
-              <Card className="p-8 hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-green-50/40 to-emerald-50/60 shadow-lg hover:shadow-green-200/50">
+              <Card className="p-4 hover:shadow-2xl transition-all duration-500 border-0 bg-gradient-to-br from-white via-green-50/40 to-emerald-50/60 shadow-lg hover:shadow-green-200/50">
                 <div className="flex items-center justify-between mb-8">
                   <div className="flex items-center gap-4">
                     <div className="w-16 h-16 bg-gradient-to-br from-green-500 via-green-600 to-emerald-500 rounded-2xl flex items-center justify-center shadow-xl hover:shadow-green-300/50 transition-all duration-300">
@@ -493,7 +493,7 @@ export function StudentDashboard() {
                 </div>
 
                 {/* Overall Score with Badge */}
-                <div className="mb-8 p-6 bg-gradient-to-r from-green-50 via-emerald-50 to-green-100 rounded-2xl shadow-inner">
+                <div className="mb-4 p-3 bg-gradient-to-r from-green-50 via-emerald-50 to-green-100 rounded-2xl shadow-inner">
                   <div className="flex items-center justify-between mb-4">
                     <span className="text-gray-800 font-semibold text-lg">
                       Điểm hiện tại
@@ -524,7 +524,7 @@ export function StudentDashboard() {
 
                 {/* 7 Days Line Chart */}
                 {chartData.length > 0 && (
-                  <div className="mb-8 p-6 bg-white rounded-2xl shadow-lg border-2 border-gray-100">
+                  <div className="mb-4 p-3 bg-white rounded-2xl shadow-lg border-2 border-gray-100">
                     <h4 className="text-lg font-bold text-gray-800 mb-4 flex items-center gap-2">
                       📊 Tiến độ 7 ngày
                     </h4>
@@ -681,7 +681,7 @@ export function StudentDashboard() {
             transition={{ delay: 0.2 }}
             className="lg:col-span-1"
           >
-            <Card className="p-6 sticky top-24">
+            <Card className="p-3 sticky top-24">
               <div className="flex items-center gap-2 mb-6">
                 <Clock className="w-5 h-5 text-blue-600" />
                 <h3 className="text-gray-900">Lịch học hôm nay</h3>

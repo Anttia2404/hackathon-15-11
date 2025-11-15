@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Plus, Sparkles, Trash2 } from 'lucide-react';
+import { useState } from "react";
+import { Plus, Sparkles, Trash2 } from "lucide-react";
 
 interface Deadline {
   title: string;
@@ -15,10 +15,10 @@ interface ScheduleGeneratorProps {
 export function ScheduleGenerator({ timetableData }: ScheduleGeneratorProps) {
   const [deadlines, setDeadlines] = useState<Deadline[]>([]);
   const [newDeadline, setNewDeadline] = useState<Deadline>({
-    title: '',
-    dueDate: '',
+    title: "",
+    dueDate: "",
     estimatedHours: 2,
-    details: ''
+    details: "",
   });
   const [isGenerating, setIsGenerating] = useState(false);
   const [generatedPlan, setGeneratedPlan] = useState<any>(null);
@@ -26,7 +26,12 @@ export function ScheduleGenerator({ timetableData }: ScheduleGeneratorProps) {
   const addDeadline = () => {
     if (newDeadline.title && newDeadline.dueDate) {
       setDeadlines([...deadlines, newDeadline]);
-      setNewDeadline({ title: '', dueDate: '', estimatedHours: 2, details: '' });
+      setNewDeadline({
+        title: "",
+        dueDate: "",
+        estimatedHours: 2,
+        details: "",
+      });
     }
   };
 
@@ -36,55 +41,67 @@ export function ScheduleGenerator({ timetableData }: ScheduleGeneratorProps) {
 
   const generatePlan = async () => {
     if (deadlines.length === 0) return;
-    
+
     setIsGenerating(true);
     try {
-      const response = await fetch('http://localhost:5000/api/schedule/generate', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          timetable: timetableData,
-          deadlines,
-          lifestyle: { sleepHours: 8, lunchDuration: 60, dinnerDuration: 60 },
-          studyMode: 'balanced',
-          hardLimits: { noAfter23: false, noSundays: false }
-        })
-      });
-      
+      const response = await fetch(
+        "http://localhost:5000/api/schedule/generate",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            timetable: timetableData,
+            deadlines,
+            lifestyle: { sleepHours: 8, lunchDuration: 60, dinnerDuration: 60 },
+            studyMode: "balanced",
+            hardLimits: { noAfter23: false, noSundays: false },
+          }),
+        }
+      );
+
       const data = await response.json();
       setGeneratedPlan(data);
     } catch (error) {
-      console.error('Failed to generate plan:', error);
+      console.error("Failed to generate plan:", error);
     } finally {
       setIsGenerating(false);
     }
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Add Deadline Form */}
       <div className="space-y-3">
         <input
           type="text"
           placeholder="Task name (e.g., Math Assignment)"
           value={newDeadline.title}
-          onChange={(e) => setNewDeadline({ ...newDeadline, title: e.target.value })}
+          onChange={(e) =>
+            setNewDeadline({ ...newDeadline, title: e.target.value })
+          }
           className="w-full p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
         />
-        
+
         <div className="grid grid-cols-2 gap-3">
           <input
             type="date"
             value={newDeadline.dueDate}
-            onChange={(e) => setNewDeadline({ ...newDeadline, dueDate: e.target.value })}
+            onChange={(e) =>
+              setNewDeadline({ ...newDeadline, dueDate: e.target.value })
+            }
             className="p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
           />
-          
+
           <input
             type="number"
             placeholder="Hours needed"
             value={newDeadline.estimatedHours}
-            onChange={(e) => setNewDeadline({ ...newDeadline, estimatedHours: Number(e.target.value) })}
+            onChange={(e) =>
+              setNewDeadline({
+                ...newDeadline,
+                estimatedHours: Number(e.target.value),
+              })
+            }
             className="p-3 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
             min="1"
           />
@@ -103,11 +120,18 @@ export function ScheduleGenerator({ timetableData }: ScheduleGeneratorProps) {
       {/* Deadlines List */}
       {deadlines.length > 0 && (
         <div className="space-y-2">
-          <h3 className="text-sm font-semibold text-slate-700">Your Deadlines ({deadlines.length})</h3>
+          <h3 className="text-sm font-semibold text-slate-700">
+            Your Deadlines ({deadlines.length})
+          </h3>
           {deadlines.map((deadline, idx) => (
-            <div key={idx} className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+            <div
+              key={idx}
+              className="flex items-center gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200"
+            >
               <div className="flex-1">
-                <div className="font-semibold text-sm text-slate-900">{deadline.title}</div>
+                <div className="font-semibold text-sm text-slate-900">
+                  {deadline.title}
+                </div>
                 <div className="text-xs text-slate-600">
                   Due: {deadline.dueDate} • {deadline.estimatedHours}h needed
                 </div>
@@ -147,14 +171,20 @@ export function ScheduleGenerator({ timetableData }: ScheduleGeneratorProps) {
       {/* Generated Plan */}
       {generatedPlan && (
         <div className="space-y-4 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <h3 className="text-lg font-bold text-green-900">📅 Your Study Plan</h3>
-          
+          <h3 className="text-lg font-bold text-green-900">
+            📅 Your Study Plan
+          </h3>
+
           {generatedPlan.workloadAnalysis && (
             <div className="p-3 bg-white rounded-lg">
               <div className="text-sm text-slate-600">Workload Score</div>
-              <div className="text-2xl font-bold text-slate-900">{generatedPlan.workloadAnalysis.score}/10</div>
+              <div className="text-2xl font-bold text-slate-900">
+                {generatedPlan.workloadAnalysis.score}/10
+              </div>
               {generatedPlan.workloadAnalysis.warning && (
-                <div className="text-xs text-orange-600 mt-1">{generatedPlan.workloadAnalysis.warning}</div>
+                <div className="text-xs text-orange-600 mt-1">
+                  {generatedPlan.workloadAnalysis.warning}
+                </div>
               )}
             </div>
           )}
@@ -165,7 +195,9 @@ export function ScheduleGenerator({ timetableData }: ScheduleGeneratorProps) {
               <div className="space-y-1">
                 {dayPlan.tasks?.map((task: any, taskIdx: number) => (
                   <div key={taskIdx} className="p-2 bg-white rounded text-sm">
-                    <span className="font-medium text-blue-700">{task.time}</span>
+                    <span className="font-medium text-blue-700">
+                      {task.time}
+                    </span>
                     <span className="text-slate-700"> • {task.activity}</span>
                   </div>
                 ))}

@@ -1,33 +1,36 @@
-import { useState } from 'react';
-import { motion } from 'framer-motion';
-import { MessageSquare, ArrowRight, Loader2 } from 'lucide-react';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import discussionService from '../../services/discussionService';
-import DiscussionParticipate from './DiscussionParticipate';
+import { useState } from "react";
+import { motion } from "framer-motion";
+import { MessageSquare, ArrowRight, Loader2 } from "lucide-react";
+import { Card } from "../ui/card";
+import { Button } from "../ui/button";
+import discussionService from "../../services/discussionService";
+import DiscussionParticipate from "./DiscussionParticipate";
 
 export function JoinDiscussion() {
-  const [pinCode, setPinCode] = useState('');
+  const [pinCode, setPinCode] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [discussion, setDiscussion] = useState<any>(null);
 
   const handleJoin = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (pinCode.length !== 6) {
-      setError('Mã PIN phải có 6 chữ số');
+      setError("Mã PIN phải có 6 chữ số");
       return;
     }
 
     setLoading(true);
-    setError('');
+    setError("");
 
     try {
       const result = await discussionService.joinDiscussion(pinCode);
       setDiscussion(result.discussion);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Không tìm thấy thảo luận. Vui lòng kiểm tra lại mã PIN.');
+      setError(
+        err.response?.data?.message ||
+          "Không tìm thấy thảo luận. Vui lòng kiểm tra lại mã PIN."
+      );
     } finally {
       setLoading(false);
     }
@@ -35,12 +38,14 @@ export function JoinDiscussion() {
 
   const handleBack = () => {
     setDiscussion(null);
-    setPinCode('');
-    setError('');
+    setPinCode("");
+    setError("");
   };
 
   if (discussion) {
-    return <DiscussionParticipate discussion={discussion} onBack={handleBack} />;
+    return (
+      <DiscussionParticipate discussion={discussion} onBack={handleBack} />
+    );
   }
 
   return (
@@ -67,8 +72,8 @@ export function JoinDiscussion() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
         >
-          <Card className="p-8">
-            <form onSubmit={handleJoin} className="space-y-6">
+          <Card className="p-4">
+            <form onSubmit={handleJoin} className="space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-3 text-center">
                   Mã PIN
@@ -77,9 +82,9 @@ export function JoinDiscussion() {
                   type="text"
                   value={pinCode}
                   onChange={(e) => {
-                    const value = e.target.value.replace(/\D/g, '').slice(0, 6);
+                    const value = e.target.value.replace(/\D/g, "").slice(0, 6);
                     setPinCode(value);
-                    setError('');
+                    setError("");
                   }}
                   placeholder="000000"
                   maxLength={6}
@@ -117,7 +122,9 @@ export function JoinDiscussion() {
             </form>
 
             <div className="mt-8 pt-6 border-t border-gray-200">
-              <h3 className="font-semibold text-gray-900 mb-3">💡 Hướng dẫn:</h3>
+              <h3 className="font-semibold text-gray-900 mb-3">
+                💡 Hướng dẫn:
+              </h3>
               <ul className="space-y-2 text-sm text-gray-600">
                 <li className="flex items-start gap-2">
                   <span className="text-blue-600 font-bold">1.</span>
