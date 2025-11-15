@@ -125,13 +125,13 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
         animate={{ opacity: 1, y: 0 }}
         className="w-full max-w-2xl relative z-10"
       >
-        <Card className="p-0 shadow-2xl overflow-hidden bg-white rounded-3xl" style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)' }}>
+        <Card className="p-0 shadow-2xl overflow-hidden bg-white" style={{ boxShadow: '0 20px 60px rgba(0, 0, 0, 0.3)', borderRadius: '2rem' }}>
           {/* Header with Gradient and Rounded Bottom */}
           <div 
             className="py-8 text-center relative"
             style={{
               background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 50%, #06b6d4 100%)',
-              borderRadius: '0 0 2rem 2rem'
+              borderRadius: '2rem 2rem 3rem 3rem'
             }}
           >
             <div className="w-20 h-20 bg-white/25 backdrop-blur-sm rounded-3xl flex items-center justify-center mx-auto mb-4 shadow-lg">
@@ -145,69 +145,67 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
             </p>
           </div>
 
-          <div className="p-8">
-            {/* Two Column Layout */}
-            <div className="grid md:grid-cols-2 gap-6">
+          <div className="p-10">
+            {/* Error Message */}
+            {error && (
+              <motion.div
+                initial={{ opacity: 0, y: -10 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="mb-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700"
+              >
+                <AlertCircle className="w-5 h-5 flex-shrink-0" />
+                <span className="text-sm">{error}</span>
+              </motion.div>
+            )}
 
+            {/* Two Column Layout */}
+            <div className="grid md:grid-cols-2 gap-8">
               {/* Left Column - Form */}
               <div className="space-y-4">
-                {/* Error Message */}
-                {error && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    className="p-3 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2 text-red-700"
-                  >
-                    <AlertCircle className="w-5 h-5 flex-shrink-0" />
-                    <span className="text-sm">{error}</span>
-                  </motion.div>
-                )}
 
-                {/* Login Form */}
+                {/* Login Form - Simple Style */}
                 {isLogin ? (
                   <form onSubmit={handleLogin} className="space-y-4">
                     <div>
-                      <Label htmlFor="email" className="text-gray-700 font-semibold">Email</Label>
-                      <div className="relative mt-2">
-                        <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <Input
-                          id="email"
-                          type="email"
-                          placeholder="your.email@student.edu"
-                          className="pl-12 py-3 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                          value={loginData.email}
-                          onChange={(e) =>
-                            setLoginData({ ...loginData, email: e.target.value })
-                          }
-                          required
-                        />
-                      </div>
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="Email"
+                        className="w-full py-3 px-4 border-0 focus:ring-2 focus:ring-blue-500 text-sm bg-gray-100"
+                        style={{ borderRadius: '0.75rem' }}
+                        value={loginData.email}
+                        onChange={(e) =>
+                          setLoginData({ ...loginData, email: e.target.value })
+                        }
+                        required
+                      />
                     </div>
 
-                    <div>
-                      <Label htmlFor="password" className="text-gray-700 font-semibold">Mật khẩu</Label>
-                      <div className="relative mt-2">
-                        <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <Input
-                          id="password"
-                          type="password"
-                          placeholder="••••••••"
-                          className="pl-12 py-3 rounded-xl border-gray-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
-                          value={loginData.password}
-                          onChange={(e) =>
-                            setLoginData({ ...loginData, password: e.target.value })
-                          }
-                          required
-                        />
-                      </div>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="Mật khẩu"
+                        className="w-full py-3 px-4 pr-10 border-0 focus:ring-2 focus:ring-blue-500 text-sm bg-gray-100"
+                        style={{ borderRadius: '0.75rem' }}
+                        value={loginData.password}
+                        onChange={(e) =>
+                          setLoginData({ ...loginData, password: e.target.value })
+                        }
+                        required
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg"
+                      >
+                        👁️
+                      </button>
                     </div>
 
                     <Button
                       type="submit"
-                      className="w-full text-white font-bold py-3.5 rounded-xl shadow-lg hover:shadow-xl transition-all"
-                      style={{
-                        background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-                      }}
+                      className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 transition-colors"
+                      style={{ borderRadius: '0.75rem' }}
                       disabled={loading}
                     >
                       {loading ? "Đang đăng nhập..." : "Đăng nhập"}
