@@ -32,8 +32,6 @@ export default function ClassManagement() {
     try {
       setLoading(true);
       const data = await adminService.getAllClasses();
-      console.log('Classes data received:', data.classes);
-      console.log('First class teacher:', data.classes?.[0]?.Teacher);
       setClasses(data.classes);
     } catch (error) {
       console.error('Load classes error:', error);

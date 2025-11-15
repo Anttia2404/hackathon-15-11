@@ -34,8 +34,6 @@ export default function CreateClassModal({ onClose, onCreate }: CreateClassModal
         adminService.getAllCourses(),
         adminService.getAllTeachers(),
       ]);
-      console.log('Teachers data received:', teachersData.teachers);
-      console.log('First teacher:', teachersData.teachers?.[0]);
       setCourses(coursesData.courses || []);
       setTeachers(teachersData.teachers || []);
     } catch (error) {

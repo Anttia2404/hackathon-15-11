@@ -35,7 +35,6 @@ export default function EditClassModal({ classData, onClose, onUpdate }: EditCla
         adminService.getAllCourses(),
         adminService.getAllTeachers(),
       ]);
-      console.log('Edit modal - Teachers data:', teachersData.teachers);
       setCourses(coursesData.courses || []);
       setTeachers(teachersData.teachers || []);
     } catch (error) {

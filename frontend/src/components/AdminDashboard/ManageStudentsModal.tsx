@@ -31,8 +31,6 @@ export default function ManageStudentsModal({ classData, onClose, isTeacher = fa
         service.getClassEnrollments(classData.class_id),
         service.getAllStudents(),
       ]);
-      console.log('Enrollments:', enrollmentsData.enrollments);
-      console.log('All students:', studentsData.students);
       setEnrollments(enrollmentsData.enrollments);
       setAllStudents(studentsData.students);
     } catch (error) {

@@ -57,8 +57,6 @@ class AdminController {
         })
       );
 
-      console.log('Classes with teacher data:', JSON.stringify(classesWithCount.slice(0, 1), null, 2));
-
       res.json({ classes: classesWithCount });
     } catch (error) {
       console.error('Get all classes error:', error);
@@ -155,8 +153,6 @@ class AdminController {
 
       // Convert to plain JSON to ensure User data is included
       const teachersData = teachers.map(teacher => teacher.toJSON());
-      
-      console.log('Teachers with User data:', JSON.stringify(teachersData, null, 2));
 
       res.json({ teachers: teachersData });
     } catch (error) {
