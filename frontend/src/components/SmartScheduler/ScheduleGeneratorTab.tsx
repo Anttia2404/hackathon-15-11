@@ -1,11 +1,11 @@
-import { useState } from 'react';
-import { DeadlineForm } from './DeadlineForm';
-import { LifestyleSettings } from './LifestyleSettings';
-import { StudyModeSelector } from './StudyModeSelector';
-import { ActionPlanDisplay } from './ActionPlanDisplay';
-import { Button } from './ui/button';
-import { Sparkles } from 'lucide-react';
-import { generateAISchedule } from '../utils/aiScheduler';
+import { useState } from "react";
+import { DeadlineForm } from "./DeadlineForm";
+import { LifestyleSettings } from "./LifestyleSettings";
+import { StudyModeSelector } from "./StudyModeSelector";
+import { ActionPlanDisplay } from "../StudentDashboard/ActionPlanDisplay";
+import { Button } from "../ui/button";
+import { Sparkles } from "lucide-react";
+import { generateAISchedule } from "../../utils/aiScheduler";
 
 export interface Deadline {
   id: string;
@@ -21,7 +21,7 @@ export interface LifestylePrefs {
   dinnerDuration: number;
 }
 
-export type StudyMode = 'relaxed' | 'normal' | 'sprint';
+export type StudyMode = "relaxed" | "normal" | "sprint";
 
 interface ScheduleGeneratorTabProps {
   timetableData: any[];
@@ -31,20 +31,23 @@ interface ScheduleGeneratorTabProps {
   };
 }
 
-export function ScheduleGeneratorTab({ timetableData, hardLimits }: ScheduleGeneratorTabProps) {
+export function ScheduleGeneratorTab({
+  timetableData,
+  hardLimits,
+}: ScheduleGeneratorTabProps) {
   const [deadlines, setDeadlines] = useState<Deadline[]>([]);
   const [lifestyle, setLifestyle] = useState<LifestylePrefs>({
     sleepHours: 7,
     lunchDuration: 45,
     dinnerDuration: 45,
   });
-  const [studyMode, setStudyMode] = useState<StudyMode>('normal');
+  const [studyMode, setStudyMode] = useState<StudyMode>("normal");
   const [generatedPlan, setGeneratedPlan] = useState<any>(null);
   const [isGenerating, setIsGenerating] = useState(false);
 
   const handleGeneratePlan = async () => {
     setIsGenerating(true);
-    
+
     // Simulate AI processing
     setTimeout(() => {
       const plan = generateAISchedule({
@@ -59,7 +62,7 @@ export function ScheduleGeneratorTab({ timetableData, hardLimits }: ScheduleGene
     }, 2000);
   };
 
-  const addDeadline = (deadline: Omit<Deadline, 'id'>) => {
+  const addDeadline = (deadline: Omit<Deadline, "id">) => {
     const newDeadline = {
       ...deadline,
       id: Date.now().toString(),
@@ -100,9 +103,10 @@ export function ScheduleGeneratorTab({ timetableData, hardLimits }: ScheduleGene
           size="lg"
         >
           <Sparkles className="w-5 h-5 mr-2" />
-          {isGenerating ? 'Generating AI Study Plan...' : 'Generate AI Study Plan'}
+          {isGenerating
+            ? "Generating AI Study Plan..."
+            : "Generate AI Study Plan"}
         </Button>
-
         {deadlines.length === 0 && (
           <p className="text-slate-500 text-sm text-center">
             Add at least one deadline to generate a study plan
@@ -117,4 +121,3 @@ export function ScheduleGeneratorTab({ timetableData, hardLimits }: ScheduleGene
     </div>
   );
 }
-

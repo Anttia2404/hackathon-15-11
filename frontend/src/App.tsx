@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
-import { Navigation } from "./components/Navigation";
+import { Navigation } from "./components/layouts";
 import { HomePage } from "./components/HomePage";
 import { LoginPage } from "./components/LoginPage";
 import { StudentDashboard } from "./components/StudentDashboard";

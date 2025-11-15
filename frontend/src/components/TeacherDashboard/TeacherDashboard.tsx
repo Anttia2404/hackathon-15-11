@@ -8,8 +8,8 @@ import {
   TrendingDown,
   Loader2,
 } from "lucide-react";
-import { Card } from "./ui/card";
-import { Progress } from "./ui/progress";
+import { Card } from "../ui/card";
+import { Progress } from "../ui/progress";
 import {
   BarChart,
   Bar,
@@ -21,8 +21,8 @@ import {
   LineChart,
   Line,
 } from "recharts";
-import { useTeacherDashboard, useAtRiskStudents } from "../hooks/useTeacher";
-import { useAuth } from "../contexts/AuthContext";
+import { useTeacherDashboard, useAtRiskStudents } from "../../hooks/useTeacher";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface TeacherDashboardProps {
   onNavigate: (page: string) => void;

@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { Brain, BarChart3, Users, GraduationCap, CheckCircle } from 'lucide-react';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { ImageWithFallback } from '../figma/ImageWithFallback';
 
 const solutions = [
   {

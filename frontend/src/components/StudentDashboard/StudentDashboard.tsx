@@ -9,11 +9,11 @@ import {
   ArrowRight,
   Loader2,
 } from "lucide-react";
-import { Card } from "./ui/card";
-import { Button } from "./ui/button";
-import { Progress } from "./ui/progress";
-import { useStudentDashboard } from "../hooks/useStudent";
-import { useAuth } from "../contexts/AuthContext";
+import { Card } from "../ui/card";
+import { Button } from "../ui/button";
+import { Progress } from "../ui/progress";
+import { useStudentDashboard } from "../../hooks/useStudent";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface StudentDashboardProps {
   onNavigate: (page: string) => void;

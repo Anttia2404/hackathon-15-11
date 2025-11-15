@@ -5,9 +5,9 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "./ui/card";
-import { Checkbox } from "./ui/checkbox";
-import { Badge } from "./ui/badge";
+} from "../ui/card";
+import { Checkbox } from "../ui/checkbox";
+import { Badge } from "../ui/badge";
 import { CalendarDays, Clock, Sparkles, CheckCircle2 } from "lucide-react";
 
 interface ActionItem {
@@ -257,4 +257,3 @@ function ActionItemCard({
     </div>
   );
 }
-

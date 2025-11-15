@@ -8,11 +8,11 @@ import {
   Building2,
   AlertCircle,
 } from "lucide-react";
-import { Button } from "./ui/button";
-import { Input } from "./ui/input";
-import { Label } from "./ui/label";
-import { Card } from "./ui/card";
-import { useAuth } from "../contexts/AuthContext";
+import { Button } from "../ui/button";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Card } from "../ui/card";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface LoginPageProps {
   onLoginSuccess: (userType: "student" | "teacher") => void;

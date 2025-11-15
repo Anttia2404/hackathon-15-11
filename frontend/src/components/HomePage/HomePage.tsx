@@ -1,35 +1,50 @@
-import { motion } from 'motion/react';
-import { GraduationCap, Brain, Calendar, FileText, BarChart3, Sparkles, ArrowRight } from 'lucide-react';
-import { Button } from './ui/button';
-import { Card } from './ui/card';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { motion } from "motion/react";
+import {
+  GraduationCap,
+  Brain,
+  Calendar,
+  FileText,
+  BarChart3,
+  Sparkles,
+  ArrowRight,
+} from "lucide-react";
+import { Button } from "../ui/button";
+import { Card } from "../ui/card";
+import { ImageWithFallback } from "../figma/ImageWithFallback";
+import { HeroSection } from "./HeroSection";
+import { FeaturesSection } from "./FeaturesSection";
+import { ProblemSection } from "./ProblemSection";
+import { SolutionSection } from "./SolutionSection";
+import { TestimonialsSection } from "./TestimonialsSection";
+import { DemoSection } from "./DemoSection";
+import { Footer, Navigation } from "../layouts";
 
 interface HomePageProps {
-  onNavigate: (page: string, userType: 'student' | 'teacher') => void;
+  onNavigate: (page: string, userType: "student" | "teacher") => void;
 }
 
 export function HomePage({ onNavigate }: HomePageProps) {
   const features = [
     {
       icon: Calendar,
-      title: 'Smart Schedule',
-      description: 'AI tạo lịch học tối ưu theo mục tiêu và thời gian của bạn'
+      title: "Smart Schedule",
+      description: "AI tạo lịch học tối ưu theo mục tiêu và thời gian của bạn",
     },
     {
       icon: FileText,
-      title: 'AI Summary',
-      description: 'Tóm tắt tài liệu, tạo flashcard và quiz tự động'
+      title: "AI Summary",
+      description: "Tóm tắt tài liệu, tạo flashcard và quiz tự động",
     },
     {
       icon: BarChart3,
-      title: 'Study Analytics',
-      description: 'Theo dõi tiến độ học tập và sức khỏe học tập'
+      title: "Study Analytics",
+      description: "Theo dõi tiến độ học tập và sức khỏe học tập",
     },
     {
       icon: Brain,
-      title: 'AI Quiz Generator',
-      description: 'Tạo bài kiểm tra và bài tập tự động cho giảng viên'
-    }
+      title: "AI Quiz Generator",
+      description: "Tạo bài kiểm tra và bài tập tự động cho giảng viên",
+    },
   ];
 
   return (
@@ -47,7 +62,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             transition={{
               duration: 20,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "easeInOut",
             }}
           />
           <motion.div
@@ -59,7 +74,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
             transition={{
               duration: 15,
               repeat: Infinity,
-              ease: "easeInOut"
+              ease: "easeInOut",
             }}
           />
         </div>
@@ -80,7 +95,9 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 rounded-full mb-6"
               >
                 <Sparkles className="w-4 h-4 text-blue-600" />
-                <span className="text-blue-700">Hackathon 2024 - AI for Education</span>
+                <span className="text-blue-700">
+                  Hackathon 2024 - AI for Education
+                </span>
               </motion.div>
 
               <motion.h1
@@ -103,8 +120,9 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 transition={{ delay: 0.4 }}
                 className="mb-8 text-gray-600 max-w-xl mx-auto lg:mx-0"
               >
-                Hỗ trợ sinh viên và giảng viên bằng AI để học và dạy hiệu quả hơn. 
-                Tối ưu hóa thời gian, nâng cao kết quả học tập với công nghệ tiên tiến.
+                Hỗ trợ sinh viên và giảng viên bằng AI để học và dạy hiệu quả
+                hơn. Tối ưu hóa thời gian, nâng cao kết quả học tập với công
+                nghệ tiên tiến.
               </motion.p>
 
               <motion.div
@@ -113,20 +131,20 @@ export function HomePage({ onNavigate }: HomePageProps) {
                 transition={{ delay: 0.5 }}
                 className="flex flex-col sm:flex-row gap-4 justify-center lg:justify-start"
               >
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="bg-blue-600 hover:bg-blue-700 group"
-                  onClick={() => onNavigate('student-dashboard', 'student')}
+                  onClick={() => onNavigate("student-dashboard", "student")}
                 >
                   <GraduationCap className="mr-2 w-5 h-5" />
                   Dành cho Sinh viên
                   <ArrowRight className="ml-2 w-4 h-4 group-hover:translate-x-1 transition-transform" />
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
+                <Button
+                  size="lg"
+                  variant="outline"
                   className="border-blue-600 text-blue-600 hover:bg-blue-50"
-                  onClick={() => onNavigate('teacher-dashboard', 'teacher')}
+                  onClick={() => onNavigate("teacher-dashboard", "teacher")}
                 >
                   <Brain className="mr-2 w-5 h-5" />
                   Dành cho Giảng viên

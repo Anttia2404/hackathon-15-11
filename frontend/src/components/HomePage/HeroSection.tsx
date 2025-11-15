@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { ArrowRight, Sparkles } from 'lucide-react';
-import { Button } from './ui/button';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Button } from '../ui/button';
+import { ImageWithFallback } from '../figma/ImageWithFallback';
 
 export function HeroSection() {
   return (

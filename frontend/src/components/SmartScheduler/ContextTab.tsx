@@ -1,13 +1,19 @@
-import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Button } from './ui/button';
-import { Textarea } from './ui/textarea';
-import { Checkbox } from './ui/checkbox';
-import { Label } from './ui/label';
-import { Sparkles, Upload, Calendar as CalendarIcon } from 'lucide-react';
-import { TimeBlocker } from './TimeBlocker';
-import { parseTimetableWithAI } from '../utils/aiParser';
-import { Badge } from './ui/badge';
+import { useState } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import { Button } from "../ui/button";
+import { Textarea } from "../ui/textarea";
+import { Checkbox } from "../ui/checkbox";
+import { Label } from "../ui/label";
+import { Sparkles, Upload, Calendar as CalendarIcon } from "lucide-react";
+import { TimeBlocker } from "./TimeBlocker";
+import { parseTimetableWithAI } from "../../utils/aiParser";
+import { Badge } from "../ui/badge";
 
 interface ContextTabProps {
   timetableData: any[];
@@ -25,21 +31,21 @@ export function ContextTab({
   hardLimits,
   setHardLimits,
 }: ContextTabProps) {
-  const [rawTimetable, setRawTimetable] = useState('');
+  const [rawTimetable, setRawTimetable] = useState("");
   const [isImporting, setIsImporting] = useState(false);
   const [importSuccess, setImportSuccess] = useState(false);
 
   const handleAIImport = async () => {
     setIsImporting(true);
     setImportSuccess(false);
-    
+
     // Simulate AI processing
     setTimeout(() => {
       const parsed = parseTimetableWithAI(rawTimetable);
       setTimetableData(parsed);
       setIsImporting(false);
       setImportSuccess(true);
-      
+
       // Reset success message after 3 seconds
       setTimeout(() => setImportSuccess(false), 3000);
     }, 1500);
@@ -57,8 +63,8 @@ export function ContextTab({
                 Import Timetable via Text
               </CardTitle>
               <CardDescription className="mt-2">
-                Paste your full timetable (copy from UTEX, Google Calendar, etc.). 
-                AI will convert it into structured schedule data.
+                Paste your full timetable (copy from UTEX, Google Calendar,
+                etc.). AI will convert it into structured schedule data.
               </CardDescription>
             </div>
             {importSuccess && (
@@ -82,10 +88,10 @@ Tuesday 10:00-12:00 ENG150 Technical Writing
           <Button
             onClick={handleAIImport}
             disabled={!rawTimetable.trim() || isImporting}
-            className="bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700"
+            className="bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700 disabled:opacity-60 disabled:cursor-not-allowed"
           >
             <Sparkles className="w-4 h-4 mr-2" />
-            {isImporting ? 'Processing with AI...' : 'Import with AI'}
+            {isImporting ? "Processing with AI..." : "Import with AI"}
           </Button>
         </CardContent>
       </Card>
@@ -98,7 +104,8 @@ Tuesday 10:00-12:00 ENG150 Technical Writing
             Manual Schedule Blocking
           </CardTitle>
           <CardDescription>
-            Click and drag to block specific time slots that are unavailable for studying
+            Click and drag to block specific time slots that are unavailable for
+            studying
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -156,7 +163,9 @@ Tuesday 10:00-12:00 ENG150 Technical Writing
       {timetableData.length > 0 && (
         <Card className="border-green-200 bg-green-50/30 shadow-sm">
           <CardHeader>
-            <CardTitle className="text-green-900">Current Schedule Overview</CardTitle>
+            <CardTitle className="text-green-900">
+              Current Schedule Overview
+            </CardTitle>
             <CardDescription className="text-green-700">
               {timetableData.length} time blocks imported
             </CardDescription>
@@ -175,7 +184,9 @@ Tuesday 10:00-12:00 ENG150 Technical Writing
                         {slot.day} • {slot.startTime} - {slot.endTime}
                       </p>
                       {slot.location && (
-                        <p className="text-slate-500 text-xs mt-1">📍 {slot.location}</p>
+                        <p className="text-slate-500 text-xs mt-1">
+                          📍 {slot.location}
+                        </p>
                       )}
                     </div>
                   </div>
@@ -193,4 +204,3 @@ Tuesday 10:00-12:00 ENG150 Technical Writing
     </div>
   );
 }
-

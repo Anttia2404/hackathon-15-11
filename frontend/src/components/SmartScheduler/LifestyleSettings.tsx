@@ -1,8 +1,14 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
-import { Input } from './ui/input';
-import { Label } from './ui/label';
-import { Moon, Utensils } from 'lucide-react';
-import { LifestylePrefs } from './ScheduleGeneratorTab';
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "../ui/card";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Moon, Utensils } from "lucide-react";
+import { LifestylePrefs } from "./ScheduleGeneratorTab";
 
 interface LifestyleSettingsProps {
   lifestyle: LifestylePrefs;
@@ -23,7 +29,8 @@ export function LifestyleSettings({
           Sleep & Meal Settings
         </CardTitle>
         <CardDescription>
-          AI may negotiate (adjust) these durations depending on deadline urgency
+          AI may negotiate (adjust) these durations depending on deadline
+          urgency
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -49,7 +56,7 @@ export function LifestyleSettings({
               className="w-24"
             />
             <span className="text-slate-600">hours</span>
-            {studyMode === 'sprint' && lifestyle.sleepHours > 6 && (
+            {studyMode === "sprint" && lifestyle.sleepHours > 6 && (
               <span className="text-amber-600 text-sm ml-auto">
                 ⚠️ Sprint mode suggests ≤6h
               </span>
@@ -111,12 +118,14 @@ export function LifestyleSettings({
 
         <div className="bg-blue-50 rounded-lg p-3 mt-4">
           <p className="text-blue-900 text-sm">
-            💡 Current total: {lifestyle.sleepHours}h sleep + 
-            {' '}{Math.round((lifestyle.lunchDuration + lifestyle.dinnerDuration) / 60 * 10) / 10}h meals
+            💡 Current total: {lifestyle.sleepHours}h sleep +{" "}
+            {Math.round(
+              ((lifestyle.lunchDuration + lifestyle.dinnerDuration) / 60) * 10
+            ) / 10}
+            h meals
           </p>
         </div>
       </CardContent>
     </Card>
   );
 }
-

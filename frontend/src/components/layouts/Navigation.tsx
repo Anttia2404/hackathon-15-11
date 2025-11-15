@@ -7,8 +7,8 @@ import {
   ClipboardList,
   LogOut,
 } from "lucide-react";
-import { Button } from "./ui/button";
-import { useAuth } from "../contexts/AuthContext";
+import { Button } from "../ui/button";
+import { useAuth } from "../../contexts/AuthContext";
 
 interface NavigationProps {
   currentPage: string;

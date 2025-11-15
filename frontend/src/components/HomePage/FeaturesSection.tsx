@@ -1,6 +1,6 @@
 import { motion } from 'motion/react';
 import { ScanFace, BrainCircuit, Calendar, MessageCircleHeart, BarChart4, ClipboardCheck } from 'lucide-react';
-import { Card } from './ui/card';
+import { Card } from '../ui/card';
 
 const features = [
   {

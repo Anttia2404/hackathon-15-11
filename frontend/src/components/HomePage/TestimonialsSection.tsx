@@ -1,7 +1,7 @@
 import { motion } from 'motion/react';
 import { Star, Quote } from 'lucide-react';
-import { Card } from './ui/card';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { Card } from '../ui/card';
+import { ImageWithFallback } from '../figma/ImageWithFallback';
 
 const testimonials = [
   {
