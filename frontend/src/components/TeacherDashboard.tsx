@@ -1,51 +1,80 @@
-import { motion } from 'motion/react';
-import { BarChart3, Users, AlertTriangle, CheckCircle, TrendingUp, TrendingDown } from 'lucide-react';
-import { Card } from './ui/card';
-import { Progress } from './ui/progress';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line } from 'recharts';
+import { motion } from "motion/react";
+import {
+  BarChart3,
+  Users,
+  AlertTriangle,
+  CheckCircle,
+  TrendingUp,
+  TrendingDown,
+  Loader2,
+} from "lucide-react";
+import { Card } from "./ui/card";
+import { Progress } from "./ui/progress";
+import {
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  LineChart,
+  Line,
+} from "recharts";
+import { useTeacherDashboard, useAtRiskStudents } from "../hooks/useTeacher";
+import { useAuth } from "../contexts/AuthContext";
 
 interface TeacherDashboardProps {
   onNavigate: (page: string) => void;
 }
 
 export function TeacherDashboard({ onNavigate }: TeacherDashboardProps) {
-  const attendanceData = [
-    { week: 'Tuần 1', attendance: 95 },
-    { week: 'Tuần 2', attendance: 92 },
-    { week: 'Tuần 3', attendance: 88 },
-    { week: 'Tuần 4', attendance: 90 },
-    { week: 'Tuần 5', attendance: 85 },
-    { week: 'Tuần 6', attendance: 87 },
-  ];
+  const { user } = useAuth();
+  const { dashboard, loading, error } = useTeacherDashboard();
+  const { atRiskStudents, loading: loadingAtRisk } = useAtRiskStudents();
 
-  const performanceData = [
-    { test: 'Quiz 1', average: 7.5 },
-    { test: 'Quiz 2', average: 8.2 },
-    { test: 'Midterm', average: 7.8 },
-    { test: 'Quiz 3', average: 8.5 },
-    { test: 'Assignment', average: 8.0 },
-  ];
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
+          <p className="text-gray-600">Đang tải dữ liệu...</p>
+        </div>
+      </div>
+    );
+  }
 
-  const engagementData = [
-    { metric: 'Tham gia lớp học', value: 85 },
-    { metric: 'Nộp bài đúng hạn', value: 78 },
-    { metric: 'Tương tác câu hỏi', value: 65 },
-    { metric: 'Hoàn thành bài tập', value: 82 },
-  ];
-
-  const atRiskStudents = [
-    { name: 'Nguyễn Văn A', id: 'SV001', attendance: 45, performance: 5.2, risk: 'high' },
-    { name: 'Trần Thị B', id: 'SV002', attendance: 60, performance: 6.0, risk: 'medium' },
-    { name: 'Lê Văn C', id: 'SV003', attendance: 55, performance: 5.8, risk: 'high' },
-    { name: 'Phạm Thị D', id: 'SV004', attendance: 70, performance: 6.5, risk: 'medium' },
-  ];
+  if (error || !dashboard) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">
+            {error || "Không thể tải dữ liệu"}
+          </p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded-lg"
+          >
+            Thử lại
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   const classStats = {
-    totalStudents: 45,
-    avgAttendance: 88,
-    assignmentCompletion: 82,
-    atRiskCount: 8,
+    totalStudents: dashboard.total_students || 0,
+    avgAttendance: Math.round(dashboard.average_attendance || 0),
+    assignmentCompletion: dashboard.assignment_completion_rate || 0,
+    atRiskCount: atRiskStudents?.length || 0,
   };
+
+  const engagementData = [
+    { metric: "Tham gia lớp học", value: classStats.avgAttendance },
+    { metric: "Nộp bài đúng hạn", value: classStats.assignmentCompletion },
+    { metric: "Tương tác câu hỏi", value: 0 },
+    { metric: "Hoàn thành bài tập", value: classStats.assignmentCompletion },
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 py-8">
@@ -57,7 +86,10 @@ export function TeacherDashboard({ onNavigate }: TeacherDashboardProps) {
           className="mb-8"
         >
           <h1 className="mb-2 text-gray-900">Teacher Dashboard</h1>
-          <p className="text-gray-600">Quản lý lớp học: Trí tuệ nhân tạo - CS301</p>
+          <p className="text-gray-600">
+            Chào mừng {user?.full_name || "Giảng viên"} - Quản lý{" "}
+            {dashboard.active_courses || 0} lớp học
+          </p>
         </motion.div>
 
         {/* Stats Cards */}
@@ -103,7 +135,9 @@ export function TeacherDashboard({ onNavigate }: TeacherDashboardProps) {
                 <TrendingDown className="w-5 h-5 text-orange-600" />
               </div>
               <div className="text-gray-500 mb-1">Hoàn thành BT</div>
-              <div className="text-gray-900">{classStats.assignmentCompletion}%</div>
+              <div className="text-gray-900">
+                {classStats.assignmentCompletion}%
+              </div>
             </Card>
           </motion.div>
 
@@ -115,10 +149,14 @@ export function TeacherDashboard({ onNavigate }: TeacherDashboardProps) {
             <Card className="p-6 bg-red-50 border-red-200">
               <div className="flex items-center justify-between mb-2">
                 <AlertTriangle className="w-8 h-8 text-red-600" />
-                <div className="px-2 py-1 bg-red-600 text-white rounded-lg">!</div>
+                <div className="px-2 py-1 bg-red-600 text-white rounded-lg">
+                  !
+                </div>
               </div>
               <div className="text-gray-700 mb-1">SV nguy cơ</div>
-              <div className="text-red-700">{classStats.atRiskCount} sinh viên</div>
+              <div className="text-red-700">
+                {classStats.atRiskCount} sinh viên
+              </div>
             </Card>
           </motion.div>
         </div>
@@ -132,27 +170,15 @@ export function TeacherDashboard({ onNavigate }: TeacherDashboardProps) {
           >
             <Card className="p-6">
               <h3 className="mb-4 text-gray-900">Tỷ lệ điểm danh theo tuần</h3>
-              <ResponsiveContainer width="100%" height={250}>
-                <LineChart data={attendanceData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="week" stroke="#6b7280" />
-                  <YAxis stroke="#6b7280" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'white', 
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px'
-                    }} 
-                  />
-                  <Line 
-                    type="monotone" 
-                    dataKey="attendance" 
-                    stroke="#3b82f6" 
-                    strokeWidth={3}
-                    dot={{ fill: '#3b82f6', r: 6 }}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
+              <div className="flex items-center justify-center h-[250px] text-gray-500">
+                <div className="text-center">
+                  <BarChart3 className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                  <p>Dữ liệu chi tiết đang được cập nhật</p>
+                  <p className="text-sm">
+                    Điểm danh trung bình: {classStats.avgAttendance}%
+                  </p>
+                </div>
+              </div>
             </Card>
           </motion.div>
 
@@ -163,22 +189,18 @@ export function TeacherDashboard({ onNavigate }: TeacherDashboardProps) {
             transition={{ delay: 0.6 }}
           >
             <Card className="p-6">
-              <h3 className="mb-4 text-gray-900">Điểm trung bình các bài kiểm tra</h3>
-              <ResponsiveContainer width="100%" height={250}>
-                <BarChart data={performanceData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#e5e7eb" />
-                  <XAxis dataKey="test" stroke="#6b7280" />
-                  <YAxis stroke="#6b7280" domain={[0, 10]} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: 'white', 
-                      border: '1px solid #e5e7eb',
-                      borderRadius: '8px'
-                    }} 
-                  />
-                  <Bar dataKey="average" fill="#8b5cf6" radius={[8, 8, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
+              <h3 className="mb-4 text-gray-900">
+                Điểm trung bình các bài kiểm tra
+              </h3>
+              <div className="flex items-center justify-center h-[250px] text-gray-500">
+                <div className="text-center">
+                  <TrendingUp className="w-12 h-12 text-gray-400 mx-auto mb-2" />
+                  <p>Dữ liệu chi tiết đang được cập nhật</p>
+                  <p className="text-sm">
+                    Tổng số sinh viên: {classStats.totalStudents}
+                  </p>
+                </div>
+              </div>
             </Card>
           </motion.div>
         </div>
@@ -218,48 +240,75 @@ export function TeacherDashboard({ onNavigate }: TeacherDashboardProps) {
                 <AlertTriangle className="w-5 h-5 text-red-600" />
               </div>
               <div className="space-y-3">
-                {atRiskStudents.map((student, index) => (
-                  <motion.div
-                    key={index}
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.8 + index * 0.1 }}
-                    className={`p-4 rounded-xl border-2 ${
-                      student.risk === 'high'
-                        ? 'border-red-200 bg-red-50'
-                        : 'border-orange-200 bg-orange-50'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <div>
-                        <div className="text-gray-900">{student.name}</div>
-                        <div className="text-gray-500">{student.id}</div>
-                      </div>
-                      <span
-                        className={`px-3 py-1 rounded-lg ${
-                          student.risk === 'high'
-                            ? 'bg-red-600 text-white'
-                            : 'bg-orange-600 text-white'
-                        }`}
-                      >
-                        {student.risk === 'high' ? 'Cao' : 'Trung bình'}
-                      </span>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2 text-gray-600">
-                      <div>Điểm danh: {student.attendance}%</div>
-                      <div>Điểm TB: {student.performance}</div>
-                    </div>
-                  </motion.div>
-                ))}
+                {loadingAtRisk ? (
+                  <div className="text-center py-8">
+                    <Loader2 className="w-8 h-8 text-gray-400 animate-spin mx-auto" />
+                  </div>
+                ) : atRiskStudents && atRiskStudents.length > 0 ? (
+                  atRiskStudents
+                    .slice(0, 4)
+                    .map((student: any, index: number) => {
+                      const riskLevel = student.risk_level || "medium";
+                      return (
+                        <motion.div
+                          key={student.student_id || index}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: 0.8 + index * 0.1 }}
+                          className={`p-4 rounded-xl border-2 ${
+                            riskLevel === "high"
+                              ? "border-red-200 bg-red-50"
+                              : "border-orange-200 bg-orange-50"
+                          }`}
+                        >
+                          <div className="flex items-center justify-between mb-2">
+                            <div>
+                              <div className="text-sm font-medium text-gray-900">
+                                {student.student_name}
+                              </div>
+                              <div className="text-xs text-gray-500">
+                                {student.student_id}
+                              </div>
+                            </div>
+                            <span
+                              className={`px-2 py-1 text-xs rounded-lg ${
+                                riskLevel === "high"
+                                  ? "bg-red-600 text-white"
+                                  : "bg-orange-600 text-white"
+                              }`}
+                            >
+                              {riskLevel === "high" ? "Cao" : "Trung bình"}
+                            </span>
+                          </div>
+                          <div className="grid grid-cols-2 gap-2 text-xs text-gray-600">
+                            <div>
+                              Điểm danh:{" "}
+                              {Math.round(student.attendance_rate || 0)}%
+                            </div>
+                            <div>
+                              Điểm TB: {(student.current_gpa || 0).toFixed(1)}
+                            </div>
+                          </div>
+                        </motion.div>
+                      );
+                    })
+                ) : (
+                  <p className="text-gray-500 text-center py-8">
+                    Không có sinh viên nguy cơ
+                  </p>
+                )}
               </div>
-              <div className="mt-4 p-4 bg-blue-50 rounded-xl text-center">
-                <p className="text-blue-700 mb-2">
-                  AI đề xuất: Cần can thiệp sớm với {atRiskStudents.length} sinh viên
-                </p>
-                <button className="text-blue-600 hover:underline">
-                  Xem chi tiết và đề xuất hỗ trợ →
-                </button>
-              </div>
+              {atRiskStudents && atRiskStudents.length > 0 && (
+                <div className="mt-4 p-4 bg-blue-50 rounded-xl text-center">
+                  <p className="text-sm text-blue-700 mb-2">
+                    AI đề xuất: Cần can thiệp sớm với {atRiskStudents.length}{" "}
+                    sinh viên
+                  </p>
+                  <button className="text-sm text-blue-600 hover:underline">
+                    Xem chi tiết và đề xuất hỗ trợ →
+                  </button>
+                </div>
+              )}
             </Card>
           </motion.div>
         </div>
