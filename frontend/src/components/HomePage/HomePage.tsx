@@ -83,122 +83,27 @@ export function HomePage({ onNavigate }: HomePageProps) {
         {/* Overlay for readability */}
         <div className="absolute inset-0 bg-white/40"></div>
 
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="flex items-center justify-center min-h-[70vh]">
-            {!isAuthenticated ? (
-              /* Playful, colorful design */
-              <motion.div
-                initial={{ opacity: 0, y: 40 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
-                className="relative max-w-5xl"
+        <div className="relative z-10 w-full h-screen">
+          {!isAuthenticated ? (
+            /* Simple Login Button - Positioned below navbar */
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.6 }}
+              className="absolute top-24 right-12"
+            >
+              <motion.button
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+                onClick={() => onNavigate("login")}
+                className="px-8 py-3 bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-700 text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all"
               >
-                {/* Welcome section */}
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-center mb-16"
-                >
-                  <h1 className="text-6xl md:text-7xl font-black text-white mb-3 tracking-tight">
-                    WELCOME
-                  </h1>
-                  <p className="text-2xl md:text-3xl font-bold text-yellow-400 mb-6">
-                    EduSmart Platform
-                  </p>
-                  <p className="text-lg text-white/90 max-w-md mx-auto leading-relaxed">
-                    Nền tảng học tập thông minh với công nghệ AI
-                    hỗ trợ sinh viên và giảng viên
-                  </p>
-                </motion.div>
-
-                {/* Cards with playful design */}
-                <div className="flex flex-col sm:flex-row gap-8 justify-center px-4">
-                {/* Student & Teacher Card - Playful */}
-                <motion.div
-                  initial={{ opacity: 0, x: -30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.3 }}
-                  whileHover={{ y: -12, rotate: -2 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => onNavigate("login")}
-                  className="cursor-pointer group"
-                >
-                  <div 
-                    style={{ backgroundColor: '#f8f9ff' }}
-                    className="relative p-8 rounded-[2.5rem] shadow-2xl hover:shadow-purple-400/40 transition-all duration-300 border-0 min-w-[280px] overflow-hidden"
-                  >
-                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-300 rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                    <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-yellow-300 rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                    
-                    <div className="relative flex flex-col items-center text-center">
-                      <motion.div
-                        whileHover={{ rotate: 360, scale: 1.15 }}
-                        transition={{ duration: 0.7, type: "spring" }}
-                        className="w-28 h-28 bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 rounded-[2rem] flex items-center justify-center mb-6 shadow-xl transform -rotate-3 group-hover:rotate-0 transition-transform"
-                      >
-                        <GraduationCap className="w-14 h-14 text-white" />
-                      </motion.div>
-                      
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
-                        Continue
-                      </h3>
-                      
-                      <p className="text-gray-600 text-sm mb-6 font-medium">
-                        Sinh viên & Giảng viên
-                      </p>
-                      
-                      <div className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-full font-semibold text-sm group-hover:from-purple-600 group-hover:to-indigo-600 transition-all shadow-lg">
-                        Tiếp tục →
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-
-                {/* Admin Card - Playful */}
-                <motion.div
-                  initial={{ opacity: 0, x: 30 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: 0.4 }}
-                  whileHover={{ y: -12, rotate: 2 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => setShowAdminModal(true)}
-                  className="cursor-pointer group"
-                >
-                  <div 
-                    style={{ backgroundColor: '#fff8f0' }}
-                    className="relative p-8 rounded-[2.5rem] shadow-2xl hover:shadow-orange-400/40 transition-all duration-300 border-0 min-w-[280px] overflow-hidden"
-                  >
-                    <div className="absolute -top-10 -right-10 w-40 h-40 bg-orange-300 rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                    <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-yellow-300 rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                    
-                    <div className="relative flex flex-col items-center text-center">
-                      <motion.div
-                        whileHover={{ rotate: -360, scale: 1.15 }}
-                        transition={{ duration: 0.7, type: "spring" }}
-                        className="w-28 h-28 bg-gradient-to-br from-orange-400 via-orange-500 to-yellow-500 rounded-[2rem] flex items-center justify-center mb-6 shadow-xl transform rotate-3 group-hover:rotate-0 transition-transform"
-                      >
-                        <Shield className="w-14 h-14 text-white" />
-                      </motion.div>
-                      
-                      <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">
-                        Admin
-                      </h3>
-                      
-                      <p className="text-gray-600 text-sm mb-6 font-medium">
-                        Quản trị viên
-                      </p>
-                      
-                      <div className="px-8 py-3 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-full font-semibold text-sm group-hover:from-orange-600 group-hover:to-yellow-600 transition-all shadow-lg">
-                        Truy cập →
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-                </div>
-              </motion.div>
-            ) : (
-              /* Show welcome message when logged in */
+                Đăng nhập
+              </motion.button>
+            </motion.div>
+          ) : (
+            /* Show welcome message when logged in */
+            <div className="flex items-center justify-center min-h-[70vh]">
               <motion.div
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -273,8 +178,8 @@ export function HomePage({ onNavigate }: HomePageProps) {
                   </div>
                 </div>
               </motion.div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </section>
 
