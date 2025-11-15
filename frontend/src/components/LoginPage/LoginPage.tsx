@@ -55,7 +55,7 @@ export function LoginPage() {
     try {
       await login(loginData);
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-
+      
       // Navigate based on user type
       if (user.user_type === "admin") {
         navigate("/admin-dashboard");
@@ -97,7 +97,7 @@ export function LoginPage() {
 
       await register(data);
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-
+      
       // Navigate based on user type
       if (user.user_type === "admin") {
         navigate("/admin-dashboard");
@@ -260,82 +260,6 @@ export function LoginPage() {
                     onClick={() => fillDemoData("teacher")}
                   >
                     Giảng viên
-                  </Button>
-                </div>
-                
-                {/* Quick Admin Buttons */}
-                <div className="flex gap-2 mt-2">
-                  <Button
-                    type="button"
-                    variant="default"
-                    size="sm"
-                    className="flex-1 bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700"
-                    onClick={async () => {
-                      setLoading(true);
-                      setError("");
-                      try {
-                        // Register admin
-                        await register({
-                          email: "admin@smartuni.edu.vn",
-                          password: "123",
-                          full_name: "Administrator",
-                          user_type: "admin",
-                        });
-                        setError("✅ Admin created! Now logging in...");
-                        // Auto login
-                        setTimeout(async () => {
-                          await login({
-                            email: "admin@smartuni.edu.vn",
-                            password: "123",
-                          });
-                          navigate("/admin-dashboard");
-                        }, 1000);
-                      } catch (err: any) {
-                        // If already exists, try to login
-                        if (err.response?.data?.message?.includes("already")) {
-                          setError("Admin exists, logging in...");
-                          try {
-                            await login({
-                              email: "admin@smartuni.edu.vn",
-                              password: "123",
-                            });
-                            navigate("/admin-dashboard");
-                          } catch (loginErr: any) {
-                            setError(loginErr.response?.data?.message || "Login failed");
-                          }
-                        } else {
-                          setError(err.response?.data?.message || "Failed to create admin");
-                        }
-                      } finally {
-                        setLoading(false);
-                      }
-                    }}
-                  >
-                    ➕ Create Admin
-                  </Button>
-                  
-                  <Button
-                    type="button"
-                    variant="default"
-                    size="sm"
-                    className="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700"
-                    onClick={async () => {
-                      setLoading(true);
-                      setError("");
-                      try {
-                        await login({
-                          email: "admin@smartuni.edu.vn",
-                          password: "123",
-                        });
-                        navigate("/admin-dashboard");
-                      } catch (err: any) {
-                        setError(err.response?.data?.message || "Admin not found. Click 'Create Admin' first!");
-                      } finally {
-                        setLoading(false);
-                      }
-                    }}
-                  >
-                    👨‍💼 Login Admin
                   </Button>
                 </div>
               </div>
