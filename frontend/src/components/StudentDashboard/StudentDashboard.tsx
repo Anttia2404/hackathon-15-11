@@ -1,5 +1,6 @@
 import { motion } from "motion/react";
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   Calendar,
   FileText,
@@ -29,11 +30,8 @@ import {
 } from "recharts";
 import { analyticsService } from "../../services/analyticsService";
 
-interface StudentDashboardProps {
-  onNavigate: (page: string) => void;
-}
-
-export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
+export function StudentDashboard() {
+  const navigate = useNavigate();
   const { user } = useAuth();
   const { dashboard, loading, error } = useStudentDashboard();
   const [analyticsData, setAnalyticsData] = useState<any>(null);
@@ -220,7 +218,7 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
             >
               <Card
                 className="p-8 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-blue-300 bg-white"
-                onClick={() => onNavigate("smart-scheduler")}
+                onClick={() => navigate("/smart-scheduler")}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -255,7 +253,7 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
             >
               <Card
                 className="p-8 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-purple-300 bg-white"
-                onClick={() => onNavigate("ai-summary")}
+                onClick={() => navigate("/smart-study")}
               >
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
@@ -301,7 +299,7 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
             >
               <Card
                 className="p-8 hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-indigo-300 bg-white relative overflow-hidden"
-                onClick={() => onNavigate("study-room")}
+                onClick={() => navigate("/study-room")}
               >
                 <div className="absolute top-0 right-0 px-3 py-1 bg-green-500 text-white text-xs font-semibold rounded-bl-xl">
                   NEW ✨
@@ -592,7 +590,7 @@ export function StudentDashboard({ onNavigate }: StudentDashboardProps) {
               <Button
                 variant="outline"
                 className="w-full mt-4"
-                onClick={() => onNavigate("smart-scheduler")}
+                onClick={() => navigate("/smart-scheduler")}
               >
                 Xem lịch đầy đủ
               </Button>

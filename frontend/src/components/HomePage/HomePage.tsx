@@ -1,4 +1,5 @@
 import { motion, AnimatePresence } from "motion/react";
+import { useNavigate } from "react-router-dom";
 import {
   GraduationCap,
   Brain,
@@ -16,11 +17,8 @@ import { useAuth } from "../../contexts/AuthContext";
 import { useState } from "react";
 import authService from "../../services/authService";
 
-interface HomePageProps {
-  onNavigate: (page: string, userType?: "student" | "teacher") => void;
-}
-
-export function HomePage({ onNavigate }: HomePageProps) {
+export function HomePage() {
+  const navigate = useNavigate();
   const { isAuthenticated, user } = useAuth();
   const [showAdminModal, setShowAdminModal] = useState(false);
   const [adminEmail, setAdminEmail] = useState("");
@@ -36,7 +34,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
     try {
       await authService.login({ email: adminEmail, password: adminPassword });
       setShowAdminModal(false);
-      onNavigate("admin-dashboard");
+      navigate("/admin-dashboard");
     } catch (err: any) {
       setError(err.response?.data?.message || "Đăng nhập thất bại");
     } finally {
@@ -121,7 +119,7 @@ export function HomePage({ onNavigate }: HomePageProps) {
                   transition={{ delay: 0.3 }}
                   whileHover={{ y: -12, rotate: -2 }}
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => onNavigate("login")}
+                  onClick={() => navigate("/login")}
                   className="cursor-pointer group"
                 >
                   <div 

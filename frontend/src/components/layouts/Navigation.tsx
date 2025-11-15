@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import {
   GraduationCap,
   Home,
@@ -14,16 +15,12 @@ import { useAuth } from "../../contexts/AuthContext";
 import { PushNotification } from "../PushNotification/PushNotification";
 
 interface NavigationProps {
-  currentPage: string;
-  onNavigate: (page: string) => void;
   userType: "student" | "teacher" | "admin" | null;
 }
 
-export function Navigation({
-  currentPage,
-  onNavigate,
-  userType,
-}: NavigationProps) {
+export function Navigation({ userType }: NavigationProps) {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { user, logout, isAuthenticated } = useAuth();
   const [notifications, setNotifications] = useState<any[]>([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -61,21 +58,21 @@ export function Navigation({
     window.location.reload();
   };
   const studentPages = [
-    { id: "student-dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "study-room", label: "Study Room", icon: MessageSquare },
-    { id: "join-discussion", label: "Join Discussion", icon: MessageSquare },
-    { id: "smart-scheduler", label: "Smart Schedule", icon: Calendar },
-    { id: "smart-study", label: "Smart Study", icon: FileText },
+    { id: "student-dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/student-dashboard" },
+    { id: "study-room", label: "Study Room", icon: MessageSquare, path: "/study-room" },
+    { id: "join-discussion", label: "Join Discussion", icon: MessageSquare, path: "/join-discussion" },
+    { id: "smart-scheduler", label: "Smart Schedule", icon: Calendar, path: "/smart-scheduler" },
+    { id: "smart-study", label: "Smart Study", icon: FileText, path: "/smart-study" },
   ];
 
   const teacherPages = [
-    { id: "teacher-dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "teacher-classes", label: "My Classes", icon: LayoutDashboard },
-    { id: "interactive-classroom", label: "Interactive Class", icon: MessageSquare },
+    { id: "teacher-dashboard", label: "Dashboard", icon: LayoutDashboard, path: "/teacher-dashboard" },
+    { id: "teacher-classes", label: "My Classes", icon: LayoutDashboard, path: "/teacher-classes" },
+    { id: "interactive-classroom", label: "Interactive Class", icon: MessageSquare, path: "/interactive-classroom" },
   ];
 
   const adminPages = [
-    { id: "admin-dashboard", label: "Admin Dashboard", icon: LayoutDashboard },
+    { id: "admin-dashboard", label: "Admin Dashboard", icon: LayoutDashboard, path: "/admin-dashboard" },
   ];
 
   const pages =
@@ -94,7 +91,7 @@ export function Navigation({
           {/* Logo - Fixed width */}
           <div className="flex-shrink-0 w-48">
             <button
-              onClick={() => onNavigate("home")}
+              onClick={() => navigate("/home")}
               className="flex items-center gap-2 group"
             >
               <div className="w-10 h-10 bg-blue-600 rounded-xl flex items-center justify-center group-hover:bg-blue-700 transition-colors">
@@ -109,8 +106,8 @@ export function Navigation({
             <div className="flex-1 flex items-center justify-center">
               <div className="flex items-center gap-4">
                 <Button
-                  variant={currentPage === "home" ? "default" : "ghost"}
-                  onClick={() => onNavigate("home")}
+                  variant={location.pathname === "/home" ? "default" : "ghost"}
+                  onClick={() => navigate("/home")}
                   className="gap-2 px-5 py-2 mx-1"
                 >
                   <Home className="w-4 h-4" />
@@ -119,8 +116,8 @@ export function Navigation({
                 {pages.map((page) => (
                   <Button
                     key={page.id}
-                    variant={currentPage === page.id ? "default" : "ghost"}
-                    onClick={() => onNavigate(page.id)}
+                    variant={location.pathname === page.path ? "default" : "ghost"}
+                    onClick={() => navigate(page.path)}
                     className="gap-2 px-5 py-2 mx-1"
                   >
                     <page.icon className="w-4 h-4" />
@@ -192,7 +189,7 @@ export function Navigation({
               /* Login Button - Show when not authenticated */
               <Button
                 size="sm"
-                onClick={() => onNavigate("login")}
+                onClick={() => navigate("/login")}
                 className="gap-2 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white shadow-md hover:shadow-lg transition-all duration-300 px-6"
               >
                 <LogOut className="w-4 h-4 rotate-180" />

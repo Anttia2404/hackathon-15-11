@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useNavigate, useLocation } from "react-router-dom";
 import { motion } from "motion/react";
 import {
   GraduationCap,
@@ -14,15 +15,19 @@ import { Label } from "../ui/label";
 import { Card } from "../ui/card";
 import { useAuth } from "../../contexts/AuthContext";
 
-interface LoginPageProps {
-  onLoginSuccess: (userType: "student" | "teacher") => void;
-}
-
-export function LoginPage({ onLoginSuccess }: LoginPageProps) {
+export function LoginPage() {
+  const navigate = useNavigate();
+  const location = useLocation();
   const { login, register } = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  // Set isLogin based on current route
+  useEffect(() => {
+    setIsLogin(location.pathname === "/login");
+    setError(""); // Clear error when switching
+  }, [location.pathname]);
 
   // Login form state
   const [loginData, setLoginData] = useState({
@@ -50,7 +55,15 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
     try {
       await login(loginData);
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-      onLoginSuccess(user.user_type);
+      
+      // Navigate based on user type
+      if (user.user_type === "admin") {
+        navigate("/admin-dashboard");
+      } else if (user.user_type === "student") {
+        navigate("/student-dashboard");
+      } else if (user.user_type === "teacher") {
+        navigate("/teacher-dashboard");
+      }
     } catch (err: any) {
       setError(
         err.response?.data?.message ||
@@ -84,7 +97,15 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
 
       await register(data);
       const user = JSON.parse(localStorage.getItem("user") || "{}");
-      onLoginSuccess(user.user_type);
+      
+      // Navigate based on user type
+      if (user.user_type === "admin") {
+        navigate("/admin-dashboard");
+      } else if (user.user_type === "student") {
+        navigate("/student-dashboard");
+      } else if (user.user_type === "teacher") {
+        navigate("/teacher-dashboard");
+      }
     } catch (err: any) {
       setError(
         err.response?.data?.message || "Đăng ký thất bại. Vui lòng thử lại."
@@ -435,10 +456,7 @@ export function LoginPage({ onLoginSuccess }: LoginPageProps) {
               {isLogin ? "Chưa có tài khoản?" : "Đã có tài khoản?"}{" "}
               <button
                 type="button"
-                onClick={() => {
-                  setIsLogin(!isLogin);
-                  setError("");
-                }}
+                onClick={() => navigate(isLogin ? "/register" : "/login")}
                 className="text-blue-600 hover:text-blue-700 font-medium"
               >
                 {isLogin ? "Đăng ký ngay" : "Đăng nhập"}
