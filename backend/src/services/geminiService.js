@@ -228,16 +228,26 @@ export async function generateStudyPlan(input) {
 
     const prompt = `Bạn là AI trợ lý lập lịch học thông minh. Nhiệm vụ: Tạo lịch học tối ưu cho sinh viên.
 
-📅 THÔNG TIN NGÀY THÁNG (TUYỆT ĐỐI - KHÔNG SAI)
-- Ngày hiện tại: ${today.toISOString().split('T')[0]} ❌ ĐÃ QUÁ - KHÔNG được schedule
-- Ngày bắt đầu: ${startDate.toISOString().split('T')[0]} ✅ BẮT ĐẦU TỪ NGÀY NÀY
+� 🚨🚨 CRITICAL RULE - ĐỌC KỸ TRƯỚC KHI TẠO LỊCH 🚨🚨🚨
+
+MỖI DEADLINE CÓ "NGÀY HỢP LỆ" - CHỈ ĐƯỢC SCHEDULE VÀO NHỮNG NGÀY ĐÓ!
+- Nếu deadline là 2025-11-20, NGÀY HỢP LỆ là: 2025-11-17, 2025-11-18, 2025-11-19
+- TUYỆT ĐỐI KHÔNG schedule vào 2025-11-20 (ngày deadline)
+- TUYỆT ĐỐI KHÔNG schedule vào 2025-11-21 trở đi (sau deadline)
+
+VÍ DỤ CỤ THỂ:
+❌ SAI: "Thi toeic" (deadline 2025-11-20) → schedule vào 2025-11-22 → BỊ XÓA
+✅ ĐÚNG: "Thi toeic" (deadline 2025-11-20) → schedule vào 2025-11-17, 2025-11-18, 2025-11-19
+
+📅 THÔNG TIN NGÀY THÁNG
+- Ngày hiện tại: ${today.toISOString().split('T')[0]} ❌ QUÁ KHỨ
+- Ngày bắt đầu: ${startDate.toISOString().split('T')[0]} ✅ BẮT ĐẦU
 - Số tuần: ${numWeeks}
 
-🚨 QUY TẮC NGÀY THÁNG (VI PHẠM = LOẠI BỎ TASK):
-1. ✅ CHỈ schedule từ ${startDate.toISOString().split('T')[0]} trở đi
-2. ❌ TUYỆT ĐỐI KHÔNG schedule vào ${today.toISOString().split('T')[0]} hoặc trước đó (QUÁ KHỨ)
-3. ❌ KHÔNG schedule vào ngày deadline (phải TRƯỚC deadline)
-4. ❌ KHÔNG schedule sau ngày deadline
+🚨 QUY TẮC NGÀY (VI PHẠM = XÓA TASK):
+1. CHỈ schedule từ ${startDate.toISOString().split('T')[0]} trở đi
+2. KHÔNG schedule vào/sau ngày deadline
+3. XEM KỸ "NGÀY HỢP LỆ" của mỗi deadline bên dưới
 
 🎯 QUY TẮC CHIA NHỎ DEADLINE (CHUNKING):
 1. ✅ Tổng thời gian các tasks = estimatedHours (CHÍNH XÁC)
@@ -262,22 +272,22 @@ ${processedDeadlines.map((d, i) => {
   const daysUntil = Math.ceil((dueDate - startDate) / (1000 * 60 * 60 * 24));
   
   return `
-${i+1}. "${d.title}"
-   📅 Deadline: ${dueDate.toISOString().split('T')[0]} (còn ${daysUntil} ngày)
-   ⏱️ Giờ ước tính: ${d.estimatedHours}h ${d.isWeak ? `→ 🚨 YẾU MÔN → ${d.actualHours.toFixed(1)}h (tăng 30%)` : ''}
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${i+1}. 📚 "${d.title}"
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   � Dheadline: ${dueDate.toISOString().split('T')[0]} (còn ${daysUntil} ngày)
+   ⏱️ Giờ cần: ${d.actualHours.toFixed(1)}h ${d.isWeak ? '🚨 YẾU MÔN (đã tăng 30%)' : ''}
    📝 Chi tiết: ${d.details || 'Không có'}
-   📌 Loại: ${d.type === 'fixed' ? '🔒 Cố định (kiểm tra/thi)' : '📖 Linh hoạt (tự học)'}
-   ${d.fixedTime ? `⏰ Thời gian cố định: ${d.fixedTime}` : ''}
    
-   ✅ NGÀY HỢP LỆ (CHỈ được dùng những ngày này - PHẢI đủ ${d.actualHours.toFixed(1)}h):
-   ${validDates.length <= 10 ? validDates.join(', ') : `${validDates.slice(0, 10).join(', ')} ... (${validDates.length} ngày)`}
+   🚨🚨🚨 NGÀY HỢP LỆ - CHỈ ĐƯỢC SCHEDULE VÀO NHỮNG NGÀY NÀY 🚨🚨🚨
+   ${validDates.map(date => `✅ ${date}`).join('\n   ')}
    
-   ❌ NGÀY KHÔNG HỢP LỆ (SẼ BỊ XÓA): 
-   - Bất kỳ ngày nào trước ${startDate.toISOString().split('T')[0]}
-   - ${dueDate.toISOString().split('T')[0]} (ngày deadline - TUYỆT ĐỐI KHÔNG dùng)
-   - Bất kỳ ngày nào sau ${dueDate.toISOString().split('T')[0]}
+   ❌❌❌ NGÀY CẤM - TUYỆT ĐỐI KHÔNG SCHEDULE ❌❌❌ 
+   - Trước ${startDate.toISOString().split('T')[0]}: ❌ QUÁ KHỨ
+   - ${dueDate.toISOString().split('T')[0]} trở đi: ❌ DEADLINE hoặc SAU DEADLINE
    
-   🔥 QUAN TRỌNG: Phải tạo đủ ${d.actualHours.toFixed(1)}h tasks trong ${validDates.length} ngày hợp lệ!
+   🎯 YÊU CẦU: Tạo đủ ${d.actualHours.toFixed(1)}h tasks, phân bổ đều trong ${validDates.length} ngày hợp lệ
+   � QVÍ DỤ: Nếu cần 3h, chia thành: ${validDates[0]} (1.5h) + ${validDates[Math.floor(validDates.length/2)]} (1.5h)
    ${d.isWeak ? '⚠️ ĐÂY LÀ MÔN YẾU - Ưu tiên schedule sớm và nhiều session!' : ''}`;
 }).join('\n')}
 
@@ -312,11 +322,13 @@ ${studyMode === 'sprint' ? `
 
 � CƯHIẾN LƯỢC PHÂN BỔ THỜI GIAN:
 
-1️⃣ TRÁNH XUNG ĐỘT:
+1️⃣ TRÁNH XUNG ĐỘT (QUAN TRỌNG):
    - ⛔ KHÔNG schedule vào thời gian TKB cứng
    - ⛔ KHÔNG schedule vào giờ ăn (12:00-13:00, 18:00-19:00)
    - ⛔ KHÔNG schedule vào giờ ngủ (22:00-06:00)
-   - ✅ CHỈ schedule vào thời gian trống
+   - 🚨 KHÔNG tạo 2 tasks cùng khung giờ (VD: 08:00-10:00 và 09:00-11:00 = TRÙNG)
+   - ✅ Mỗi task phải có thời gian RIÊNG BIỆT, KHÔNG chồng lấn
+   - ✅ Để khoảng trống giữa các tasks (VD: 08:00-10:00, sau đó 10:00-12:00)
 
 2️⃣ PHÂN BỔ ĐỀU:
    - ❌ KHÔNG dồn tất cả vào 1 ngày (VD: 8h trong 1 ngày)
@@ -362,7 +374,7 @@ ${weekDates.map(w => {
   }).join('\n')}`;
 }).join('\n\n')}
 
-🎯 YÊU CẦU OUTPUT:
+🎯 YÊU CẦU OUTPUT (TUYỆT ĐỐI TUÂN THỦ):
 1. ✅ Tổng giờ học = actualHours (chính xác, sai số < 0.5h)
 2. ✅ Mỗi session: 1-2 giờ (không quá dài)
 3. ✅ Ưu tiên deadline gần và môn yếu
@@ -370,6 +382,7 @@ ${weekDates.map(w => {
 5. ✅ Tuân thủ hard limits
 6. ✅ Điều chỉnh sleep/meal theo study mode
 7. ✅ Đưa ra workload analysis và strategy rõ ràng
+8. 🚨 CHỈ schedule vào NGÀY HỢP LỆ đã liệt kê ở trên - KHÔNG schedule vào ngày deadline hoặc sau đó
 
 📤 OUTPUT JSON (BẮT BUỘC):
 {
@@ -432,36 +445,53 @@ Giả sử có deadline "Bài tập Toán" 6h, due ${processedDeadlines[0] ? new
 }
 → Chỉ 4h, thiếu 2h! PHẢI đủ 6h
 
+❌ SAI - Schedule vào hoặc sau deadline:
+Deadline: 2025-11-20
+{
+  "Monday": [{"time": "08:00 - 10:00", "activity": "Study: Bài tập Toán - Phần 1"}],
+  "Tuesday": [{"time": "08:00 - 10:00", "activity": "Study: Bài tập Toán - Phần 2"}],
+  "2025-11-20": [{"time": "08:00 - 10:00", "activity": "Study: Bài tập Toán - Phần 3"}]  ← ❌ NGÀY DEADLINE
+}
+→ Task cuối rơi vào NGÀY DEADLINE → BỊ XÓA!
+
 ❌ SAI - Schedule sau deadline:
+Deadline: 2025-11-20
+{
+  "Monday": [{"time": "08:00 - 10:00", "activity": "Study: Bài tập Toán - Phần 1"}],
+  "2025-11-21": [{"time": "08:00 - 10:00", "activity": "Study: Bài tập Toán - Phần 2"}]  ← ❌ SAU DEADLINE
+}
+→ Task thứ 2 SAU deadline → BỊ XÓA!
+
+❌ SAI - Tasks trùng khung giờ (TIME CONFLICT):
 {
   "Monday": [
-    {"time": "08:00 - 10:00", "activity": "Study: Bài tập Toán - Phần 1", "category": "study", "priority": "high"}
-  ],
-  "Tuesday": [
-    {"time": "08:00 - 10:00", "activity": "Continue: Bài tập Toán - Phần 2", "category": "study", "priority": "high"}
-  ],
-  "${processedDeadlines[0] ? new Date(processedDeadlines[0].dueDate).toISOString().split('T')[0] : '2025-11-20'}": [
-    {"time": "08:00 - 10:00", "activity": "Continue: Bài tập Toán - Phần 3", "category": "study", "priority": "high"}
+    {"time": "08:00 - 10:00", "activity": "Study: Toán"},
+    {"time": "09:00 - 11:00", "activity": "Study: Lý"}  ← ❌ TRÙNG với task trên (09:00-10:00)
   ]
 }
-→ Task cuối rơi vào NGÀY DEADLINE → BỊ XÓA → Thiếu giờ!
+→ 2 tasks cùng lúc → KHÔNG THỂ HỌC 2 MÔN CÙNG LÚC!
 
-✅ ĐÚNG - Phân bổ đều và đủ giờ:
+❌ SAI - Xung đột với TKB cứng:
+TKB: Monday 08:00-10:00 có lớp
+{
+  "Monday": [
+    {"time": "08:00 - 10:00", "activity": "Study: ..."} ← ❌ TRÙNG với lớp học
+  ]
+}
+
+✅ ĐÚNG - Phân bổ đều, đủ giờ, KHÔNG trùng:
 {
   "Monday": [
     {"time": "08:00 - 10:00", "activity": "Study: Bài tập Toán - Phần 1 (Lý thuyết)", "category": "study", "priority": "high"},
-    {"time": "14:00 - 16:00", "activity": "Continue: Bài tập Toán - Phần 2 (Bài tập)", "category": "study", "priority": "high"}
+    {"time": "14:00 - 16:00", "activity": "Study: Bài tập Toán - Phần 2 (Bài tập)", "category": "study", "priority": "high"}
   ],
   "Tuesday": [
-    {"time": "08:00 - 10:00", "activity": "Continue: Bài tập Toán - Phần 3 (Ôn tập)", "category": "study", "priority": "high"}
+    {"time": "08:00 - 10:00", "activity": "Study: Bài tập Toán - Phần 3 (Ôn tập)", "category": "study", "priority": "high"}
   ]
 }
-→ Tổng: 2h + 2h + 2h = 6h ✅ CHÍNH XÁC!
-
-❌ SAI - Xung đột với TKB:
-{
-  "Monday": [
-    {"time": "08:00 - 10:00", "activity": "Study: ..."} // Nếu TKB có lớp 08:00-10:00 → XUNG ĐỘT!
+→ Tổng: 2h + 2h + 2h = 6h ✅
+→ Không trùng khung giờ ✅
+→ Có khoảng nghỉ giữa các session ✅
   ]
 }
 
@@ -543,6 +573,182 @@ Giả sử có deadline "Bài tập Toán" 6h, due ${processedDeadlines[0] ? new
       throw new Error('Could not extract valid JSON from AI response');
     }
     
+    // Auto-fix: Move tasks that are after deadline to valid dates
+    console.log('\n🔧 Auto-fixing invalid dates...');
+    let autoFixCount = 0;
+    
+    parsed.weeks?.forEach((week) => {
+      const weekStart = new Date(week.startDate);
+      const days = week.days || {};
+      
+      Object.entries(days).forEach(([dayName, tasks]) => {
+        if (tasks && tasks.length > 0) {
+          const dayIndex = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].indexOf(dayName);
+          const taskDate = new Date(weekStart);
+          taskDate.setDate(weekStart.getDate() + dayIndex);
+          const taskDateOnly = new Date(taskDate);
+          taskDateOnly.setHours(0, 0, 0, 0);
+          
+          tasks.forEach(task => {
+            if (task.category !== 'study') return;
+            
+            // Find which deadline this task belongs to
+            for (const d of validDeadlines) {
+              const titleWords = d.title.toLowerCase().split(' ');
+              const activityLower = task.activity.toLowerCase();
+              
+              if (titleWords.some(word => word.length > 3 && activityLower.includes(word))) {
+                const dueDate = new Date(d.dueDate);
+                const dueDateOnly = new Date(dueDate);
+                dueDateOnly.setHours(0, 0, 0, 0);
+                
+                // If task is after deadline, try to move it to last valid date
+                if (taskDateOnly > dueDateOnly) {
+                  const lastValidDate = new Date(dueDate);
+                  lastValidDate.setDate(lastValidDate.getDate() - 1);
+                  
+                  console.log(`   🔧 Moving task from ${taskDate.toISOString().split('T')[0]} to ${lastValidDate.toISOString().split('T')[0]}: ${task.activity}`);
+                  
+                  // Find the target day in the week
+                  const targetDayName = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'][lastValidDate.getDay()];
+                  
+                  // Move task to target day
+                  if (!week.days[targetDayName]) {
+                    week.days[targetDayName] = [];
+                  }
+                  week.days[targetDayName].push(task);
+                  
+                  // Mark for removal from current day
+                  task._shouldRemove = true;
+                  autoFixCount++;
+                }
+                break;
+              }
+            }
+          });
+          
+          // Remove marked tasks
+          week.days[dayName] = tasks.filter(t => !t._shouldRemove);
+        }
+      });
+    });
+    
+    if (autoFixCount > 0) {
+      console.log(`   ✅ Auto-fixed ${autoFixCount} task(s)`);
+    } else {
+      console.log(`   ✅ No auto-fix needed`);
+    }
+    
+    // Detect and resolve time conflicts
+    console.log('\n🔍 Checking for time conflicts...');
+    let conflictCount = 0;
+    
+    parsed.weeks?.forEach((week) => {
+      const weekStart = new Date(week.startDate);
+      const days = week.days || {};
+      
+      Object.entries(days).forEach(([dayName, tasks]) => {
+        if (!tasks || tasks.length <= 1) return;
+        
+        const dayIndex = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'].indexOf(dayName);
+        const taskDate = new Date(weekStart);
+        taskDate.setDate(weekStart.getDate() + dayIndex);
+        const dateStr = taskDate.toISOString().split('T')[0];
+        
+        // Sort tasks by start time
+        const sortedTasks = [...tasks].sort((a, b) => {
+          const aStart = a.time?.split(' - ')[0] || '00:00';
+          const bStart = b.time?.split(' - ')[0] || '00:00';
+          return aStart.localeCompare(bStart);
+        });
+        
+        // Check for overlaps
+        const validTasks = [];
+        const conflictedTasks = [];
+        
+        sortedTasks.forEach((task, index) => {
+          if (!task.time || !task.time.includes(' - ')) {
+            validTasks.push(task);
+            return;
+          }
+          
+          const [startStr, endStr] = task.time.split(' - ');
+          const [startH, startM] = startStr.split(':').map(Number);
+          const [endH, endM] = endStr.split(':').map(Number);
+          const taskStart = startH * 60 + (startM || 0);
+          const taskEnd = endH * 60 + (endM || 0);
+          
+          // Check against already validated tasks
+          let hasConflict = false;
+          for (const validTask of validTasks) {
+            if (!validTask.time || !validTask.time.includes(' - ')) continue;
+            
+            const [vStartStr, vEndStr] = validTask.time.split(' - ');
+            const [vStartH, vStartM] = vStartStr.split(':').map(Number);
+            const [vEndH, vEndM] = vEndStr.split(':').map(Number);
+            const vStart = vStartH * 60 + (vStartM || 0);
+            const vEnd = vEndH * 60 + (vEndM || 0);
+            
+            // Check overlap: (start1 < end2) AND (start2 < end1)
+            if (taskStart < vEnd && vStart < taskEnd) {
+              hasConflict = true;
+              console.log(`   ⚠️ CONFLICT on ${dateStr}: ${task.time} "${task.activity}" overlaps with ${validTask.time} "${validTask.activity}"`);
+              conflictedTasks.push(task);
+              conflictCount++;
+              break;
+            }
+          }
+          
+          if (!hasConflict) {
+            validTasks.push(task);
+          }
+        });
+        
+        // Try to reschedule conflicted tasks to next available slot
+        conflictedTasks.forEach(task => {
+          const [startStr, endStr] = task.time.split(' - ');
+          const [startH, startM] = startStr.split(':').map(Number);
+          const [endH, endM] = endStr.split(':').map(Number);
+          const duration = (endH * 60 + (endM || 0)) - (startH * 60 + (startM || 0));
+          
+          // Find next available slot (after last task)
+          if (validTasks.length > 0) {
+            const lastTask = validTasks[validTasks.length - 1];
+            if (lastTask.time && lastTask.time.includes(' - ')) {
+              const lastEndStr = lastTask.time.split(' - ')[1];
+              const [lastEndH, lastEndM] = lastEndStr.split(':').map(Number);
+              const newStartMinutes = lastEndH * 60 + (lastEndM || 0);
+              const newEndMinutes = newStartMinutes + duration;
+              
+              // Check if new time is reasonable (before 23:00)
+              if (newEndMinutes <= 23 * 60) {
+                const newStartH = Math.floor(newStartMinutes / 60);
+                const newStartM = newStartMinutes % 60;
+                const newEndH = Math.floor(newEndMinutes / 60);
+                const newEndM = newEndMinutes % 60;
+                
+                task.time = `${String(newStartH).padStart(2, '0')}:${String(newStartM).padStart(2, '0')} - ${String(newEndH).padStart(2, '0')}:${String(newEndM).padStart(2, '0')}`;
+                validTasks.push(task);
+                console.log(`   ✅ RESCHEDULED: "${task.activity}" to ${task.time}`);
+                conflictCount--; // Successfully resolved
+              } else {
+                console.log(`   ❌ REMOVED: "${task.activity}" - cannot reschedule (too late)`);
+              }
+            }
+          }
+        });
+        
+        // Update tasks for this day
+        week.days[dayName] = validTasks;
+      });
+    });
+    
+    if (conflictCount > 0) {
+      console.log(`   ⚠️ ${conflictCount} unresolved conflict(s) - tasks removed`);
+    } else {
+      console.log(`   ✅ No time conflicts`);
+    }
+    
     // Post-process: STRICT validation
     console.log('\n🔍 STRICT Validation...');
     console.log(`   Start date boundary: ${startDate.toISOString().split('T')[0]}`);
@@ -580,9 +786,9 @@ Giả sử có deadline "Bài tập Toán" 6h, due ${processedDeadlines[0] ? new
             const startDateOnly = new Date(startDate);
             startDateOnly.setHours(0, 0, 0, 0);
             
-            // Check 1: Task must not be in the past (today or before)
-            if (taskDateOnly <= todayOnly) {
-              console.log(`   ❌ IN PAST/TODAY: ${taskDateStr} <= ${today.toISOString().split('T')[0]} | ${task.activity}`);
+            // Check 1: Task must not be in the past (before today)
+            if (taskDateOnly < todayOnly) {
+              console.log(`   ❌ IN PAST: ${taskDateStr} < ${today.toISOString().split('T')[0]} | ${task.activity}`);
               removedCount++;
               return false;
             }
@@ -603,10 +809,12 @@ Giả sử có deadline "Bài tập Toán" 6h, due ${processedDeadlines[0] ? new
               // Check if this task is for this deadline
               if (titleWords.some(word => word.length > 3 && activityLower.includes(word))) {
                 const dueDate = new Date(d.dueDate);
+                const dueDateOnly = new Date(dueDate);
+                dueDateOnly.setHours(0, 0, 0, 0);
                 
-                // STRICT: Task must be BEFORE deadline (not on or after)
-                if (taskDate >= dueDate) {
-                  console.log(`   ❌ ON/AFTER DEADLINE: ${taskDateStr} >= ${dueDate.toISOString().split('T')[0]} | ${task.activity}`);
+                // STRICT: Task must be ON or BEFORE deadline (not after)
+                if (taskDateOnly > dueDateOnly) {
+                  console.log(`   ❌ AFTER DEADLINE: ${taskDateStr} > ${dueDate.toISOString().split('T')[0]} | ${task.activity}`);
                   removedCount++;
                   isValid = false;
                   break;
@@ -651,39 +859,23 @@ Giả sử có deadline "Bài tập Toán" 6h, due ${processedDeadlines[0] ? new
       }
     });
     
-    // Final summary
+    // Final summary - count all study tasks
+    let totalTasks = 0;
+    let keptTasks = 0;
+    parsed.weeks?.forEach(week => {
+      Object.values(week.days || {}).forEach(tasks => {
+        if (Array.isArray(tasks)) {
+          const studyTasks = tasks.filter(t => t.category === 'study');
+          keptTasks += studyTasks.length;
+        }
+      });
+    });
+    totalTasks = keptTasks + removedCount;
+    
     console.log('\n📋 FINAL SUMMARY:');
-    console.log(`   Total tasks created: ${Object.values(deadlineHours).reduce((sum, d) => {
-      let count = 0;
-      parsed.weeks?.forEach(week => {
-        Object.values(week.days || {}).forEach(tasks => {
-          if (Array.isArray(tasks)) {
-            count += tasks.filter(t => {
-              const titleWords = d.title?.toLowerCase().split(' ') || [];
-              const activityLower = (t.activity || '').toLowerCase();
-              return titleWords.some(word => word.length > 3 && activityLower.includes(word));
-            }).length;
-          }
-        });
-      });
-      return sum + count;
-    }, 0)} tasks`);
+    console.log(`   Total tasks created: ${totalTasks} tasks`);
     console.log(`   Tasks removed: ${removedCount}`);
-    console.log(`   Tasks kept: ${Object.values(deadlineHours).reduce((sum, d) => {
-      let count = 0;
-      parsed.weeks?.forEach(week => {
-        Object.values(week.days || {}).forEach(tasks => {
-          if (Array.isArray(tasks)) {
-            count += tasks.filter(t => {
-              const titleWords = d.title?.toLowerCase().split(' ') || [];
-              const activityLower = (t.activity || '').toLowerCase();
-              return titleWords.some(word => word.length > 3 && activityLower.includes(word));
-            }).length;
-          }
-        });
-      });
-      return sum + count;
-    }, 0)}`);
+    console.log(`   Tasks kept: ${keptTasks}`);
     
     if (removedCount > 0) {
       console.log(`\n⚠️ Removed ${removedCount} invalid tasks (past dates or conflicts)\n`);
