@@ -222,7 +222,7 @@ Tuesday 14:00-16:00 MATH210 Linear Algebra - Building B
               <Button
                 onClick={handleReplaceClick}
                 variant="outline"
-                className="border-red-300 text-red-700 hover:bg-red-50"
+                className="border-red-300 text-red-700 hover:bg-red-50 relative z-10 cursor-pointer"
               >
                 🔄 Thay thế thời khóa biểu mới
               </Button>

@@ -10,6 +10,10 @@ import {
   X,
   Lock,
   Mail,
+  MapPin,
+  Facebook,
+  Twitter,
+  Heart,
 } from "lucide-react";
 import { Button } from "../ui/button";
 import { Card } from "../ui/card";
@@ -66,133 +70,72 @@ export function HomePage() {
   ];
 
   return (
-    <div
-      className="min-h-screen relative overflow-hidden"
-      style={{ backgroundColor: "#ffffff" }}
-    >
+    <div className="min-h-screen w-full relative bg-white">
+      {/* Purple Glow Background */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `radial-gradient(circle at top right, rgba(173, 109, 244, 0.5), transparent 70%)`,
+          filter: "blur(80px)",
+        }}
+      />
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.3), transparent 60%)`,
+          filter: "blur(80px)",
+        }}
+      />
+
       {/* Hero Section with HCMUTE Background */}
       <section
-        className="pt-20 pb-32 relative overflow-hidden min-h-screen"
+        className="min-h-screen relative overflow-hidden flex items-center justify-center"
         style={{
           backgroundImage: "url(/images/2.jpg)",
           backgroundSize: "cover",
           backgroundPosition: "center center",
           backgroundRepeat: "no-repeat",
-          backgroundAttachment: "fixed",
         }}
       >
-        {/* Overlay for readability */}
-        <div className="absolute inset-0 bg-white/40"></div>
+        {/* Simple overlay */}
+        <div className="absolute inset-0 bg-black/20"></div>
 
         <div className="container mx-auto px-4 relative z-10">
-          <div className="flex items-center justify-center min-h-[70vh]">
+          <div className="flex items-center justify-center">
             {!isAuthenticated ? (
-              /* Playful, colorful design */
               <motion.div
-                initial={{ opacity: 0, y: 40 }}
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, type: "spring", bounce: 0.4 }}
-                className="relative max-w-5xl"
+                transition={{ duration: 0.6 }}
+                className="text-center max-w-4xl w-full"
               >
-                {/* Welcome section */}
-                <motion.div
-                  initial={{ opacity: 0, y: -20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.2 }}
-                  className="text-center mb-16"
-                >
-                  <h1 className="text-6xl md:text-7xl font-black text-white mb-3 tracking-tight">
-                    WELCOME
-                  </h1>
-                  <p className="text-2xl md:text-3xl font-bold text-yellow-400 mb-6">
-                    EduSmart Platform
-                  </p>
-                  <p className="text-lg text-white/90 max-w-md mx-auto leading-relaxed">
-                    Nền tảng học tập thông minh với công nghệ AI hỗ trợ sinh
-                    viên và giảng viên
-                  </p>
-                </motion.div>
-
-                {/* Cards with playful design */}
-                <div className="flex flex-col sm:flex-row gap-8 justify-center px-4">
-                  {/* Student & Teacher Card - Playful */}
+                {/* Single Card - Continue */}
+                <div className="flex justify-center items-center px-4">
+                  {/* Continue Card (Student & Teacher) */}
                   <motion.div
-                    initial={{ opacity: 0, x: -30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.3 }}
-                    whileHover={{ y: -12, rotate: -2 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => navigate("/login")}
-                    className="cursor-pointer group"
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.2 }}
+                    className="w-auto"
                   >
-                    <div
-                      style={{ backgroundColor: "#f8f9ff" }}
-                      className="relative p-8 rounded-[2.5rem] shadow-2xl hover:shadow-purple-400/40 transition-all duration-300 border-0 min-w-[280px] overflow-hidden"
-                    >
-                      <div className="absolute -top-10 -right-10 w-40 h-40 bg-purple-300 rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                      <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-yellow-300 rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
-
-                      <div className="relative flex flex-col items-center text-center">
-                        <motion.div
-                          whileHover={{ rotate: 360, scale: 1.15 }}
-                          transition={{ duration: 0.7, type: "spring" }}
-                          className="w-28 h-28 bg-gradient-to-br from-purple-500 via-purple-600 to-indigo-600 rounded-[2rem] flex items-center justify-center mb-6 shadow-xl transform -rotate-3 group-hover:rotate-0 transition-transform"
-                        >
-                          <GraduationCap className="w-14 h-14 text-white" />
-                        </motion.div>
-
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-purple-600 transition-colors">
-                          Continue
+                    <div className="bg-gradient-to-br from-blue-600 via-cyan-500 to-green-500 rounded-xl px-8 py-5 shadow-2xl inline-block">
+                      <div className="flex flex-col items-center text-center">
+                        <h3 className="text-lg font-bold text-white mb-1">
+                          Nâng tầm giáo dục nhờ AI
                         </h3>
 
-                        <p className="text-gray-600 text-sm mb-6 font-medium">
-                          Sinh viên & Giảng viên
+                        <p className="text-white/90 text-sm mb-4">
+                          Học tập dễ dàng, hiệu quả hơn bao giờ hết
                         </p>
 
-                        <div className="px-8 py-3 bg-gradient-to-r from-purple-500 to-indigo-500 text-white rounded-full font-semibold text-sm group-hover:from-purple-600 group-hover:to-indigo-600 transition-all shadow-lg">
-                          Tiếp tục →
-                        </div>
-                      </div>
-                    </div>
-                  </motion.div>
-
-                  {/* Admin Card - Playful */}
-                  <motion.div
-                    initial={{ opacity: 0, x: 30 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.4 }}
-                    whileHover={{ y: -12, rotate: 2 }}
-                    whileTap={{ scale: 0.95 }}
-                    onClick={() => setShowAdminModal(true)}
-                    className="cursor-pointer group"
-                  >
-                    <div
-                      style={{ backgroundColor: "#fff8f0" }}
-                      className="relative p-8 rounded-[2.5rem] shadow-2xl hover:shadow-orange-400/40 transition-all duration-300 border-0 min-w-[280px] overflow-hidden"
-                    >
-                      <div className="absolute -top-10 -right-10 w-40 h-40 bg-orange-300 rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
-                      <div className="absolute -bottom-10 -left-10 w-40 h-40 bg-yellow-300 rounded-full blur-3xl opacity-30 group-hover:opacity-50 transition-opacity"></div>
-
-                      <div className="relative flex flex-col items-center text-center">
-                        <motion.div
-                          whileHover={{ rotate: -360, scale: 1.15 }}
-                          transition={{ duration: 0.7, type: "spring" }}
-                          className="w-28 h-28 bg-gradient-to-br from-orange-400 via-orange-500 to-yellow-500 rounded-[2rem] flex items-center justify-center mb-6 shadow-xl transform rotate-3 group-hover:rotate-0 transition-transform"
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          onClick={() => navigate("/login")}
+                          className="px-8 py-2.5 bg-white text-blue-600 rounded-lg font-semibold hover:bg-blue-50 transition-all shadow-lg hover:shadow-xl"
                         >
-                          <Shield className="w-14 h-14 text-white" />
-                        </motion.div>
-
-                        <h3 className="text-2xl font-bold text-gray-900 mb-2 group-hover:text-orange-600 transition-colors">
-                          Admin
-                        </h3>
-
-                        <p className="text-gray-600 text-sm mb-6 font-medium">
-                          Quản trị viên
-                        </p>
-
-                        <div className="px-8 py-3 bg-gradient-to-r from-orange-500 to-yellow-500 text-white rounded-full font-semibold text-sm group-hover:from-orange-600 group-hover:to-yellow-600 transition-all shadow-lg">
-                          Truy cập →
-                        </div>
+                          Tham Gia Ngay
+                        </motion.button>
                       </div>
                     </div>
                   </motion.div>
@@ -435,6 +378,105 @@ export function HomePage() {
           </div>
         )}
       </AnimatePresence>
+
+      {/* Footer Section - Compact like reference image */}
+      <footer className="relative bg-slate-900 border-t border-slate-800">
+        <div className="container mx-auto px-4 py-12">
+          <div className="grid md:grid-cols-3 gap-8 mb-8">
+            {/* Column 1: About */}
+            <div>
+              <h3 className="text-lg font-bold mb-3 text-slate-200">
+                HCMUTE AI Campus
+              </h3>
+              <p className="text-slate-400 text-sm mb-3 leading-relaxed">
+                Nền tảng giáo dục thông minh, kết nối sinh viên với công nghệ AI
+                tiên tiến để nâng cao chất lượng học tập.
+              </p>
+              <div className="flex items-start gap-2 text-slate-400 text-sm">
+                <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
+                <span>1 Võ Văn Ngân, Thủ Đức, TP. Hồ Chí Minh</span>
+              </div>
+            </div>
+
+            {/* Column 2: Quick Links */}
+            <div>
+              <h3 className="text-lg font-bold mb-3 text-slate-200">
+                Liên Kết Nhanh
+              </h3>
+              <ul className="space-y-2 text-sm">
+                <li>
+                  <a
+                    href="#"
+                    className="text-slate-400 hover:text-purple-400 transition-colors"
+                  >
+                    Tính Năng
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-slate-400 hover:text-purple-400 transition-colors"
+                  >
+                    Về Chúng Tôi
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="text-slate-400 hover:text-purple-400 transition-colors"
+                  >
+                    Liên Hệ
+                  </a>
+                </li>
+              </ul>
+            </div>
+
+            {/* Column 3: Social */}
+            <div>
+              <h3 className="text-lg font-bold mb-3 text-slate-200">
+                Theo Dõi Chúng Tôi
+              </h3>
+              <p className="text-slate-400 text-sm mb-3">
+                Cập nhật thông tin mới nhất về các sự kiện
+              </p>
+              <div className="flex gap-2">
+                <a
+                  href="#"
+                  className="w-9 h-9 bg-slate-800 hover:bg-indigo-600 rounded-lg flex items-center justify-center transition-all"
+                  title="Facebook"
+                >
+                  <Facebook className="w-4 h-4 text-slate-300" />
+                </a>
+                <a
+                  href="#"
+                  className="w-9 h-9 bg-slate-800 hover:bg-purple-600 rounded-lg flex items-center justify-center transition-all"
+                  title="Twitter"
+                >
+                  <Twitter className="w-4 h-4 text-slate-300" />
+                </a>
+                <a
+                  href="#"
+                  className="w-9 h-9 bg-slate-800 hover:bg-pink-600 rounded-lg flex items-center justify-center transition-all"
+                  title="Email"
+                >
+                  <Mail className="w-4 h-4 text-slate-300" />
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Bar */}
+          <div className="border-t border-slate-800 pt-6 text-center">
+            <p className="text-slate-400 text-sm mb-1">
+              © 2025 HCMUTE AI Campus. Tất cả quyền được bảo lưu.
+            </p>
+            <p className="text-slate-500 text-xs flex items-center justify-center gap-1">
+              Made with <Heart className="w-3 h-3 text-red-500 fill-red-500" />{" "}
+              in nhóm Tứ Trụ Dev
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

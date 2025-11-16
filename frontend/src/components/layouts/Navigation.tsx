@@ -148,9 +148,9 @@ export function Navigation({ userType }: NavigationProps) {
             </button>
           </div>
 
-          {/* Navigation Links - Centered */}
+          {/* Navigation Links - Left Side */}
           {userType && (
-            <div className="flex-1 flex items-center justify-center">
+            <div className="flex-1 flex items-center">
               <div className="flex items-center gap-4">
                 <Button
                   variant={location.pathname === "/home" ? "default" : "ghost"}
@@ -178,7 +178,7 @@ export function Navigation({ userType }: NavigationProps) {
           )}
 
           {/* Right Side - User Info or Login Button */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 ml-auto">
             {isAuthenticated && user ? (
               <>
                 {/* Notification Bell for Students */}

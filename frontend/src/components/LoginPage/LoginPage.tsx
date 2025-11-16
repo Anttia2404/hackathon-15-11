@@ -155,55 +155,60 @@ export function LoginPage() {
   };
 
   return (
-    <div
-      className="min-h-screen flex items-center justify-center p-4 relative overflow-hidden"
-      style={{
-        backgroundImage: "url(/images/2.jpg)",
-        backgroundSize: "cover",
-        backgroundPosition: "center center",
-        backgroundRepeat: "no-repeat",
-        backgroundAttachment: "fixed",
-      }}
-    >
-      {/* Overlay for readability */}
-      <div className="absolute inset-0 bg-black/30"></div>
+    <div className="min-h-screen w-full relative bg-white flex items-center justify-center p-4 overflow-hidden">
+      {/* Purple Glow Background */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `radial-gradient(circle at top right, rgba(173, 109, 244, 0.5), transparent 70%)`,
+          filter: "blur(80px)",
+        }}
+      />
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.3), transparent 60%)`,
+          filter: "blur(80px)",
+        }}
+      />
 
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        className="w-full max-w-md relative z-10"
+        transition={{ duration: 0.5 }}
+        className="w-full max-w-sm relative z-10"
       >
         <div className="relative w-full">
-          {/* Radial Gradient Background for Card */}
+          {/* Clean gradient background */}
           <div
-            className="absolute inset-0 rounded-lg"
+            className="absolute inset-0 rounded-2xl"
             style={{
               background:
-                "radial-gradient(125% 125% at 50% 10%, #fff 40%, #6366f1 100%)",
+                "linear-gradient(135deg, #ffffff 0%, #f8f9ff 50%, #f0f2ff 100%)",
             }}
           />
 
-          <Card className="p-8 shadow-2xl bg-transparent border-0 relative z-10">
+          <Card className="p-6 shadow-2xl bg-transparent border-0 relative z-10 backdrop-blur-sm">
             {/* Logo & Title */}
-            <div className="text-center mb-8 relative z-20">
+            <div className="text-center mb-5 relative z-20">
               <motion.div
                 initial={{ scale: 0, rotate: -180 }}
                 animate={{ scale: 1, rotate: 0 }}
                 transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                className="relative w-20 h-20 mx-auto mb-4 z-20"
+                className="relative w-14 h-14 mx-auto mb-3 z-20"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-600 rounded-2xl animate-pulse z-10"></div>
-                <div className="absolute inset-1 bg-white rounded-2xl z-20"></div>
-                <div className="absolute inset-2 bg-gradient-to-br from-pink-500 via-purple-500 to-indigo-600 rounded-2xl flex items-center justify-center z-30">
-                  <GraduationCap className="w-10 h-10 text-white" />
+                <div className="absolute inset-0 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 rounded-xl shadow-lg z-10"></div>
+                <div className="absolute inset-0.5 bg-white rounded-xl z-20"></div>
+                <div className="absolute inset-1 bg-gradient-to-br from-indigo-500 via-purple-600 to-pink-500 rounded-xl flex items-center justify-center z-30">
+                  <GraduationCap className="w-7 h-7 text-white" />
                 </div>
               </motion.div>
               <motion.h1
                 initial={{ opacity: 0, y: 10 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.3 }}
-                className="text-3xl font-bold bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent mb-2"
+                className="text-2xl font-bold bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 bg-clip-text text-transparent mb-1.5 tracking-tight"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
                 {isLogin ? "Đăng nhập" : "Đăng ký"}
               </motion.h1>
@@ -211,7 +216,8 @@ export function LoginPage() {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.4 }}
-                className="text-gray-700 font-medium"
+                className="text-base text-gray-600 font-normal"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
               >
                 {isLogin ? "Chào mừng bạn trở lại! 👋" : "Tạo tài khoản mới 🎓"}
               </motion.p>
@@ -231,21 +237,25 @@ export function LoginPage() {
 
             {/* Login Form */}
             {isLogin ? (
-              <form onSubmit={handleLogin} className="space-y-4 relative z-20">
+              <form
+                onSubmit={handleLogin}
+                className="space-y-3.5 relative z-20"
+              >
                 <div>
                   <Label
                     htmlFor="email"
-                    className="text-gray-700 font-semibold mb-1.5 block"
+                    className="text-gray-800 font-semibold text-sm mb-1.5 block"
+                    style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                   >
                     Email
                   </Label>
                   <div className="relative">
-                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 z-10 pointer-events-none" />
+                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400 z-10 pointer-events-none" />
                     <Input
                       id="email"
                       type="email"
                       placeholder="your.email@student.edu"
-                      className="pl-10 pr-3 border-2 focus:border-purple-500 transition-colors"
+                      className="pl-10 pr-3 h-10 border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
                       value={loginData.email}
                       onChange={(e) =>
                         setLoginData({ ...loginData, email: e.target.value })
@@ -256,19 +266,29 @@ export function LoginPage() {
                 </div>
 
                 <div>
-                  <Label
-                    htmlFor="password"
-                    className="text-gray-700 font-semibold mb-1.5 block"
-                  >
-                    Mật khẩu
-                  </Label>
+                  <div className="flex items-center justify-between mb-1.5">
+                    <Label
+                      htmlFor="password"
+                      className="text-gray-800 font-semibold text-sm"
+                      style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                    >
+                      Mật khẩu
+                    </Label>
+                    <button
+                      type="button"
+                      className="text-xs text-indigo-600 hover:text-indigo-700 font-medium transition-colors"
+                      onClick={() => alert("Tính năng đang phát triển")}
+                    >
+                      Quên mật khẩu?
+                    </button>
+                  </div>
                   <div className="relative">
-                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-purple-500 z-10 pointer-events-none" />
+                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-indigo-400 z-10 pointer-events-none" />
                     <Input
                       id="password"
                       type="password"
                       placeholder="••••••••"
-                      className="pl-10 pr-3 border-2 focus:border-purple-500 transition-colors"
+                      className="pl-10 pr-3 h-10 border-2 border-gray-200 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 transition-all shadow-sm"
                       value={loginData.password}
                       onChange={(e) =>
                         setLoginData({ ...loginData, password: e.target.value })
@@ -280,13 +300,14 @@ export function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-700 text-white font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02]"
+                  className="w-full h-10 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.01] mt-1"
                   disabled={loading}
+                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                 >
                   {loading ? (
                     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Đang đăng nhập...
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span className="text-sm">Đang đăng nhập...</span>
                     </div>
                   ) : (
                     "Đăng nhập"
@@ -294,16 +315,19 @@ export function LoginPage() {
                 </Button>
 
                 {/* Demo Accounts */}
-                <div className="pt-4 border-t border-gray-200">
-                  <p className="text-sm text-gray-700 mb-3 text-center font-semibold">
-                    🎯 Tài khoản demo:
+                <div className="pt-3 border-t border-gray-200 mt-4">
+                  <p
+                    className="text-xs text-gray-600 mb-2 text-center font-medium"
+                    style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+                  >
+                    🎯 Tài khoản demo
                   </p>
-                  <div className="grid grid-cols-3 gap-2">
+                  <div className="grid grid-cols-3 gap-1.5">
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="border-2 border-purple-300 hover:border-purple-500 hover:bg-purple-50 transition-all font-medium"
+                      className="h-8 text-xs border-2 border-purple-200 hover:border-purple-400 hover:bg-purple-50 transition-all font-medium"
                       onClick={() => fillDemoData("student")}
                     >
                       👨‍🎓 SV
@@ -312,7 +336,7 @@ export function LoginPage() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="border-2 border-indigo-300 hover:border-indigo-500 hover:bg-indigo-50 transition-all font-medium"
+                      className="h-8 text-xs border-2 border-indigo-200 hover:border-indigo-400 hover:bg-indigo-50 transition-all font-medium"
                       onClick={() => fillDemoData("teacher")}
                     >
                       👨‍🏫 GV
@@ -321,7 +345,7 @@ export function LoginPage() {
                       type="button"
                       variant="outline"
                       size="sm"
-                      className="border-2 border-pink-300 hover:border-pink-500 hover:bg-pink-50 transition-all font-medium"
+                      className="h-8 text-xs border-2 border-pink-200 hover:border-pink-400 hover:bg-pink-50 transition-all font-medium"
                       onClick={handleAdminLogin}
                       disabled={loading}
                     >
@@ -517,13 +541,14 @@ export function LoginPage() {
 
                 <Button
                   type="submit"
-                  className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-indigo-600 hover:from-pink-600 hover:via-purple-600 hover:to-indigo-700 text-white font-bold shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.02]"
+                  className="w-full h-10 bg-gradient-to-r from-indigo-600 via-purple-600 to-pink-600 hover:from-indigo-700 hover:via-purple-700 hover:to-pink-700 text-white font-semibold shadow-lg hover:shadow-xl transition-all transform hover:scale-[1.01]"
                   disabled={loading}
+                  style={{ fontFamily: "Inter, system-ui, sans-serif" }}
                 >
                   {loading ? (
                     <div className="flex items-center justify-center gap-2">
-                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                      Đang đăng ký...
+                      <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                      <span className="text-sm">Đang đăng ký...</span>
                     </div>
                   ) : (
                     "Đăng ký"
@@ -533,13 +558,16 @@ export function LoginPage() {
             )}
 
             {/* Toggle Login/Register */}
-            <div className="mt-6 text-center relative z-20">
-              <p className="text-gray-700">
+            <div className="mt-4 text-center relative z-20">
+              <p
+                className="text-sm text-gray-600"
+                style={{ fontFamily: "Inter, system-ui, sans-serif" }}
+              >
                 {isLogin ? "Chưa có tài khoản?" : "Đã có tài khoản?"}{" "}
                 <button
                   type="button"
                   onClick={() => navigate(isLogin ? "/register" : "/login")}
-                  className="bg-gradient-to-r from-pink-600 via-purple-600 to-indigo-600 bg-clip-text text-transparent font-bold hover:from-pink-700 hover:via-purple-700 hover:to-indigo-700 transition-all"
+                  className="text-indigo-600 hover:text-indigo-700 font-semibold transition-colors underline decoration-2 underline-offset-2"
                 >
                   {isLogin ? "Đăng ký ngay" : "Đăng nhập"}
                 </button>

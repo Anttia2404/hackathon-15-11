@@ -281,11 +281,26 @@ export function StudyRoom() {
   if (!isInRoom) {
     // Landing Page - Create/Join Room
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center py-12">
+      <div className="min-h-screen w-full relative bg-white flex items-center justify-center py-12">
+        {/* Purple Glow Background */}
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: `radial-gradient(circle at top right, rgba(173, 109, 244, 0.5), transparent 70%)`,
+            filter: "blur(80px)",
+          }}
+        />
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: `radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.3), transparent 60%)`,
+            filter: "blur(80px)",
+          }}
+        />
         {/* Compact Header Banner */}
-        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+        <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500 z-10"></div>
 
-        <div className="container mx-auto px-4">
+        <div className="container mx-auto px-4 relative z-10">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
@@ -510,8 +525,23 @@ export function StudyRoom() {
 
   // Study Room Interface
   return (
-    <div className="min-h-screen bg-gradient-to-br from-indigo-50 via-purple-50 to-pink-50 py-8">
-      <div className="container mx-auto px-4">
+    <div className="min-h-screen w-full relative bg-white py-8">
+      {/* Purple Glow Background */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `radial-gradient(circle at top right, rgba(173, 109, 244, 0.5), transparent 70%)`,
+          filter: "blur(80px)",
+        }}
+      />
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.3), transparent 60%)`,
+          filter: "blur(80px)",
+        }}
+      />
+      <div className="container mx-auto px-4 relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}

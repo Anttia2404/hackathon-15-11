@@ -47,7 +47,7 @@ export function SmartScheduler() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen w-full bg-white">
       {/* Top Navigation */}
       <header className="bg-white border-b border-slate-200 sticky top-0 z-50 shadow-sm">
         <div className="container max-w-7xl mx-auto px-6 py-4">

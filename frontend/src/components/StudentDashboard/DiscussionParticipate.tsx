@@ -40,11 +40,26 @@ export default function DiscussionParticipate({
 
   if (submitted) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-blue-50 flex items-center justify-center p-4">
+      <div className="min-h-screen w-full relative bg-white flex items-center justify-center p-4">
+        {/* Purple Glow Background */}
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: `radial-gradient(circle at top right, rgba(173, 109, 244, 0.5), transparent 70%)`,
+            filter: "blur(80px)",
+          }}
+        />
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            backgroundImage: `radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.3), transparent 60%)`,
+            filter: "blur(80px)",
+          }}
+        />
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="text-center"
+          className="text-center relative z-10"
         >
           <div className="w-24 h-24 bg-green-500 rounded-full flex items-center justify-center mx-auto mb-6">
             <CheckCircle className="w-12 h-12 text-white" />
@@ -63,8 +78,23 @@ export default function DiscussionParticipate({
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8">
-      <div className="container mx-auto px-4 max-w-2xl">
+    <div className="min-h-screen w-full relative bg-white py-8">
+      {/* Purple Glow Background */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `radial-gradient(circle at top right, rgba(173, 109, 244, 0.5), transparent 70%)`,
+          filter: "blur(80px)",
+        }}
+      />
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.3), transparent 60%)`,
+          filter: "blur(80px)",
+        }}
+      />
+      <div className="container mx-auto px-4 max-w-2xl relative z-10">
         <Button onClick={onBack} variant="ghost" className="mb-4 gap-2">
           <ArrowLeft className="w-4 h-4" />
           Quay lại

@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   MessageSquare,
   BarChart3,
@@ -14,20 +14,23 @@ import {
   Users,
   Clock,
   TrendingUp,
-} from 'lucide-react';
-import { Card } from '../ui/card';
-import { Button } from '../ui/button';
-import discussionService, { Discussion } from '../../services/discussionService';
-import CreateDiscussionModal from './CreateDiscussionModal.tsx';
-import DiscussionResults from './DiscussionResults.tsx';
+} from "lucide-react";
+import { Card } from "../ui/card";
+import { Button } from "../ui/button";
+import discussionService, {
+  Discussion,
+} from "../../services/discussionService";
+import CreateDiscussionModal from "./CreateDiscussionModal.tsx";
+import DiscussionResults from "./DiscussionResults.tsx";
 
 export function InteractiveClassroom() {
   const [discussions, setDiscussions] = useState<Discussion[]>([]);
   const [loading, setLoading] = useState(true);
   const [showCreateModal, setShowCreateModal] = useState(false);
-  const [selectedDiscussion, setSelectedDiscussion] = useState<Discussion | null>(null);
-  const [filterType, setFilterType] = useState<string>('all');
-  const [filterStatus, setFilterStatus] = useState<string>('all');
+  const [selectedDiscussion, setSelectedDiscussion] =
+    useState<Discussion | null>(null);
+  const [filterType, setFilterType] = useState<string>("all");
+  const [filterStatus, setFilterStatus] = useState<string>("all");
 
   useEffect(() => {
     loadDiscussions();
@@ -37,13 +40,13 @@ export function InteractiveClassroom() {
     try {
       setLoading(true);
       const filters: any = {};
-      if (filterType !== 'all') filters.type = filterType;
-      if (filterStatus !== 'all') filters.status = filterStatus;
+      if (filterType !== "all") filters.type = filterType;
+      if (filterStatus !== "all") filters.status = filterStatus;
 
       const data = await discussionService.getTeacherDiscussions(filters);
       setDiscussions(data.discussions);
     } catch (error) {
-      console.error('Load discussions error:', error);
+      console.error("Load discussions error:", error);
     } finally {
       setLoading(false);
     }
@@ -55,7 +58,7 @@ export function InteractiveClassroom() {
       setShowCreateModal(false);
       loadDiscussions();
     } catch (error) {
-      console.error('Create discussion error:', error);
+      console.error("Create discussion error:", error);
     }
   };
 
@@ -64,60 +67,84 @@ export function InteractiveClassroom() {
       await discussionService.updateDiscussionStatus(id, status);
       loadDiscussions();
     } catch (error) {
-      console.error('Update status error:', error);
+      console.error("Update status error:", error);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Bạn có chắc muốn xóa thảo luận này?')) return;
+    if (!confirm("Bạn có chắc muốn xóa thảo luận này?")) return;
     try {
       await discussionService.deleteDiscussion(id);
       loadDiscussions();
     } catch (error) {
-      console.error('Delete error:', error);
+      console.error("Delete error:", error);
     }
   };
 
   const copyPinCode = (pinCode: string) => {
     navigator.clipboard.writeText(pinCode);
-    alert('Đã copy mã PIN!');
+    alert("Đã copy mã PIN!");
   };
 
   const discussionTypes = [
-    { id: 'all', label: 'Tất cả', icon: MessageSquare },
-    { id: 'poll', label: 'Khảo sát', icon: BarChart3 },
-    { id: 'qna', label: 'Hỏi đáp', icon: HelpCircle },
-    { id: 'wordcloud', label: 'Word Cloud', icon: Cloud },
-    { id: 'feedback', label: 'Ý kiến', icon: MessageCircle },
+    { id: "all", label: "Tất cả", icon: MessageSquare },
+    { id: "poll", label: "Khảo sát", icon: BarChart3 },
+    { id: "qna", label: "Hỏi đáp", icon: HelpCircle },
+    { id: "wordcloud", label: "Word Cloud", icon: Cloud },
+    { id: "feedback", label: "Ý kiến", icon: MessageCircle },
   ];
 
   const getTypeIcon = (type: string) => {
-    const typeObj = discussionTypes.find(t => t.id === type);
+    const typeObj = discussionTypes.find((t) => t.id === type);
     return typeObj ? typeObj.icon : MessageSquare;
   };
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'active': return 'bg-green-100 text-green-700';
-      case 'draft': return 'bg-gray-100 text-gray-700';
-      case 'closed': return 'bg-red-100 text-red-700';
-      default: return 'bg-gray-100 text-gray-700';
+      case "active":
+        return "bg-green-100 text-green-700";
+      case "draft":
+        return "bg-gray-100 text-gray-700";
+      case "closed":
+        return "bg-red-100 text-red-700";
+      default:
+        return "bg-gray-100 text-gray-700";
     }
   };
 
   const getStatusLabel = (status: string) => {
     switch (status) {
-      case 'active': return 'Đang diễn ra';
-      case 'draft': return 'Nháp';
-      case 'closed': return 'Đã đóng';
-      case 'archived': return 'Lưu trữ';
-      default: return status;
+      case "active":
+        return "Đang diễn ra";
+      case "draft":
+        return "Nháp";
+      case "closed":
+        return "Đã đóng";
+      case "archived":
+        return "Lưu trữ";
+      default:
+        return status;
     }
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 py-8">
-      <div className="container mx-auto px-4 max-w-7xl">
+    <div className="min-h-screen w-full relative bg-white py-8">
+      {/* Purple Glow Background */}
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `radial-gradient(circle at top right, rgba(173, 109, 244, 0.5), transparent 70%)`,
+          filter: "blur(80px)",
+        }}
+      />
+      <div
+        className="absolute inset-0 z-0"
+        style={{
+          backgroundImage: `radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.3), transparent 60%)`,
+          filter: "blur(80px)",
+        }}
+      />
+      <div className="container mx-auto px-4 max-w-7xl relative z-10">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -146,10 +173,10 @@ export function InteractiveClassroom() {
           {/* Filters */}
           <div className="flex gap-4 flex-wrap">
             <div className="flex gap-2">
-              {discussionTypes.map(type => (
+              {discussionTypes.map((type) => (
                 <Button
                   key={type.id}
-                  variant={filterType === type.id ? 'default' : 'outline'}
+                  variant={filterType === type.id ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterType(type.id)}
                   className="gap-2"
@@ -160,14 +187,14 @@ export function InteractiveClassroom() {
               ))}
             </div>
             <div className="flex gap-2">
-              {['all', 'active', 'draft', 'closed'].map(status => (
+              {["all", "active", "draft", "closed"].map((status) => (
                 <Button
                   key={status}
-                  variant={filterStatus === status ? 'default' : 'outline'}
+                  variant={filterStatus === status ? "default" : "outline"}
                   size="sm"
                   onClick={() => setFilterStatus(status)}
                 >
-                  {status === 'all' ? 'Tất cả' : getStatusLabel(status)}
+                  {status === "all" ? "Tất cả" : getStatusLabel(status)}
                 </Button>
               ))}
             </div>
@@ -216,7 +243,11 @@ export function InteractiveClassroom() {
                             <h3 className="font-semibold text-gray-900 line-clamp-1">
                               {discussion.title}
                             </h3>
-                            <span className={`text-xs px-2 py-1 rounded-full ${getStatusColor(discussion.status)}`}>
+                            <span
+                              className={`text-xs px-2 py-1 rounded-full ${getStatusColor(
+                                discussion.status
+                              )}`}
+                            >
                               {getStatusLabel(discussion.status)}
                             </span>
                           </div>
@@ -240,19 +271,21 @@ export function InteractiveClassroom() {
                             <Clock className="w-4 h-4" />
                             <span>
                               {new Date(discussion.expires_at) > new Date()
-                                ? 'Còn hiệu lực'
-                                : 'Hết hạn'}
+                                ? "Còn hiệu lực"
+                                : "Hết hạn"}
                             </span>
                           </div>
                         )}
                       </div>
 
                       {/* PIN Code */}
-                      {discussion.status === 'active' && (
+                      {discussion.status === "active" && (
                         <div className="bg-gradient-to-r from-blue-50 to-purple-50 rounded-lg p-3 mb-4">
                           <div className="flex items-center justify-between">
                             <div>
-                              <p className="text-xs text-gray-600 mb-1">Mã PIN</p>
+                              <p className="text-xs text-gray-600 mb-1">
+                                Mã PIN
+                              </p>
                               <p className="text-2xl font-bold text-blue-600 tracking-wider">
                                 {discussion.pin_code}
                               </p>
@@ -270,17 +303,22 @@ export function InteractiveClassroom() {
 
                       {/* Actions */}
                       <div className="flex gap-2">
-                        {discussion.status === 'draft' && (
+                        {discussion.status === "draft" && (
                           <Button
                             size="sm"
-                            onClick={() => handleStatusChange(discussion.discussion_id, 'active')}
+                            onClick={() =>
+                              handleStatusChange(
+                                discussion.discussion_id,
+                                "active"
+                              )
+                            }
                             className="flex-1 gap-2"
                           >
                             <Play className="w-4 h-4" />
                             Bắt đầu
                           </Button>
                         )}
-                        {discussion.status === 'active' && (
+                        {discussion.status === "active" && (
                           <>
                             <Button
                               size="sm"
@@ -294,13 +332,18 @@ export function InteractiveClassroom() {
                             <Button
                               size="sm"
                               variant="outline"
-                              onClick={() => handleStatusChange(discussion.discussion_id, 'closed')}
+                              onClick={() =>
+                                handleStatusChange(
+                                  discussion.discussion_id,
+                                  "closed"
+                                )
+                              }
                             >
                               <Pause className="w-4 h-4" />
                             </Button>
                           </>
                         )}
-                        {discussion.status === 'closed' && (
+                        {discussion.status === "closed" && (
                           <Button
                             size="sm"
                             variant="outline"
